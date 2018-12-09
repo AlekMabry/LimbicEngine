@@ -13,5 +13,51 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Source Files\RenderEngine">
+      <UniqueIdentifier>{1f7bf581-4edc-4c2c-afde-d3465ee67d38}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\RenderEngine">
+      <UniqueIdentifier>{1da35345-9b04-40df-8c0d-0c886f3b9b12}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="shaderLoader.cpp">
+      <Filter>Source Files\RenderEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="textureLoader.cpp">
+      <Filter>Source Files\RenderEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="contentLoader.cpp">
+      <Filter>Source Files\RenderEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="player.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="bspHandler.cpp">
+      <Filter>Source Files\RenderEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="render.cpp">
+      <Filter>Source Files\RenderEngine</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="shaderLoader.hpp">
+      <Filter>Header Files\RenderEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="textureLoader.hpp">
+      <Filter>Header Files\RenderEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="player.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="bspHandler.hpp">
+      <Filter>Header Files\RenderEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="render.hpp">
+      <Filter>Header Files\RenderEngine</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
