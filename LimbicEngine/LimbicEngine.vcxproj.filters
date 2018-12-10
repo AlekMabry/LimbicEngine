@@ -42,6 +42,9 @@
     <ClCompile Include="render.cpp">
       <Filter>Source Files\RenderEngine</Filter>
     </ClCompile>
+    <ClCompile Include="vtfHandler.cpp">
+      <Filter>Source Files\RenderEngine</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="shaderLoader.hpp">
@@ -57,6 +60,9 @@
       <Filter>Header Files\RenderEngine</Filter>
     </ClInclude>
     <ClInclude Include="render.hpp">
+      <Filter>Header Files\RenderEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="vtfHandler.hpp">
       <Filter>Header Files\RenderEngine</Filter>
     </ClInclude>
   </ItemGroup>

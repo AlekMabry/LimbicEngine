@@ -13,8 +13,13 @@ using namespace glm;
 #include "player.hpp"
 #include "bspHandler.hpp"
 #include "render.hpp"
+#include "vtfHandler.hpp"
 
 int main() {
+	vtfHandler vtfObject;
+	vtfObject.loadVTF("outpost731/textures/concrete.vtf");
+	vtfObject.printInfo();
+
 	GLFWwindow* window;
 	bspHandler bspObject;
 	render renderEngine(1024, 768, 90);
