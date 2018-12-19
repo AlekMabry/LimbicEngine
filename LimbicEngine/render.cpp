@@ -1,20 +1,12 @@
+#include "render.hpp"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <iostream>
 #include <vector>
 
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
-
-#include <glm.hpp>
-#include <gtc/matrix_transform.hpp>
-using namespace glm;
-
 #include "shaderLoader.hpp"
 #include "textureLoader.hpp"
-#include "player.hpp"
-#include "bspHandler.hpp"
-#include "render.hpp"
 
 render::render(int width, int height, float fov)
 {
@@ -53,64 +45,56 @@ render::render(int width, int height, float fov)
 	tex_missing = loadBMP_custom("outpost731/textures/missingTexture.bmp");
 }
 
-void render::bsp_loadBuffers()
-{
-	bsp->compileTris(map_triData, map_uvData, map_lightmap_uvData);
-
-	// Create the VAOs (Vertex Array Objects)
-	glGenVertexArrays(1, &VertexArrayID);
-	glBindVertexArray(VertexArrayID);
-
-	// Create buffers (VBO)
-	glGenBuffers(1, &map_vertexBuffer);
-	glBindBuffer(GL_ARRAY_BUFFER, map_vertexBuffer);
-	glBufferData(GL_ARRAY_BUFFER, map_triData.size() * sizeof(GLfloat), &map_triData[0], GL_STATIC_DRAW);
-
-	glGenBuffers(1, &map_uvBuffer);
-	glBindBuffer(GL_ARRAY_BUFFER, map_uvBuffer);
-	glBufferData(GL_ARRAY_BUFFER, map_uvData.size() * sizeof(GLfloat), &map_uvData[0], GL_STATIC_DRAW);
-
-	glGenBuffers(1, &map_lightmap_uvBuffer);
-	glBindBuffer(GL_ARRAY_BUFFER, map_lightmap_uvBuffer);
-	glBufferData(GL_ARRAY_BUFFER, map_lightmap_uvData.size() * sizeof(GLfloat), &map_lightmap_uvData[0], GL_STATIC_DRAW);
-}
-
-void render::renderFrame()
+void render::usePlayerPerspective()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	vec3 mainPlayerPos = mainPlayer->getPosition();
 	vec3 mainPlayerDir = mainPlayer->getDirection();
-	mat4 Projection = perspective(radians(FOV), (float) screenWidth / (float) screenHeight, (float) 0.1, (float) 2048.0);
-	mat4 View = lookAt(
+	gl_transform_projection = perspective(radians(FOV), (float) screenWidth / (float) screenHeight, (float) 0.1, (float) 2048.0);
+	gl_transform_view = lookAt(
 		mainPlayerPos,					// Camera position in world space
-		mainPlayerPos+mainPlayerDir,
+		mainPlayerPos + mainPlayerDir,
 		vec3(0, 0, 1)					//Head is up
 	);
+	gl_transform_world_view = gl_transform_projection * gl_transform_view;
+}
 
-	mat4 MATRIX_WORLD_VIEW_PROJECTION = Projection*View;
+void render::drawTris(int shader, int size, GLuint vertexData, GLuint uvData, float width, float height)
+{
+	/*
+	SETUP SHADER
+	Shader ID's are as follows:
+	0 - Full White
+	1 - Solid Texture
+	2 - Solid Texture Lightmap
+	3 - Transparent Texture
+	*/
 
 	glUseProgram(mapShader_default);
 
 	GLuint MatrixID = glGetUniformLocation(mapShader_default, "MATRIX_WORLD_VIEW_PROJECTION");
-	glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MATRIX_WORLD_VIEW_PROJECTION[0][0]);
+	glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &gl_transform_world_view[0][0]);
+
+	GLuint textureDimensions = glGetUniformLocation(mapShader_default, "in_texDimensions");
+	glUniform2f(textureDimensions, width, height);
 
 	glEnableVertexAttribArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, map_vertexBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, vertexData);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
 	glEnableVertexAttribArray(1);
-	glBindBuffer(GL_ARRAY_BUFFER, map_uvBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, uvData);
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
-	glEnableVertexAttribArray(2);
-	glBindBuffer(GL_ARRAY_BUFFER, map_lightmap_uvBuffer);
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
-	// Draw the triangle !
-	glDrawArrays(GL_TRIANGLES, 0, map_triData.size()); // Starting from vertex 0; 3 vertices total -> 1 triangle
+	// Draw the triangles
+	glDrawArrays(GL_TRIANGLES, 0, size); // Starting from vertex 0; 3 vertices total -> 1 triangle
 	glDisableVertexAttribArray(0);
+}
 
+void render::uploadFramebuffer()
+{
 	// Swap buffers
 	glfwSwapBuffers(window);
 	glfwPollEvents();
@@ -124,9 +108,4 @@ GLFWwindow * render::getWindowPointer()
 void render::setPlayerPointer(player * playerObject)
 {
 	mainPlayer = playerObject;
-}
-
-void render::setBspPointer(bspHandler* bspHandlerObject)
-{
-	bsp = bspHandlerObject;
 }

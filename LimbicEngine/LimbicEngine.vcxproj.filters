@@ -45,6 +45,9 @@
     <ClCompile Include="vtfHandler.cpp">
       <Filter>Source Files\RenderEngine</Filter>
     </ClCompile>
+    <ClCompile Include="wadLoader.cpp">
+      <Filter>Source Files\RenderEngine</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="shaderLoader.hpp">
@@ -63,6 +66,12 @@
       <Filter>Header Files\RenderEngine</Filter>
     </ClInclude>
     <ClInclude Include="vtfHandler.hpp">
+      <Filter>Header Files\RenderEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="wadLoader.hpp">
+      <Filter>Header Files\RenderEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="common.hpp">
       <Filter>Header Files\RenderEngine</Filter>
     </ClInclude>
   </ItemGroup>

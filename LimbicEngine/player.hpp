@@ -1,7 +1,11 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
+#include "common.hpp"
+
 class player {
+private:
+
 public:
 	vec3 pos;
 	float dir;
@@ -19,8 +23,6 @@ public:
 	vec3 getPosition();
 	vec3 getRight();
 	vec3 getUp();
-
-private:
 };
 
 #endif

@@ -1,9 +1,4 @@
-
-#include <GLFW/glfw3.h>
-
-#include <glm.hpp>
-#include <gtc/matrix_transform.hpp>
-using namespace glm;
+#pragma once
 
 #include "player.hpp"
 

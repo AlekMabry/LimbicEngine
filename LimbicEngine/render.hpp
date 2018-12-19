@@ -1,29 +1,20 @@
 #ifndef RENDER_HPP
 #define RENDER_HPP
 
+#include "common.hpp"
+#include "player.hpp"
+
 class render
 {
 private:
 	GLFWwindow* window;
 	player* mainPlayer;
 
+	mat4 gl_transform_projection;
+	mat4 gl_transform_view;
+	mat4 gl_transform_world_view;
+
 public:
-	// Pointers to other objects
-	bspHandler* bsp;
-
-	// Raw data
-	std::vector<GLfloat> map_triData;
-	std::vector<GLfloat> map_uvData;
-	std::vector<GLfloat> map_lightmap_uvData;
-
-	// VAO's
-	GLuint VertexArrayID;
-
-	// VBO's
-	GLuint map_vertexBuffer;
-	GLuint map_uvBuffer;
-	GLuint map_lightmap_uvBuffer;
-
 	// Temporary/Ect
 	GLuint tex_missing;
 
@@ -37,13 +28,13 @@ public:
 	float FOV;
 
 	render(int width, int height, float fov);
-	void bsp_loadBuffers();
-	void renderFrame();
+	void usePlayerPerspective();
+	void drawTris(int shader, int size, GLuint vertexData, GLuint uvData, float width, float height);
+	void uploadFramebuffer();
 	
 	// Getters and Setters
 	GLFWwindow* getWindowPointer();
 	void setPlayerPointer(player* playerObject);
-	void setBspPointer(bspHandler* bspHandlerObject);
 };
 
 #endif
