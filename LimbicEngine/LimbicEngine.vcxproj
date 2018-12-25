@@ -127,25 +127,21 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="bspHandler.cpp" />
     <ClCompile Include="contentLoader.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="map.cpp" />
     <ClCompile Include="player.cpp" />
     <ClCompile Include="render.cpp" />
     <ClCompile Include="shaderLoader.cpp" />
     <ClCompile Include="textureLoader.cpp" />
-    <ClCompile Include="vtfHandler.cpp" />
-    <ClCompile Include="wadLoader.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="bspHandler.hpp" />
     <ClInclude Include="common.hpp" />
+    <ClInclude Include="map.hpp" />
     <ClInclude Include="player.hpp" />
     <ClInclude Include="render.hpp" />
     <ClInclude Include="shaderLoader.hpp" />
     <ClInclude Include="textureLoader.hpp" />
-    <ClInclude Include="vtfHandler.hpp" />
-    <ClInclude Include="wadLoader.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
