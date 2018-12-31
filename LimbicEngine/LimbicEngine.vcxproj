@@ -86,12 +86,12 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(ProjectDir)\Libraries\glm\glm;$(ProjectDir)\Libraries\glfw-3.2.1\include;$(ProjectDir)\Libraries\glew-2.1.0\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)\Libraries\freetype-windows-binaries-master\include;$(ProjectDir)\Libraries\glm\glm;$(ProjectDir)\Libraries\glfw-3.2.1\include;$(ProjectDir)\Libraries\glew-2.1.0\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_MBCS;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>$(ProjectDir)\Libraries\glm\glm\Release;$(ProjectDir)\Libraries\glfw-3.2.1\lib-vc2015;$(ProjectDir)\Libraries\glew-2.1.0\lib\Release\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>glew32.lib;glfw3.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(ProjectDir)\Libraries\freetype-windows-binaries-master\win64;$(ProjectDir)\Libraries\glm\glm\Release;$(ProjectDir)\Libraries\glfw-3.2.1\lib-vc2015;$(ProjectDir)\Libraries\glew-2.1.0\lib\Release\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>glew32.lib;glfw3.lib;opengl32.lib;freetype.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -116,31 +116,35 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(ProjectDir)\Libraries\glm\glm;$(ProjectDir)\Libraries\glfw-3.2.1\include;$(ProjectDir)\Libraries\glew-2.1.0\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)\Libraries\freetype-windows-binaries-master\include;$(ProjectDir)\Libraries\glm\glm;$(ProjectDir)\Libraries\glfw-3.2.1\include;$(ProjectDir)\Libraries\glew-2.1.0\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>$(ProjectDir)\Libraries\glm\glm\Release;$(ProjectDir)\Libraries\glfw-3.2.1\lib-vc2015;$(ProjectDir)\Libraries\glew-2.1.0\lib\Release\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>glew32.lib;glfw3.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(ProjectDir)\Libraries\freetype-windows-binaries-master\win64;$(ProjectDir)\Libraries\glm\glm\Release;$(ProjectDir)\Libraries\glfw-3.2.1\lib-vc2015;$(ProjectDir)\Libraries\glew-2.1.0\lib\Release\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>glew32.lib;glfw3.lib;opengl32.lib;freetype.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="contentLoader.cpp" />
+    <ClCompile Include="hud.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="map.cpp" />
     <ClCompile Include="player.cpp" />
     <ClCompile Include="render.cpp" />
     <ClCompile Include="shaderLoader.cpp" />
+    <ClCompile Include="text.cpp" />
     <ClCompile Include="textureLoader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="common.hpp" />
+    <ClInclude Include="hud.hpp" />
     <ClInclude Include="map.hpp" />
     <ClInclude Include="player.hpp" />
     <ClInclude Include="render.hpp" />
     <ClInclude Include="shaderLoader.hpp" />
+    <ClInclude Include="text.hpp" />
     <ClInclude Include="textureLoader.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

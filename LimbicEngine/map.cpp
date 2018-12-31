@@ -82,6 +82,12 @@ int map::load(const char *bspname, const char *wadname)
 	}
 
 	// Load leaves
+	leafArrayLen = bspHeader.lump[LUMP_LEAVES].nLength / sizeof(dleave_t);
+	leafArray = new dleave_t[leafArrayLen];
+	fseek(bspFile, bspHeader.lump[LUMP_LEAVES].nOffset, SEEK_SET);
+	for (int i = 0; i < leafArrayLen; i++) {
+		fread(&leafArray[i], sizeof(dleave_t), 1, bspFile);
+	}
 
 	// Load marksurfaces
 	clipnodeArrayLen = bspHeader.lump[LUMP_CLIPNODES].nLength / sizeof(dclipnode_t);
@@ -243,6 +249,8 @@ int map::load(const char *bspname, const char *wadname)
 
 void map::compileBuffers()
 {
+	// Generate face array from visibility information
+
 	int edgeIndex, v;
 	dvec3_t vert0;
 	dvec3_t vert1;

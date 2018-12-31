@@ -30,6 +30,7 @@ public:
 	render(int width, int height, float fov);
 	void usePlayerPerspective();
 	void drawTris(int shader, int size, GLuint vertexData, GLuint uvData, float width, float height);
+	int draw_2D(int shader, int size, GLuint vertexData, GLuint uvData, float width);
 	void uploadFramebuffer();
 	
 	// Getters and Setters

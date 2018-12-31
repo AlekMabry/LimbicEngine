@@ -71,6 +71,11 @@ void render::drawTris(int shader, int size, GLuint vertexData, GLuint uvData, fl
 	3 - Transparent Texture
 	*/
 
+	//Enable depth test
+	glEnable(GL_DEPTH_TEST);
+	//Accept fragment if it is closer to the camera than the former one
+	glDepthFunc(GL_LESS);
+
 	glUseProgram(mapShader_default);
 
 	GLuint MatrixID = glGetUniformLocation(mapShader_default, "MATRIX_WORLD_VIEW_PROJECTION");

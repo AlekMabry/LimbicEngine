@@ -7,7 +7,7 @@ player::player(GLFWwindow* window) {
 	mouseSpeed = 0.005f;
 	pos.x = 256;
 	pos.y = 256;
-	pos.z = 256;
+	pos.z = 128;
 }
 
 void player::update() {

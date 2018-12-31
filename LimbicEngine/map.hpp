@@ -206,7 +206,8 @@ public:
 	// Lightmap
 	dclipnode_t* clipnodeArray;
 	int clipnodeArrayLen;
-	// Leaves
+	dleave_t* leafArray;
+	int leafArrayLen;
 	dmarksurface_t* marksurfaceArray;
 	int marksurfaceArrayLen;
 	dedge_t* edgeArray;

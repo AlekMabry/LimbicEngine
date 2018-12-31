@@ -42,6 +42,12 @@
     <ClCompile Include="map.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="hud.cpp">
+      <Filter>Source Files\RenderEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="text.cpp">
+      <Filter>Source Files\RenderEngine</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="shaderLoader.hpp">
@@ -61,6 +67,12 @@
     </ClInclude>
     <ClInclude Include="map.hpp">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="hud.hpp">
+      <Filter>Header Files\RenderEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="text.hpp">
+      <Filter>Header Files\RenderEngine</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
