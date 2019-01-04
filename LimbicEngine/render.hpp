@@ -1,41 +1,28 @@
 #ifndef RENDER_HPP
 #define RENDER_HPP
 
+#include "io.hpp"
 #include "common.hpp"
-#include "player.hpp"
+#include <vector>
 
 class render
 {
 private:
-	GLFWwindow* window;
-	player* mainPlayer;
-
-	mat4 gl_transform_projection;
-	mat4 gl_transform_view;
-	mat4 gl_transform_world_view;
-
 public:
-	// Temporary/Ect
-	GLuint tex_missing;
-
-	// Shaders
-	GLuint mapShader_default;
-	GLuint lightmap01;
-
+	io* statusStream;
+	
 	// Settings
 	int screenWidth;
 	int screenHeight;
 	float FOV;
 
-	render(int width, int height, float fov);
-	void usePlayerPerspective();
-	void drawTris(int shader, int size, GLuint vertexData, GLuint uvData, float width, float height);
-	int draw_2D(int shader, int size, GLuint vertexData, GLuint uvData, float width);
-	void uploadFramebuffer();
-	
-	// Getters and Setters
-	GLFWwindow* getWindowPointer();
-	void setPlayerPointer(player* playerObject);
+	virtual int openWAD(const char* fname);
+	virtual int addMatWAD(const char* texname, vec2 dimensions, int &id, int type);
+	virtual int closeWAD();
+	virtual int pushVertices(int iMat, std::vector<float> &vertData, std::vector<float> &uvData);
+	virtual int setWorldView(vec3 pos, vec3 dir, vec3 up, float fov);
+	virtual void render3D();
+	virtual int uploadFramebuffer();
 };
 
 #endif

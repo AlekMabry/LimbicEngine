@@ -58,13 +58,6 @@ struct dbspheader_t
 	dbsplump_t lump[HEADER_LUMPS]; // Stores the directory of lumps
 };
 
-struct dwadheader_t
-{
-	char szMagic[4];	// Should be WAD2/WAD3
-	int nDir;			// Number of directory entries
-	int nDirOffset;		// Offset into directory
-};
-
 struct dvec3_t
 {
 	float x;
@@ -163,24 +156,15 @@ typedef struct dmodel_t
 	int iFirstFace, nFaces;        // Index and count into faces
 };
 
-
+#ifndef DTEXDATA_T
+#define DTEXDATA_T
 struct dtexdata_t
 {
 	char szName[16];  // Name of texture
 	unsigned int nWidth, nHeight;     // Extends of the texture
 	unsigned int nOffsets[4]; // Offsets to texture mipmaps BSPMIPTEX;
 };
-
-struct dentry_t
-{
-	int nFilePos;		// Offset in WAD
-	int nDiskSize;		// Size in file
-	int nSize;			// Uncompressed size
-	byte nType;			// Type of entry
-	bool bCompression;	// 0 if none
-	short nDummy;		// Not used
-	char szName[16];	// Must be null terminated
-};
+#endif
 
 #pragma pack(pop)
 
@@ -221,25 +205,19 @@ public:
 	dtexheader_t texHeader;
 	dtexoffset_t* texoffsetArray;
 
-	// WAD File Vars
-	dwadheader_t wadHeader;
-	dentry_t* wadEntryArray;
-	int wadEntryArrayLen;
+	// Render Engine
+	std::vector<int> materialIndex;
 
-	// OpenGL Stuffs
-	GLuint* gl_maptextures;
-	GLuint gl_vao;
-	GLuint gl_vertexData;
-	GLuint gl_uvData;
-	std::vector<GLfloat> gl_vertexBuffers[128];
-	std::vector<GLfloat> gl_uvBuffers[128];
+	// Render Stuffs
+	std::vector<std::vector<float>> gl_vertexBuffers;
+	std::vector<std::vector<float>> gl_uvBuffers;
 
 	// Handles
 	render* renderHandle;
 
+	map(render* rHandle);
 	int load(const char *bspname, const char *wadname);
 	void compileBuffers();
-	void renderMap();
-
+	void pushBuffers();
 	void setRenderHandle(render* handle);
 };

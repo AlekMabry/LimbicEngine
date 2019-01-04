@@ -2,8 +2,9 @@
 
 #include "player.hpp"
 
-player::player(GLFWwindow* window) {
-	windowPointer = window;
+player::player(GLFWwindow* wHandle, render* rHandle) {
+	window = wHandle;
+	renderHandle = rHandle;
 	mouseSpeed = 0.005f;
 	pos.x = 256;
 	pos.y = 256;
@@ -12,11 +13,11 @@ player::player(GLFWwindow* window) {
 
 void player::update() {
 	double xpos, ypos;
-	glfwGetCursorPos(windowPointer, &xpos, &ypos);
-	glfwSetCursorPos(windowPointer, 1024 / 2, 768 / 2);
+	glfwGetCursorPos(window, &xpos, &ypos);
+	glfwSetCursorPos(window, 1280 / 2, 720 / 2);
 
-	dir += mouseSpeed * float(1024 / 2 - xpos);
-	pitch += mouseSpeed * float(768 / 2 - ypos);
+	dir += mouseSpeed * float(1280 / 2 - xpos);
+	pitch += mouseSpeed * float(720 / 2 - ypos);
 
 	// Unit vector in the direction the player is facing
 	dirVector.x = cos(dir) * cos(pitch);
@@ -33,22 +34,27 @@ void player::update() {
 	
 	
 	// Move forward
-	if (glfwGetKey(windowPointer, GLFW_KEY_UP) == GLFW_PRESS) {
+	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
 		pos += dirVector * (float) 2; // deltaTime * speed;
 	}
 	// Move backward
-	if (glfwGetKey(windowPointer, GLFW_KEY_DOWN) == GLFW_PRESS) {
+	if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
 		pos -= dirVector * (float) 2; // deltaTime * speed;
 	}
 	// Strafe right
-	if (glfwGetKey(windowPointer, GLFW_KEY_RIGHT) == GLFW_PRESS) {
+	if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
 		pos += rightVector * (float) 2; // deltaTime * speed;
 	}
 	// Strafe left
-	if (glfwGetKey(windowPointer, GLFW_KEY_LEFT) == GLFW_PRESS) {
+	if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
 		pos -= rightVector * (float) 2; // deltaTime * speed;
 	}
 	
+}
+
+void player::pushPerspective()
+{
+	renderHandle->setWorldView(getPosition(), getDirection(), getUp() ,90);
 }
 
 vec3 player::getDirection()

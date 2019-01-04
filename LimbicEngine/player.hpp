@@ -2,6 +2,7 @@
 #define PLAYER_H
 
 #include "common.hpp"
+#include "render.hpp"
 
 class player {
 private:
@@ -11,14 +12,17 @@ public:
 	float dir;
 	float pitch;
 	float mouseSpeed;
-	GLFWwindow* windowPointer;
+
+	GLFWwindow* window;
+	render* renderHandle;
 
 	vec3 dirVector;
 	vec3 rightVector;
 	vec3 upVector;
 
-	player(GLFWwindow * window);
+	player(GLFWwindow* wHandle, render* rHandle);
 	void update();
+	void pushPerspective();
 	vec3 getDirection();
 	vec3 getPosition();
 	vec3 getRight();

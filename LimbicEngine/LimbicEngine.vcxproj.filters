@@ -36,16 +36,16 @@
     <ClCompile Include="player.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="render.cpp">
-      <Filter>Source Files\RenderEngine</Filter>
-    </ClCompile>
     <ClCompile Include="map.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="hud.cpp">
+    <ClCompile Include="pc_gl_render.cpp">
       <Filter>Source Files\RenderEngine</Filter>
     </ClCompile>
-    <ClCompile Include="text.cpp">
+    <ClCompile Include="io.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="render.cpp">
       <Filter>Source Files\RenderEngine</Filter>
     </ClCompile>
   </ItemGroup>
@@ -68,11 +68,11 @@
     <ClInclude Include="map.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="hud.hpp">
+    <ClInclude Include="pc_gl_render.hpp">
       <Filter>Header Files\RenderEngine</Filter>
     </ClInclude>
-    <ClInclude Include="text.hpp">
-      <Filter>Header Files\RenderEngine</Filter>
+    <ClInclude Include="io.hpp">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

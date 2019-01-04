@@ -128,23 +128,23 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="contentLoader.cpp" />
-    <ClCompile Include="hud.cpp" />
+    <ClCompile Include="io.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="map.cpp" />
+    <ClCompile Include="pc_gl_render.cpp" />
     <ClCompile Include="player.cpp" />
     <ClCompile Include="render.cpp" />
     <ClCompile Include="shaderLoader.cpp" />
-    <ClCompile Include="text.cpp" />
     <ClCompile Include="textureLoader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="common.hpp" />
-    <ClInclude Include="hud.hpp" />
+    <ClInclude Include="io.hpp" />
     <ClInclude Include="map.hpp" />
+    <ClInclude Include="pc_gl_render.hpp" />
     <ClInclude Include="player.hpp" />
     <ClInclude Include="render.hpp" />
     <ClInclude Include="shaderLoader.hpp" />
-    <ClInclude Include="text.hpp" />
     <ClInclude Include="textureLoader.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
