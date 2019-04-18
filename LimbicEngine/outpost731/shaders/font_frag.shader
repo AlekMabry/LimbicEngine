@@ -1,12 +1,15 @@
 #version 330 core
-in vec2 TexCoords;
-out vec4 color;
+in vec2 UV;
 
-uniform sampler2D text;
-uniform vec3 textColor;
+uniform mat4 MATRIX_WORLD_VIEW_PROJECTION;
+uniform vec2 in_texDimensions;
+uniform vec3 in_color;
+uniform sampler2D fontAtlas;
+
+out vec3 color;
 
 void main()
 {    
-    vec4 sampled = vec4(1.0, 1.0, 1.0, texture(text, TexCoords).r);
-    color = vec4(textColor, 1.0) * sampled;
+    vec4 sampled = fontAtlas(UV / in_texDimensions).rgb;
+    color = in_color * sampled;
 }

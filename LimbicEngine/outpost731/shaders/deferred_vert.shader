@@ -12,12 +12,14 @@ uniform vec2 in_texDimensions;
 
 out vec2 uv;
 out vec3 norm;
+out vec3 pos;
 out vec2 texDimensions;
   
 void main(){
   uv = in_uv;
-  norm = MATRIX_NORMAL_VIEW_PROJECTION * in_norm;
+  norm = in_norm;
   texDimensions = in_texDimensions;
+  pos = in_position;
   // Output position of the vertex, in clip space : MATRIX_WORLD_VIEW_PROJECTION * position
   gl_Position =  MATRIX_WORLD_VIEW_PROJECTION * vec4(in_position,1);
 }
