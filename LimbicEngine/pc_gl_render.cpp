@@ -35,6 +35,8 @@ pc_gl_render::pc_gl_render(io* inOutStream, int w, int h, float fov)
 
 	// Load shaders and compile
 	opaqueShader = LoadShaders("outpost731/shaders/map_default_vert.shader", "outpost731/shaders/map_default_frag.shader");
+	deferred_firstPassShader = LoadShaders("outpost731/shaders/deferred_vert.shader", "outpost731/shaders/deferred_frag.shader");
+	debugShader = LoadShaders("outpost731/shaders/debug_vert.shader", "outpost731/shaders/debug_frag.shader");
 
 	// Load textures
 	tex_missing = loadBMP_custom("outpost731/textures/missingTexture.bmp");
@@ -42,6 +44,122 @@ pc_gl_render::pc_gl_render(io* inOutStream, int w, int h, float fov)
 	// Create the VAOs (Vertex Array Objects)
 	glGenVertexArrays(1, &gl_vao);
 	glBindVertexArray(gl_vao);
+
+	// Generate Framebuffers
+	glGenFramebuffers(1, &gBuffer);
+	glBindFramebuffer(GL_FRAMEBUFFER, gBuffer);
+
+	// Position Color Buffer
+	glGenTextures(1, &gPosition);
+	glBindTexture(GL_TEXTURE_2D, gPosition);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, screenWidth, screenHeight, 0, GL_RGB, GL_FLOAT, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, gPosition, 0);
+
+	// Normal Color Buffer
+	glGenTextures(1, &gNormal);
+	glBindTexture(GL_TEXTURE_2D, gNormal);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, screenWidth, screenHeight, 0, GL_RGB, GL_FLOAT, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, gNormal, 0);
+
+	// Albedo and Specular Buffer
+	glGenTextures(1, &gAlbedoSpec);
+	glBindTexture(GL_TEXTURE_2D, gAlbedoSpec);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, screenWidth, screenHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, gAlbedoSpec, 0);
+
+	// Depth/Stencil Buffer
+	glGenRenderbuffers(1, &gDepthStencil);
+	glBindRenderbuffer(GL_RENDERBUFFER, gDepthStencil);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, screenWidth, screenHeight);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, gDepthStencil);
+
+	gAttachments[0] = GL_COLOR_ATTACHMENT0;
+	gAttachments[1] = GL_COLOR_ATTACHMENT1;
+	gAttachments[2] = GL_COLOR_ATTACHMENT2;
+
+	float verts[] = {
+		// Top Left Quad
+		-1.0, 0.0,
+		0.0, 0.0,
+		0.0, 1.0,
+		0.0, 1.0,
+		-1.0, 1.0,
+		-1.0, 0.0,
+		// Top Right Quad
+		0.0, 0.0,
+		1.0, 0.0,
+		1.0, 1.0,
+		1.0, 1.0,
+		0.0, 1.0,
+		0.0, 0.0,
+		// Bottom Left Quad
+		-1.0, -1.0,
+		0.0, -1.0,
+		0.0, 0.0,
+		0.0, 0.0,
+		-1.0, 0.0,
+		-1.0, -1.0,
+		// Bottom Right Quad
+		0.0, -1.0,
+		1.0, -1.0,
+		1.0, 0.0,
+		1.0, 0.0,
+		0.0, 0.0,
+		0.0, -1.0,
+		// Fullscreen Quad
+		-1.0, 1.0,
+		-1.0, -1.0,
+		1.0, -1.0,
+		1.0, -1.0,
+		1.0, 1.0,
+		-1.0, 1.0
+	};
+	float uvs[] = {
+		0.0, 0.0,	// bottom left
+		1.0, 0.0,	// bottom right
+		1.0, 1.0,	// top right
+		1.0, 1.0,	// top right
+		0,	1.0,	// top left
+		0.0, 0.0,	// bottom left
+		0.0, 0.0,	// bottom left
+		1.0, 0.0,	// bottom right
+		1.0, 1.0,	// top right
+		1.0, 1.0,	// top right
+		0,	1.0,	// top left
+		0.0, 0.0,	// bottom left
+		0.0, 0.0,	// bottom left
+		1.0, 0.0,	// bottom right
+		1.0, 1.0,	// top right
+		1.0, 1.0,	// top right
+		0,	1.0,	// top left
+		0.0, 0.0,	// bottom left
+		0.0, 0.0,	// bottom left
+		1.0, 0.0,	// bottom right
+		1.0, 1.0,	// top right
+		1.0, 1.0,	// top right
+		0,	1.0,	// top left
+		0.0, 0.0,	// bottom left
+		0.0, 0.0,	// bottom left
+		1.0, 0.0,	// bottom right
+		1.0, 1.0,	// top right
+		1.0, 1.0,	// top right
+		0,	1.0,	// top left
+		0.0, 0.0	// bottom left
+	};
+
+	// Load Debug Quad
+	glGenBuffers(1, &gl_fourQuad_vertData);
+	glGenBuffers(1, &gl_fourQuad_uvData);
+	glBindBuffer(GL_ARRAY_BUFFER, gl_fourQuad_vertData);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(verts), verts, GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, gl_fourQuad_uvData);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(uvs), uvs, GL_STATIC_DRAW);
 }
 
 int pc_gl_render::openWAD(const char* fname)
@@ -169,14 +287,17 @@ int pc_gl_render::closeWAD()
 	return STATUS_SUCCESS;
 }
 
-int pc_gl_render::pushVertices(int iMat, std::vector<float> &vertData, std::vector<float> &uvData)
+int pc_gl_render::pushVertices(int iMat, std::vector<float> &vertData, std::vector<float> &uvData, std::vector<float> &normData)
 {
 	GLuint gl_vertData;
 	GLuint gl_uvData;
+	GLuint gl_normData;
+
 	int size;
 
 	glGenBuffers(1, &gl_vertData);
 	glGenBuffers(1, &gl_uvData);
+	glGenBuffers(1, &gl_normData);
 
 	glBindBuffer(GL_ARRAY_BUFFER, gl_vertData);
 	glBufferData(GL_ARRAY_BUFFER, vertData.size() * sizeof(float), &vertData[0], GL_DYNAMIC_DRAW);
@@ -184,11 +305,15 @@ int pc_gl_render::pushVertices(int iMat, std::vector<float> &vertData, std::vect
 	glBindBuffer(GL_ARRAY_BUFFER, gl_uvData);
 	glBufferData(GL_ARRAY_BUFFER, uvData.size() * sizeof(float), &uvData[0], GL_DYNAMIC_DRAW);
 
+	glBindBuffer(GL_ARRAY_BUFFER, gl_normData);
+	glBufferData(GL_ARRAY_BUFFER, normData.size() * sizeof(float), &normData[0], GL_DYNAMIC_DRAW);
+
 	size = vertData.size();
 
 	matArray[iMat].size.push_back(size);
 	matArray[iMat].vertData.push_back(gl_vertData);
 	matArray[iMat].uvData.push_back(gl_uvData);
+	matArray[iMat].normData.push_back(gl_normData);
 
 	return STATUS_SUCCESS;
 }
@@ -202,26 +327,36 @@ int pc_gl_render::setWorldView(vec3 pos, vec3 dir, vec3 up, float fov)
 		up					//Head is up
 	);
 	world_gl_transform_world_view = world_gl_transform_projection * world_gl_transform_view;
+	world_gl_normal_view = inverseTranspose(mat3(world_gl_transform_world_view));
 
 	return STATUS_SUCCESS;
 }
 
 void pc_gl_render::render3D()
 {
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glDisable(GL_CULL_FACE);
 
-	glEnable(GL_DEPTH_TEST);
-	glDepthFunc(GL_LESS);
+	glUseProgram(deferred_firstPassShader);
 
-	glUseProgram(opaqueShader);
-
-	GLuint MatrixID = glGetUniformLocation(opaqueShader, "MATRIX_WORLD_VIEW_PROJECTION");
+	GLuint MatrixID = glGetUniformLocation(deferred_firstPassShader, "MATRIX_WORLD_VIEW_PROJECTION");
 	glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &world_gl_transform_world_view[0][0]);
 
-	GLuint textureDimensions = glGetUniformLocation(opaqueShader, "in_texDimensions");
+	GLuint NormalMatrixID = glGetUniformLocation(deferred_firstPassShader, "MATRIX_NORMAL_VIEW_PROJECTION");
+	glUniformMatrix3fv(NormalMatrixID, 1, GL_FALSE, &world_gl_normal_view[0][0]);
+
+	GLuint textureDimensions = glGetUniformLocation(deferred_firstPassShader, "in_texDimensions");
 
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
+	glEnableVertexAttribArray(2);
+
+	// Change to first-pass buffers
+	glDrawBuffers(3, gAttachments);
+	glBindFramebuffer(GL_FRAMEBUFFER, gBuffer);
+	glBindRenderbuffer(GL_RENDERBUFFER, gDepthStencil);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LESS);
 
 	for (int i = 0; i < matArray.size(); i++)
 	{
@@ -236,16 +371,50 @@ void pc_gl_render::render3D()
 			glBindBuffer(GL_ARRAY_BUFFER, matArray[i].uvData[j]);
 			glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
+			glBindBuffer(GL_ARRAY_BUFFER, matArray[i].normData[j]);
+			glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+
 			glDrawArrays(GL_TRIANGLES, 0, matArray[i].size[j]);
 
 			glDeleteBuffers(1, &matArray[i].vertData[j]);
 			glDeleteBuffers(1, &matArray[i].uvData[j]);
+			glDeleteBuffers(1, &matArray[i].normData[j]);
 		}
 
 		matArray[i].vertData.clear();
 		matArray[i].uvData.clear();
+		matArray[i].normData.clear();
 		matArray[i].size.clear();
 	}
+
+	// Now draw gBuffer to display
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glBindRenderbuffer(GL_RENDERBUFFER, 0);
+
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LESS);
+	glUseProgram(debugShader);
+	glEnableVertexAttribArray(0);
+
+	// Set Quad Models
+	glBindBuffer(GL_ARRAY_BUFFER, gl_fourQuad_vertData);
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
+	glBindBuffer(GL_ARRAY_BUFFER, gl_fourQuad_uvData);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
+
+	// Albedo Texture in top left
+	glBindTexture(GL_TEXTURE_2D, gAlbedoSpec);
+	glDrawArrays(GL_TRIANGLES, 0, 6);
+
+	// Normal Texture in top right
+	glBindTexture(GL_TEXTURE_2D, gNormal);
+	glDrawArrays(GL_TRIANGLES, 6, 6);
+
+	// Normal Texture in bottom left
+	glBindTexture(GL_TEXTURE_2D, gPosition);
+	glDrawArrays(GL_TRIANGLES, 12, 6);
+
 }
 
 int pc_gl_render::uploadFramebuffer()

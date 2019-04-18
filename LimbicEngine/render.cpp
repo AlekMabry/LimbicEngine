@@ -15,7 +15,7 @@ int render::closeWAD()
 	return -1;
 }
 
-int render::pushVertices(int iMat, std::vector<float> &vertData, std::vector<float> &uvData)
+int render::pushVertices(int iMat, std::vector<float> &vertData, std::vector<float> &uvData, std::vector<float> &normData)
 {
 	return -1;
 }

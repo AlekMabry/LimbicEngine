@@ -147,7 +147,7 @@ struct dsurfedge_t
 	int iEdgeID;		// Index into dedge_t array	
 };
 
-typedef struct dmodel_t
+struct dmodel_t
 {
 	float nMins[3], nMaxs[3];          // Defines bounding box
 	dvec3_t vOrigin;                  // Coordinates to move the // coordinate system
@@ -211,6 +211,7 @@ public:
 	// Render Stuffs
 	std::vector<std::vector<float>> gl_vertexBuffers;
 	std::vector<std::vector<float>> gl_uvBuffers;
+	std::vector<std::vector<float>> gl_normBuffers;
 
 	// Handles
 	render* renderHandle;

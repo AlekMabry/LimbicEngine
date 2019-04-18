@@ -49,6 +49,7 @@ struct d_material_opaque
 	std::vector<int> size;		// Length of vertex data
 	std::vector<GLuint> vertData;	// Contains array of vertex data
 	std::vector<GLuint> uvData;	// Contains array of vertex data
+	std::vector<GLuint> normData;	// Contains array of normal data
 };
 
 class pc_gl_render :public render
@@ -59,6 +60,12 @@ private:
 
 	// Shaders
 	GLuint opaqueShader;
+	GLuint deferred_firstPassShader;
+	GLuint debugShader;
+
+	// Four Quad VBO
+	GLuint gl_fourQuad_vertData;
+	GLuint gl_fourQuad_uvData;
 
 	// One vao, multiple VAOs is a waste of state change
 	GLuint gl_vao;
@@ -67,6 +74,7 @@ private:
 	mat4 world_gl_transform_projection;
 	mat4 world_gl_transform_view;
 	mat4 world_gl_transform_world_view;
+	mat3 world_gl_normal_view;
 
 	std::vector<d_material_opaque> matArray;
 
@@ -76,12 +84,20 @@ private:
 	dentry_t* wadEntryArray;
 	int wadEntryArrayLen;
 
+	// Framebuffers for Deferred Rendering
+	GLuint gBuffer;
+	GLuint gPosition;
+	GLuint gNormal;
+	GLuint gAlbedoSpec;
+	GLuint gAttachments[3];
+	GLuint gDepthStencil;
+
 public:
 	pc_gl_render(io* inOutStream, int w, int h, float fov);
 	int openWAD(const char* fname);
 	int addMatWAD(const char* texname, vec2 dimensions, int &id, int type);
 	int closeWAD();
-	int pushVertices(int iMat, std::vector<float> &vertData, std::vector<float> &uvData);
+	int pushVertices(int iMat, std::vector<float> &vertData, std::vector<float> &uvData, std::vector<float> &normData);
 	int setWorldView(vec3 pos, vec3 dir, vec3 up, float fov);
 	void render3D();
 	int uploadFramebuffer();

@@ -176,6 +176,7 @@ void map::compileBuffers()
 
 	gl_vertexBuffers.clear();
 	gl_uvBuffers.clear();
+	gl_normBuffers.clear();
 
 	/*
 	The renderer draws regular opaque surfaces first then draws transparent surfaces like glass.
@@ -188,10 +189,26 @@ void map::compileBuffers()
 	{
 		std::vector<float> temp_vertData;
 		std::vector<float> temp_uvData;
+		std::vector<float> temp_normData;
 
 		// Iterate through every face on the map to find if it matches the current texture
 		for (int i = 0; i < faceArrayLen; i++) {
 			short texInfoIndex = faceArray[i].iTextureInfo;
+
+			vec3 normal;
+			short normMultiplier = faceArray[i].nPlaneSide;
+			if (normMultiplier == 0)
+			{
+				normal.x = planeArray[faceArray[i].iPlane].vNorm.x;
+				normal.y = planeArray[faceArray[i].iPlane].vNorm.y;
+				normal.z = planeArray[faceArray[i].iPlane].vNorm.z;
+			}
+			else
+			{
+				normal.x = -planeArray[faceArray[i].iPlane].vNorm.x;
+				normal.y = -planeArray[faceArray[i].iPlane].vNorm.y;
+				normal.z = -planeArray[faceArray[i].iPlane].vNorm.z;
+			}
 
 			// Check to see if current face matches the current texture
 			if (texinfoArray[texInfoIndex].iMiptex == texID)
@@ -263,6 +280,16 @@ void map::compileBuffers()
 					temp_uvData.push_back(uv2[0]);
 					temp_uvData.push_back(uv2[1]);
 
+					temp_normData.push_back(normal.x);
+					temp_normData.push_back(normal.y);
+					temp_normData.push_back(normal.z);
+					temp_normData.push_back(normal.x);
+					temp_normData.push_back(normal.y);
+					temp_normData.push_back(normal.z);
+					temp_normData.push_back(normal.x);
+					temp_normData.push_back(normal.y);
+					temp_normData.push_back(normal.z);
+
 					vert1 = vert2;
 					uv1[0] = uv2[0];
 					uv1[1] = uv2[1];
@@ -271,6 +298,7 @@ void map::compileBuffers()
 		}
 		gl_vertexBuffers.push_back(temp_vertData);
 		gl_uvBuffers.push_back(temp_uvData);
+		gl_normBuffers.push_back(temp_normData);
 	}
 }
 
@@ -280,7 +308,7 @@ void map::pushBuffers()
 	{
 		if (gl_vertexBuffers[i].size() != 0)
 		{
-			renderHandle->pushVertices(materialIndex[i], gl_vertexBuffers[i], gl_uvBuffers[i]);
+			renderHandle->pushVertices(materialIndex[i], gl_vertexBuffers[i], gl_uvBuffers[i], gl_normBuffers[i]);
 		}
 	}
 }

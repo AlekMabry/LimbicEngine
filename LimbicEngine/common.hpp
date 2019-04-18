@@ -8,6 +8,7 @@
 
 #include <glm.hpp>
 #include <gtc/matrix_transform.hpp>
+#include <gtc/matrix_inverse.hpp>
 using namespace glm;
 
 #endif
