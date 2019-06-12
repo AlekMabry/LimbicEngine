@@ -1,5 +1,9 @@
 #pragma once
+
+#ifdef WINDOWS
 #include <windows.h>
+#endif
+
 #include <stdio.h>
 #include <vector>
 #include <stdint.h>
@@ -107,7 +111,7 @@ struct dface_t
 	unsigned int iFirstEdge;		// Index of the first surfedge
 	unsigned short nEdges;			// Number of consecutive surfedges
 	unsigned short iTextureInfo;	// Index of the texture info structure
-	byte nStyles[4];				// Specify lighting styles
+	char nStyles[4];				// Specify lighting styles
 	unsigned int nLightmapOffset;	// Offsets into the raw lightmap data
 };
 

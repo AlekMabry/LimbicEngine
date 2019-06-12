@@ -164,7 +164,12 @@ pc_gl_render::pc_gl_render(io* inOutStream, int w, int h, float fov)
 
 int pc_gl_render::openWAD(const char* fname)
 {
-	if (fopen_s(&wadFile, fname, "rb"))
+    #ifdef WINDOWS
+    if (fopen_s(&wadFile, fname, "rb"))
+    #else
+    wadFile = fopen(fname, "rb");
+    if (wadFile == NULL)
+    #endif
 	{
 		statusStream->submitError("WAD failed to open!");
 		return STATUS_FAILEDLOAD;
@@ -196,14 +201,22 @@ int pc_gl_render::addMatWAD(const char* texname, vec2 dimensions, int &id, int t
 
 	// First find the texture itself in the WAD entry list
 	int texID_wad = -1;
+    #ifdef WINDOWS
 	std::string strA = _strdup(texname);
+    #else
+    std::string strA = strdup(texname);
+    #endif
 	for (int c = 0; c < strA.size(); c++)
 	{
 		strA[c] = toupper(strA[c]);
 	}
 	for (int j = 0; j < wadEntryArrayLen; j++)
 	{
+        #ifdef WINDOWS
 		std::string strB = _strdup(wadEntryArray[j].szName);
+        #else
+        std::string strB = strdup(wadEntryArray[j].szName);
+        #endif
 		// for (int k = 0; k < 16; k++)
 		for (int k = 0; k < strB.size(); k++)
 		{

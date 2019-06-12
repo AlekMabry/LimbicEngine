@@ -2,7 +2,10 @@
 #ifndef PC_GL_RENDER_H
 #define PC_GL_RENDER_H
 
-#include <Windows.h>
+#ifdef WINDOWS
+#include <windows.h>
+#endif
+
 #include "render.hpp"
 #include "error.hpp"
 #include "common.hpp"
@@ -23,7 +26,7 @@ struct dentry_t
 	int nFilePos;		// Offset in WAD
 	int nDiskSize;		// Size in file
 	int nSize;			// Uncompressed size
-	byte nType;			// Type of entry
+	char nType;			// Type of entry
 	bool bCompression;	// 0 if none
 	short nDummy;		// Not used
 	char szName[16];	// Must be null terminated

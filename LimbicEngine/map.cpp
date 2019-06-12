@@ -9,7 +9,12 @@ int map::load(const char *bspname, const char *wadname)
 {
 	FILE* bspFile;
 
+    #ifdef WINDOWS
 	if (fopen_s(&bspFile, bspname, "rb"))
+    #else
+	bspFile = fopen(bspname, "rb");
+	if (bspFile == NULL)
+    #endif
 	{
 		fprintf(stderr, "[ERROR] BSP failed to open!\n");
 	}
