@@ -19,8 +19,11 @@
 [Xx]86/
 [Bb]uild/
 bld/
-[Bb]in/
+# [Bb]in/
 [Oo]bj/
+bin/LimbicEditor
+bin/LimbicEngine
+cmake-build-debug/
 
 # Visual Studio 2015 cache/options directory
 .vs/
@@ -241,3 +244,5 @@ ModelManifest.xml
 # FAKE - F# Make
 .fake/
 # *.bsp
+
+
