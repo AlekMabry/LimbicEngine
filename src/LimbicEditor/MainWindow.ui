@@ -14,362 +14,337 @@
    <string>Limbic Editor</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QTabWidget" name="tabWidget">
-    <property name="geometry">
-     <rect>
-      <x>0</x>
-      <y>-10</y>
-      <width>1291</width>
-      <height>701</height>
-     </rect>
-    </property>
-    <property name="currentIndex">
-     <number>1</number>
-    </property>
-    <widget class="QWidget" name="tabLevelView">
-     <attribute name="title">
-      <string>Level</string>
-     </attribute>
-     <widget class="QOpenGLWidget" name="openGLWidget">
-      <property name="geometry">
-       <rect>
-        <x>9</x>
-        <y>9</y>
-        <width>971</width>
-        <height>611</height>
-       </rect>
+   <layout class="QGridLayout" name="gridLayout">
+    <item row="0" column="0">
+     <widget class="QTabWidget" name="tabWidget">
+      <property name="currentIndex">
+       <number>1</number>
       </property>
-     </widget>
-     <widget class="QScrollArea" name="scrollArea">
-      <property name="geometry">
-       <rect>
-        <x>990</x>
-        <y>10</y>
-        <width>281</width>
-        <height>611</height>
-       </rect>
-      </property>
-      <property name="widgetResizable">
-       <bool>true</bool>
-      </property>
-      <widget class="QWidget" name="scrollAreaWidgetContents">
-       <property name="geometry">
-        <rect>
-         <x>0</x>
-         <y>0</y>
-         <width>277</width>
-         <height>607</height>
-        </rect>
-       </property>
-       <widget class="QTreeWidget" name="treeWidget">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>10</y>
-          <width>256</width>
-          <height>192</height>
-         </rect>
-        </property>
-        <column>
-         <property name="text">
-          <string notr="true">1</string>
-         </property>
-        </column>
-       </widget>
-       <widget class="QLabel" name="labelX">
-        <property name="geometry">
-         <rect>
-          <x>20</x>
-          <y>230</y>
-          <width>21</width>
-          <height>19</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>X:</string>
-        </property>
-       </widget>
-       <widget class="QLabel" name="labelY">
-        <property name="geometry">
-         <rect>
-          <x>20</x>
-          <y>250</y>
-          <width>21</width>
-          <height>19</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>Y:</string>
-        </property>
-       </widget>
-       <widget class="QLabel" name="labelZ">
-        <property name="geometry">
-         <rect>
-          <x>20</x>
-          <y>270</y>
-          <width>21</width>
-          <height>19</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>Z:</string>
-        </property>
-       </widget>
-       <widget class="QPlainTextEdit" name="pTextEdit_X">
-        <property name="geometry">
-         <rect>
-          <x>40</x>
-          <y>230</y>
-          <width>111</width>
-          <height>21</height>
-         </rect>
-        </property>
-       </widget>
-       <widget class="QPlainTextEdit" name="pTextEdit_Y">
-        <property name="geometry">
-         <rect>
-          <x>40</x>
-          <y>250</y>
-          <width>111</width>
-          <height>21</height>
-         </rect>
-        </property>
-       </widget>
-       <widget class="QPlainTextEdit" name="pTextEdit_Z">
-        <property name="geometry">
-         <rect>
-          <x>40</x>
-          <y>270</y>
-          <width>111</width>
-          <height>21</height>
-         </rect>
-        </property>
-       </widget>
-       <widget class="QPlainTextEdit" name="pTextEdit_xAngle">
-        <property name="geometry">
-         <rect>
-          <x>150</x>
-          <y>230</y>
-          <width>111</width>
-          <height>21</height>
-         </rect>
-        </property>
-       </widget>
-       <widget class="QPlainTextEdit" name="pTextEdit_zAngle">
-        <property name="geometry">
-         <rect>
-          <x>150</x>
-          <y>270</y>
-          <width>111</width>
-          <height>21</height>
-         </rect>
-        </property>
-       </widget>
-       <widget class="QPlainTextEdit" name="pTextEdit_yAngle">
-        <property name="geometry">
-         <rect>
-          <x>150</x>
-          <y>250</y>
-          <width>111</width>
-          <height>21</height>
-         </rect>
-        </property>
-       </widget>
-       <widget class="QLabel" name="labelPosition">
-        <property name="geometry">
-         <rect>
-          <x>70</x>
-          <y>210</y>
-          <width>67</width>
-          <height>19</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>Position</string>
-        </property>
-       </widget>
-       <widget class="QLabel" name="labelAngle">
-        <property name="geometry">
-         <rect>
-          <x>180</x>
-          <y>210</y>
-          <width>41</width>
-          <height>19</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>Angle</string>
-        </property>
-       </widget>
+      <widget class="QWidget" name="tabLevelView">
+       <attribute name="title">
+        <string>Level</string>
+       </attribute>
+       <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <item>
+         <widget class="QFrame" name="frame">
+          <property name="frameShape">
+           <enum>QFrame::StyledPanel</enum>
+          </property>
+          <property name="frameShadow">
+           <enum>QFrame::Raised</enum>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QScrollArea" name="scrollArea">
+          <property name="widgetResizable">
+           <bool>true</bool>
+          </property>
+          <widget class="QWidget" name="scrollAreaWidgetContents">
+           <property name="geometry">
+            <rect>
+             <x>0</x>
+             <y>0</y>
+             <width>1228</width>
+             <height>597</height>
+            </rect>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout_3">
+            <item>
+             <widget class="QComboBox" name="comboBox"/>
+            </item>
+           </layout>
+          </widget>
+         </widget>
+        </item>
+       </layout>
       </widget>
-     </widget>
-    </widget>
-    <widget class="QWidget" name="tabAssetView">
-     <attribute name="title">
-      <string>Asset Manager</string>
-     </attribute>
-     <widget class="QFrame" name="matEditorFrame">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>10</y>
-        <width>651</width>
-        <height>581</height>
-       </rect>
-      </property>
-      <property name="frameShape">
-       <enum>QFrame::StyledPanel</enum>
-      </property>
-      <property name="frameShadow">
-       <enum>QFrame::Raised</enum>
-      </property>
-      <widget class="QLineEdit" name="lineEdit">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>30</y>
-         <width>411</width>
-         <height>41</height>
-        </rect>
-       </property>
-       <property name="placeholderText">
-        <string/>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>10</y>
-         <width>411</width>
-         <height>19</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Material File:</string>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="pushButton_openFile">
-       <property name="geometry">
-        <rect>
-         <x>530</x>
-         <y>30</y>
-         <width>51</width>
-         <height>41</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Open</string>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="pushButton_fileManager">
-       <property name="geometry">
-        <rect>
-         <x>420</x>
-         <y>30</y>
-         <width>96</width>
-         <height>41</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>File Manager</string>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="pushButton_save">
-       <property name="geometry">
-        <rect>
-         <x>580</x>
-         <y>30</y>
-         <width>51</width>
-         <height>41</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Save</string>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_shaderFile">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>80</y>
-         <width>91</width>
-         <height>19</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Shader File:</string>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="lineEdit_shaderFile">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>100</y>
-         <width>621</width>
-         <height>35</height>
-        </rect>
-       </property>
-      </widget>
-      <widget class="QSpinBox" name="spinBox_frameCount">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>160</y>
-         <width>106</width>
-         <height>35</height>
-        </rect>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_frameCount">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>140</y>
-         <width>101</width>
-         <height>19</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Frames:</string>
-       </property>
-      </widget>
-      <widget class="QTreeView" name="treeView">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>210</y>
-         <width>256</width>
-         <height>192</height>
-        </rect>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_textureCount">
-       <property name="geometry">
-        <rect>
-         <x>140</x>
-         <y>140</y>
-         <width>67</width>
-         <height>19</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Textures:</string>
-       </property>
-      </widget>
-      <widget class="QSpinBox" name="spinBox_textureCount">
-       <property name="geometry">
-        <rect>
-         <x>140</x>
-         <y>160</y>
-         <width>106</width>
-         <height>35</height>
-        </rect>
-       </property>
+      <widget class="QWidget" name="tabMaterialView">
+       <attribute name="title">
+        <string>Materials</string>
+       </attribute>
+       <layout class="QHBoxLayout" name="horizontalLayout">
+        <item>
+         <widget class="QFrame" name="matDirectoryframe">
+          <property name="maximumSize">
+           <size>
+            <width>640</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="frameShape">
+           <enum>QFrame::StyledPanel</enum>
+          </property>
+          <property name="frameShadow">
+           <enum>QFrame::Raised</enum>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout">
+           <item>
+            <widget class="QWidget" name="widget" native="true">
+             <layout class="QHBoxLayout" name="horizontalLayout_3">
+              <property name="sizeConstraint">
+               <enum>QLayout::SetDefaultConstraint</enum>
+              </property>
+              <item>
+               <widget class="QPushButton" name="pushButton_openDirectory">
+                <property name="text">
+                 <string>Open Directory</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="pushButton_saveMat">
+                <property name="text">
+                 <string>Save</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="pushButton_saveAllMat">
+                <property name="text">
+                 <string>Save All</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="pushButton_subMat">
+                <property name="enabled">
+                 <bool>true</bool>
+                </property>
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="text">
+                 <string>-</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="pushButton_addMat">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string>+</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
+            <widget class="QTreeWidget" name="treeWidget_materials"/>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
+         <widget class="QFrame" name="matEditorFrame">
+          <property name="frameShape">
+           <enum>QFrame::StyledPanel</enum>
+          </property>
+          <property name="frameShadow">
+           <enum>QFrame::Raised</enum>
+          </property>
+          <layout class="QHBoxLayout" name="horizontalLayout_4">
+           <item>
+            <widget class="QWidget" name="widget_2" native="true">
+             <layout class="QVBoxLayout" name="verticalLayout_2">
+              <property name="leftMargin">
+               <number>0</number>
+              </property>
+              <property name="topMargin">
+               <number>0</number>
+              </property>
+              <property name="rightMargin">
+               <number>0</number>
+              </property>
+              <item>
+               <widget class="QWidget" name="widget_4" native="true">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <layout class="QVBoxLayout" name="verticalLayout_5">
+                 <property name="spacing">
+                  <number>0</number>
+                 </property>
+                 <property name="leftMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="topMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="rightMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="bottomMargin">
+                  <number>0</number>
+                 </property>
+                 <item>
+                  <widget class="QLabel" name="label_shaderFile">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="minimumSize">
+                    <size>
+                     <width>0</width>
+                     <height>0</height>
+                    </size>
+                   </property>
+                   <property name="maximumSize">
+                    <size>
+                     <width>16777215</width>
+                     <height>16777215</height>
+                    </size>
+                   </property>
+                   <property name="text">
+                    <string>Shader File:</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLineEdit" name="lineEdit_shaderFile"/>
+                 </item>
+                 <item>
+                  <widget class="QLabel" name="label_textureCount">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="text">
+                    <string>Textures:</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QSpinBox" name="spinBox_textureCount"/>
+                 </item>
+                 <item>
+                  <widget class="QLabel" name="label_frameCount">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="text">
+                    <string>Frames:</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QSpinBox" name="spinBox_frameCount"/>
+                 </item>
+                 <item>
+                  <widget class="QCheckBox" name="checkBox_saveInMaterial">
+                   <property name="text">
+                    <string>Save textures in file</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+              <item>
+               <widget class="QWidget" name="widget_5" native="true">
+                <layout class="QVBoxLayout" name="verticalLayout_6">
+                 <item>
+                  <widget class="QLabel" name="label_materialPreview">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="text">
+                    <string>Preview:</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QComboBox" name="comboBox_materialPreviewModel">
+                   <item>
+                    <property name="text">
+                     <string>Sphere</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>Cube</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>Plane</string>
+                    </property>
+                   </item>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QOpenGLWidget" name="openGLWidget">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="minimumSize">
+                    <size>
+                     <width>0</width>
+                     <height>160</height>
+                    </size>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
+            <widget class="QWidget" name="widget_3" native="true">
+             <layout class="QVBoxLayout" name="verticalLayout_4">
+              <item>
+               <widget class="QTreeWidget" name="treeWidget_texTree">
+                <column>
+                 <property name="text">
+                  <string notr="true">1</string>
+                 </property>
+                </column>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+       </layout>
       </widget>
      </widget>
-    </widget>
-   </widget>
+    </item>
+   </layout>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
@@ -387,6 +362,9 @@
     <addaction name="actionLevel_Load"/>
     <addaction name="actionLevel_Save_As"/>
     <addaction name="actionLevel_Save"/>
+    <addaction name="separator"/>
+    <addaction name="actionMaterial_Directory_Load"/>
+    <addaction name="actionMaterial_Directory_Save_All"/>
    </widget>
    <widget class="QMenu" name="menuEdit">
     <property name="title">
@@ -410,6 +388,16 @@
   <action name="actionLevel_Save">
    <property name="text">
     <string>Level Save</string>
+   </property>
+  </action>
+  <action name="actionMaterial_Directory_Load">
+   <property name="text">
+    <string>Material Directory Load</string>
+   </property>
+  </action>
+  <action name="actionMaterial_Directory_Save_All">
+   <property name="text">
+    <string>Material Directory Save All</string>
    </property>
   </action>
  </widget>

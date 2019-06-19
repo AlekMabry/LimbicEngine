@@ -5,16 +5,21 @@
 #include <QMainWindow>
 
 
-#include "ui_MainWindow.h"
+#include "MainWindow.h"
 
 int main(int argc, char *argv[])
 {
     QApplication qtApp(argc, argv);
 
+    /*
     QMainWindow *widget = new QMainWindow;
     Ui::MainWindow ui;
     ui.setupUi(widget);
+     */
 
-    widget->show();
+    MainWindow *mainWindow = new MainWindow;
+
+
+    mainWindow->show();
     return qtApp.exec();
 }
