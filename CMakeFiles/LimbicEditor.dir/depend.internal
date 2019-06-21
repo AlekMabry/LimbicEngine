@@ -7,6 +7,7 @@ CMakeFiles/LimbicEditor.dir/LimbicEditor_autogen/mocs_compilation.cpp.o
  /home/alek/Documents/LimbicEngine_OpenGL/src/LimbicEditor/MainWindow.h
  /home/alek/Documents/LimbicEngine_OpenGL/src/LimbicEditor/Material.h
  /home/alek/Documents/LimbicEngine_OpenGL/src/LimbicEditor/MaterialTreeItem.h
+ /usr/include/qt5/QtCore/QString
  /usr/include/qt5/QtCore/QVariant
  /usr/include/qt5/QtCore/qabstractitemmodel.h
  /usr/include/qt5/QtCore/qalgorithms.h
@@ -29,9 +30,11 @@ CMakeFiles/LimbicEditor.dir/LimbicEditor_autogen/mocs_compilation.cpp.o
  /usr/include/qt5/QtCore/qcoreevent.h
  /usr/include/qt5/QtCore/qdatastream.h
  /usr/include/qt5/QtCore/qdebug.h
+ /usr/include/qt5/QtCore/qdir.h
  /usr/include/qt5/QtCore/qeventloop.h
  /usr/include/qt5/QtCore/qfile.h
  /usr/include/qt5/QtCore/qfiledevice.h
+ /usr/include/qt5/QtCore/qfileinfo.h
  /usr/include/qt5/QtCore/qflags.h
  /usr/include/qt5/QtCore/qgenericatomic.h
  /usr/include/qt5/QtCore/qglobal.h
@@ -88,16 +91,13 @@ CMakeFiles/LimbicEditor.dir/LimbicEditor_autogen/mocs_compilation.cpp.o
  /usr/include/qt5/QtCore/qvector.h
  /usr/include/qt5/QtCore/qversiontagging.h
  /usr/include/qt5/QtGui/QSurfaceFormat
- /usr/include/qt5/QtGui/qabstracttextdocumentlayout.h
  /usr/include/qt5/QtGui/qbrush.h
  /usr/include/qt5/QtGui/qcolor.h
  /usr/include/qt5/QtGui/qcursor.h
  /usr/include/qt5/QtGui/qevent.h
  /usr/include/qt5/QtGui/qfont.h
- /usr/include/qt5/QtGui/qfontdatabase.h
  /usr/include/qt5/QtGui/qfontinfo.h
  /usr/include/qt5/QtGui/qfontmetrics.h
- /usr/include/qt5/QtGui/qglyphrun.h
  /usr/include/qt5/QtGui/qguiapplication.h
  /usr/include/qt5/QtGui/qicon.h
  /usr/include/qt5/QtGui/qimage.h
@@ -114,15 +114,12 @@ CMakeFiles/LimbicEditor.dir/LimbicEditor_autogen/mocs_compilation.cpp.o
  /usr/include/qt5/QtGui/qpixelformat.h
  /usr/include/qt5/QtGui/qpixmap.h
  /usr/include/qt5/QtGui/qpolygon.h
- /usr/include/qt5/QtGui/qrawfont.h
  /usr/include/qt5/QtGui/qregion.h
  /usr/include/qt5/QtGui/qrgb.h
  /usr/include/qt5/QtGui/qrgba64.h
  /usr/include/qt5/QtGui/qsurfaceformat.h
  /usr/include/qt5/QtGui/qtextcursor.h
- /usr/include/qt5/QtGui/qtextdocument.h
  /usr/include/qt5/QtGui/qtextformat.h
- /usr/include/qt5/QtGui/qtextlayout.h
  /usr/include/qt5/QtGui/qtextoption.h
  /usr/include/qt5/QtGui/qtgui-config.h
  /usr/include/qt5/QtGui/qtguiglobal.h
@@ -134,7 +131,11 @@ CMakeFiles/LimbicEditor.dir/LimbicEditor_autogen/mocs_compilation.cpp.o
  /usr/include/qt5/QtGui/qwindowdefs_win.h
  /usr/include/qt5/QtWidgets/QAction
  /usr/include/qt5/QtWidgets/QApplication
+ /usr/include/qt5/QtWidgets/QCheckBox
+ /usr/include/qt5/QtWidgets/QComboBox
+ /usr/include/qt5/QtWidgets/QFileDialog
  /usr/include/qt5/QtWidgets/QFrame
+ /usr/include/qt5/QtWidgets/QGridLayout
  /usr/include/qt5/QtWidgets/QHBoxLayout
  /usr/include/qt5/QtWidgets/QHeaderView
  /usr/include/qt5/QtWidgets/QLabel
@@ -143,10 +144,8 @@ CMakeFiles/LimbicEditor.dir/LimbicEditor_autogen/mocs_compilation.cpp.o
  /usr/include/qt5/QtWidgets/QMenu
  /usr/include/qt5/QtWidgets/QMenuBar
  /usr/include/qt5/QtWidgets/QOpenGLWidget
- /usr/include/qt5/QtWidgets/QPlainTextEdit
  /usr/include/qt5/QtWidgets/QPushButton
  /usr/include/qt5/QtWidgets/QScrollArea
- /usr/include/qt5/QtWidgets/QSpacerItem
  /usr/include/qt5/QtWidgets/QSpinBox
  /usr/include/qt5/QtWidgets/QStatusBar
  /usr/include/qt5/QtWidgets/QTabWidget
@@ -164,7 +163,11 @@ CMakeFiles/LimbicEditor.dir/LimbicEditor_autogen/mocs_compilation.cpp.o
  /usr/include/qt5/QtWidgets/qactiongroup.h
  /usr/include/qt5/QtWidgets/qapplication.h
  /usr/include/qt5/QtWidgets/qboxlayout.h
+ /usr/include/qt5/QtWidgets/qcheckbox.h
+ /usr/include/qt5/QtWidgets/qcombobox.h
  /usr/include/qt5/QtWidgets/qdesktopwidget.h
+ /usr/include/qt5/QtWidgets/qdialog.h
+ /usr/include/qt5/QtWidgets/qfiledialog.h
  /usr/include/qt5/QtWidgets/qframe.h
  /usr/include/qt5/QtWidgets/qgridlayout.h
  /usr/include/qt5/QtWidgets/qheaderview.h
@@ -176,7 +179,6 @@ CMakeFiles/LimbicEditor.dir/LimbicEditor_autogen/mocs_compilation.cpp.o
  /usr/include/qt5/QtWidgets/qmenu.h
  /usr/include/qt5/QtWidgets/qmenubar.h
  /usr/include/qt5/QtWidgets/qopenglwidget.h
- /usr/include/qt5/QtWidgets/qplaintextedit.h
  /usr/include/qt5/QtWidgets/qpushbutton.h
  /usr/include/qt5/QtWidgets/qrubberband.h
  /usr/include/qt5/QtWidgets/qscrollarea.h
@@ -188,7 +190,6 @@ CMakeFiles/LimbicEditor.dir/LimbicEditor_autogen/mocs_compilation.cpp.o
  /usr/include/qt5/QtWidgets/qstyleoption.h
  /usr/include/qt5/QtWidgets/qtabbar.h
  /usr/include/qt5/QtWidgets/qtabwidget.h
- /usr/include/qt5/QtWidgets/qtextedit.h
  /usr/include/qt5/QtWidgets/qtreeview.h
  /usr/include/qt5/QtWidgets/qtreewidget.h
  /usr/include/qt5/QtWidgets/qtreewidgetitemiterator.h
@@ -201,6 +202,7 @@ CMakeFiles/LimbicEditor.dir/src/LimbicEditor/MainWindow.cpp.o
  /home/alek/Documents/LimbicEngine_OpenGL/src/LimbicEditor/MainWindow.h
  /home/alek/Documents/LimbicEngine_OpenGL/src/LimbicEditor/Material.h
  /home/alek/Documents/LimbicEngine_OpenGL/src/LimbicEditor/MaterialTreeItem.h
+ /usr/include/qt5/QtCore/QString
  /usr/include/qt5/QtCore/QVariant
  /usr/include/qt5/QtCore/qabstractitemmodel.h
  /usr/include/qt5/QtCore/qalgorithms.h
@@ -223,9 +225,11 @@ CMakeFiles/LimbicEditor.dir/src/LimbicEditor/MainWindow.cpp.o
  /usr/include/qt5/QtCore/qcoreevent.h
  /usr/include/qt5/QtCore/qdatastream.h
  /usr/include/qt5/QtCore/qdebug.h
+ /usr/include/qt5/QtCore/qdir.h
  /usr/include/qt5/QtCore/qeventloop.h
  /usr/include/qt5/QtCore/qfile.h
  /usr/include/qt5/QtCore/qfiledevice.h
+ /usr/include/qt5/QtCore/qfileinfo.h
  /usr/include/qt5/QtCore/qflags.h
  /usr/include/qt5/QtCore/qgenericatomic.h
  /usr/include/qt5/QtCore/qglobal.h
@@ -282,16 +286,13 @@ CMakeFiles/LimbicEditor.dir/src/LimbicEditor/MainWindow.cpp.o
  /usr/include/qt5/QtCore/qvector.h
  /usr/include/qt5/QtCore/qversiontagging.h
  /usr/include/qt5/QtGui/QSurfaceFormat
- /usr/include/qt5/QtGui/qabstracttextdocumentlayout.h
  /usr/include/qt5/QtGui/qbrush.h
  /usr/include/qt5/QtGui/qcolor.h
  /usr/include/qt5/QtGui/qcursor.h
  /usr/include/qt5/QtGui/qevent.h
  /usr/include/qt5/QtGui/qfont.h
- /usr/include/qt5/QtGui/qfontdatabase.h
  /usr/include/qt5/QtGui/qfontinfo.h
  /usr/include/qt5/QtGui/qfontmetrics.h
- /usr/include/qt5/QtGui/qglyphrun.h
  /usr/include/qt5/QtGui/qguiapplication.h
  /usr/include/qt5/QtGui/qicon.h
  /usr/include/qt5/QtGui/qimage.h
@@ -308,15 +309,12 @@ CMakeFiles/LimbicEditor.dir/src/LimbicEditor/MainWindow.cpp.o
  /usr/include/qt5/QtGui/qpixelformat.h
  /usr/include/qt5/QtGui/qpixmap.h
  /usr/include/qt5/QtGui/qpolygon.h
- /usr/include/qt5/QtGui/qrawfont.h
  /usr/include/qt5/QtGui/qregion.h
  /usr/include/qt5/QtGui/qrgb.h
  /usr/include/qt5/QtGui/qrgba64.h
  /usr/include/qt5/QtGui/qsurfaceformat.h
  /usr/include/qt5/QtGui/qtextcursor.h
- /usr/include/qt5/QtGui/qtextdocument.h
  /usr/include/qt5/QtGui/qtextformat.h
- /usr/include/qt5/QtGui/qtextlayout.h
  /usr/include/qt5/QtGui/qtextoption.h
  /usr/include/qt5/QtGui/qtgui-config.h
  /usr/include/qt5/QtGui/qtguiglobal.h
@@ -328,7 +326,11 @@ CMakeFiles/LimbicEditor.dir/src/LimbicEditor/MainWindow.cpp.o
  /usr/include/qt5/QtGui/qwindowdefs_win.h
  /usr/include/qt5/QtWidgets/QAction
  /usr/include/qt5/QtWidgets/QApplication
+ /usr/include/qt5/QtWidgets/QCheckBox
+ /usr/include/qt5/QtWidgets/QComboBox
+ /usr/include/qt5/QtWidgets/QFileDialog
  /usr/include/qt5/QtWidgets/QFrame
+ /usr/include/qt5/QtWidgets/QGridLayout
  /usr/include/qt5/QtWidgets/QHBoxLayout
  /usr/include/qt5/QtWidgets/QHeaderView
  /usr/include/qt5/QtWidgets/QLabel
@@ -337,10 +339,8 @@ CMakeFiles/LimbicEditor.dir/src/LimbicEditor/MainWindow.cpp.o
  /usr/include/qt5/QtWidgets/QMenu
  /usr/include/qt5/QtWidgets/QMenuBar
  /usr/include/qt5/QtWidgets/QOpenGLWidget
- /usr/include/qt5/QtWidgets/QPlainTextEdit
  /usr/include/qt5/QtWidgets/QPushButton
  /usr/include/qt5/QtWidgets/QScrollArea
- /usr/include/qt5/QtWidgets/QSpacerItem
  /usr/include/qt5/QtWidgets/QSpinBox
  /usr/include/qt5/QtWidgets/QStatusBar
  /usr/include/qt5/QtWidgets/QTabWidget
@@ -358,7 +358,11 @@ CMakeFiles/LimbicEditor.dir/src/LimbicEditor/MainWindow.cpp.o
  /usr/include/qt5/QtWidgets/qactiongroup.h
  /usr/include/qt5/QtWidgets/qapplication.h
  /usr/include/qt5/QtWidgets/qboxlayout.h
+ /usr/include/qt5/QtWidgets/qcheckbox.h
+ /usr/include/qt5/QtWidgets/qcombobox.h
  /usr/include/qt5/QtWidgets/qdesktopwidget.h
+ /usr/include/qt5/QtWidgets/qdialog.h
+ /usr/include/qt5/QtWidgets/qfiledialog.h
  /usr/include/qt5/QtWidgets/qframe.h
  /usr/include/qt5/QtWidgets/qgridlayout.h
  /usr/include/qt5/QtWidgets/qheaderview.h
@@ -370,7 +374,6 @@ CMakeFiles/LimbicEditor.dir/src/LimbicEditor/MainWindow.cpp.o
  /usr/include/qt5/QtWidgets/qmenu.h
  /usr/include/qt5/QtWidgets/qmenubar.h
  /usr/include/qt5/QtWidgets/qopenglwidget.h
- /usr/include/qt5/QtWidgets/qplaintextedit.h
  /usr/include/qt5/QtWidgets/qpushbutton.h
  /usr/include/qt5/QtWidgets/qrubberband.h
  /usr/include/qt5/QtWidgets/qscrollarea.h
@@ -382,7 +385,6 @@ CMakeFiles/LimbicEditor.dir/src/LimbicEditor/MainWindow.cpp.o
  /usr/include/qt5/QtWidgets/qstyleoption.h
  /usr/include/qt5/QtWidgets/qtabbar.h
  /usr/include/qt5/QtWidgets/qtabwidget.h
- /usr/include/qt5/QtWidgets/qtextedit.h
  /usr/include/qt5/QtWidgets/qtreeview.h
  /usr/include/qt5/QtWidgets/qtreewidget.h
  /usr/include/qt5/QtWidgets/qtreewidgetitemiterator.h
@@ -397,6 +399,7 @@ CMakeFiles/LimbicEditor.dir/src/LimbicEditor/MaterialTreeItem.cpp.o
  /home/alek/Documents/LimbicEngine_OpenGL/src/LimbicEditor/Material.h
  /home/alek/Documents/LimbicEngine_OpenGL/src/LimbicEditor/MaterialTreeItem.cpp
  /home/alek/Documents/LimbicEngine_OpenGL/src/LimbicEditor/MaterialTreeItem.h
+ /usr/include/qt5/QtCore/QString
  /usr/include/qt5/QtCore/qabstractitemmodel.h
  /usr/include/qt5/QtCore/qalgorithms.h
  /usr/include/qt5/QtCore/qarraydata.h
@@ -527,6 +530,7 @@ CMakeFiles/LimbicEditor.dir/src/LimbicEditor/main.cpp.o
  /home/alek/Documents/LimbicEngine_OpenGL/src/LimbicEditor/MaterialTreeItem.h
  /home/alek/Documents/LimbicEngine_OpenGL/src/LimbicEditor/main.cpp
  /usr/include/qt5/QtCore/QFile
+ /usr/include/qt5/QtCore/QString
  /usr/include/qt5/QtCore/QVariant
  /usr/include/qt5/QtCore/qabstractitemmodel.h
  /usr/include/qt5/QtCore/qalgorithms.h
@@ -549,9 +553,11 @@ CMakeFiles/LimbicEditor.dir/src/LimbicEditor/main.cpp.o
  /usr/include/qt5/QtCore/qcoreevent.h
  /usr/include/qt5/QtCore/qdatastream.h
  /usr/include/qt5/QtCore/qdebug.h
+ /usr/include/qt5/QtCore/qdir.h
  /usr/include/qt5/QtCore/qeventloop.h
  /usr/include/qt5/QtCore/qfile.h
  /usr/include/qt5/QtCore/qfiledevice.h
+ /usr/include/qt5/QtCore/qfileinfo.h
  /usr/include/qt5/QtCore/qflags.h
  /usr/include/qt5/QtCore/qgenericatomic.h
  /usr/include/qt5/QtCore/qglobal.h
@@ -608,16 +614,13 @@ CMakeFiles/LimbicEditor.dir/src/LimbicEditor/main.cpp.o
  /usr/include/qt5/QtCore/qvector.h
  /usr/include/qt5/QtCore/qversiontagging.h
  /usr/include/qt5/QtGui/QSurfaceFormat
- /usr/include/qt5/QtGui/qabstracttextdocumentlayout.h
  /usr/include/qt5/QtGui/qbrush.h
  /usr/include/qt5/QtGui/qcolor.h
  /usr/include/qt5/QtGui/qcursor.h
  /usr/include/qt5/QtGui/qevent.h
  /usr/include/qt5/QtGui/qfont.h
- /usr/include/qt5/QtGui/qfontdatabase.h
  /usr/include/qt5/QtGui/qfontinfo.h
  /usr/include/qt5/QtGui/qfontmetrics.h
- /usr/include/qt5/QtGui/qglyphrun.h
  /usr/include/qt5/QtGui/qguiapplication.h
  /usr/include/qt5/QtGui/qicon.h
  /usr/include/qt5/QtGui/qimage.h
@@ -634,15 +637,12 @@ CMakeFiles/LimbicEditor.dir/src/LimbicEditor/main.cpp.o
  /usr/include/qt5/QtGui/qpixelformat.h
  /usr/include/qt5/QtGui/qpixmap.h
  /usr/include/qt5/QtGui/qpolygon.h
- /usr/include/qt5/QtGui/qrawfont.h
  /usr/include/qt5/QtGui/qregion.h
  /usr/include/qt5/QtGui/qrgb.h
  /usr/include/qt5/QtGui/qrgba64.h
  /usr/include/qt5/QtGui/qsurfaceformat.h
  /usr/include/qt5/QtGui/qtextcursor.h
- /usr/include/qt5/QtGui/qtextdocument.h
  /usr/include/qt5/QtGui/qtextformat.h
- /usr/include/qt5/QtGui/qtextlayout.h
  /usr/include/qt5/QtGui/qtextoption.h
  /usr/include/qt5/QtGui/qtgui-config.h
  /usr/include/qt5/QtGui/qtguiglobal.h
@@ -654,7 +654,11 @@ CMakeFiles/LimbicEditor.dir/src/LimbicEditor/main.cpp.o
  /usr/include/qt5/QtGui/qwindowdefs_win.h
  /usr/include/qt5/QtWidgets/QAction
  /usr/include/qt5/QtWidgets/QApplication
+ /usr/include/qt5/QtWidgets/QCheckBox
+ /usr/include/qt5/QtWidgets/QComboBox
+ /usr/include/qt5/QtWidgets/QFileDialog
  /usr/include/qt5/QtWidgets/QFrame
+ /usr/include/qt5/QtWidgets/QGridLayout
  /usr/include/qt5/QtWidgets/QHBoxLayout
  /usr/include/qt5/QtWidgets/QHeaderView
  /usr/include/qt5/QtWidgets/QLabel
@@ -663,10 +667,8 @@ CMakeFiles/LimbicEditor.dir/src/LimbicEditor/main.cpp.o
  /usr/include/qt5/QtWidgets/QMenu
  /usr/include/qt5/QtWidgets/QMenuBar
  /usr/include/qt5/QtWidgets/QOpenGLWidget
- /usr/include/qt5/QtWidgets/QPlainTextEdit
  /usr/include/qt5/QtWidgets/QPushButton
  /usr/include/qt5/QtWidgets/QScrollArea
- /usr/include/qt5/QtWidgets/QSpacerItem
  /usr/include/qt5/QtWidgets/QSpinBox
  /usr/include/qt5/QtWidgets/QStatusBar
  /usr/include/qt5/QtWidgets/QTabWidget
@@ -684,7 +686,11 @@ CMakeFiles/LimbicEditor.dir/src/LimbicEditor/main.cpp.o
  /usr/include/qt5/QtWidgets/qactiongroup.h
  /usr/include/qt5/QtWidgets/qapplication.h
  /usr/include/qt5/QtWidgets/qboxlayout.h
+ /usr/include/qt5/QtWidgets/qcheckbox.h
+ /usr/include/qt5/QtWidgets/qcombobox.h
  /usr/include/qt5/QtWidgets/qdesktopwidget.h
+ /usr/include/qt5/QtWidgets/qdialog.h
+ /usr/include/qt5/QtWidgets/qfiledialog.h
  /usr/include/qt5/QtWidgets/qframe.h
  /usr/include/qt5/QtWidgets/qgridlayout.h
  /usr/include/qt5/QtWidgets/qheaderview.h
@@ -696,7 +702,6 @@ CMakeFiles/LimbicEditor.dir/src/LimbicEditor/main.cpp.o
  /usr/include/qt5/QtWidgets/qmenu.h
  /usr/include/qt5/QtWidgets/qmenubar.h
  /usr/include/qt5/QtWidgets/qopenglwidget.h
- /usr/include/qt5/QtWidgets/qplaintextedit.h
  /usr/include/qt5/QtWidgets/qpushbutton.h
  /usr/include/qt5/QtWidgets/qrubberband.h
  /usr/include/qt5/QtWidgets/qscrollarea.h
@@ -708,7 +713,6 @@ CMakeFiles/LimbicEditor.dir/src/LimbicEditor/main.cpp.o
  /usr/include/qt5/QtWidgets/qstyleoption.h
  /usr/include/qt5/QtWidgets/qtabbar.h
  /usr/include/qt5/QtWidgets/qtabwidget.h
- /usr/include/qt5/QtWidgets/qtextedit.h
  /usr/include/qt5/QtWidgets/qtreeview.h
  /usr/include/qt5/QtWidgets/qtreewidget.h
  /usr/include/qt5/QtWidgets/qtreewidgetitemiterator.h

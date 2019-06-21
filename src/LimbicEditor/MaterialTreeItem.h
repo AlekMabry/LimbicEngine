@@ -4,12 +4,15 @@
 
 #include <QtWidgets/QTreeWidgetItem>
 #include "Material.h"
+#include <QString>
 
 class MaterialTreeItem : public QTreeWidgetItem
 {
 
 public:
     Material material;
+    std::string file_path;
+    std::string new_file_path;
 };
 
 

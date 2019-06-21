@@ -12,7 +12,10 @@
 #include <QtCore/QVariant>
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
+#include <QtWidgets/QCheckBox>
+#include <QtWidgets/QComboBox>
 #include <QtWidgets/QFrame>
+#include <QtWidgets/QGridLayout>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QHeaderView>
 #include <QtWidgets/QLabel>
@@ -21,10 +24,8 @@
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QMenuBar>
 #include <QtWidgets/QOpenGLWidget>
-#include <QtWidgets/QPlainTextEdit>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QScrollArea>
-#include <QtWidgets/QSpacerItem>
 #include <QtWidgets/QSpinBox>
 #include <QtWidgets/QStatusBar>
 #include <QtWidgets/QTabWidget>
@@ -40,44 +41,50 @@ public:
     QAction *actionLevel_Load;
     QAction *actionLevel_Save_As;
     QAction *actionLevel_Save;
+    QAction *actionMaterial_Directory_Load;
+    QAction *actionMaterial_Directory_Save_All;
     QWidget *centralwidget;
-    QHBoxLayout *horizontalLayout_2;
+    QGridLayout *gridLayout;
     QTabWidget *tabWidget;
     QWidget *tabLevelView;
-    QOpenGLWidget *openGLWidget;
+    QHBoxLayout *horizontalLayout_2;
+    QFrame *frame;
     QScrollArea *scrollArea;
     QWidget *scrollAreaWidgetContents;
-    QTreeWidget *treeWidget;
-    QLabel *labelX;
-    QLabel *labelY;
-    QLabel *labelZ;
-    QPlainTextEdit *pTextEdit_X;
-    QPlainTextEdit *pTextEdit_Y;
-    QPlainTextEdit *pTextEdit_Z;
-    QPlainTextEdit *pTextEdit_xAngle;
-    QPlainTextEdit *pTextEdit_zAngle;
-    QPlainTextEdit *pTextEdit_yAngle;
-    QLabel *labelPosition;
-    QLabel *labelAngle;
-    QWidget *tabAssetView;
+    QVBoxLayout *verticalLayout_3;
+    QComboBox *comboBox;
+    QWidget *tabMaterialView;
     QHBoxLayout *horizontalLayout;
     QFrame *matDirectoryframe;
     QVBoxLayout *verticalLayout;
     QWidget *widget;
     QHBoxLayout *horizontalLayout_3;
-    QLabel *label_materialsTitle;
-    QSpacerItem *horizontalSpacer;
+    QPushButton *pushButton_openDirectory;
+    QPushButton *pushButton_saveMat;
+    QPushButton *pushButton_saveAllMat;
     QPushButton *pushButton_subMat;
     QPushButton *pushButton_addMat;
     QTreeWidget *treeWidget_materials;
     QFrame *matEditorFrame;
+    QHBoxLayout *horizontalLayout_4;
+    QWidget *widget_2;
     QVBoxLayout *verticalLayout_2;
+    QWidget *widget_4;
+    QVBoxLayout *verticalLayout_5;
     QLabel *label_shaderFile;
     QLineEdit *lineEdit_shaderFile;
     QLabel *label_textureCount;
-    QLabel *label_frameCount;
     QSpinBox *spinBox_textureCount;
+    QLabel *label_frameCount;
     QSpinBox *spinBox_frameCount;
+    QCheckBox *checkBox_saveInMaterial;
+    QWidget *widget_5;
+    QVBoxLayout *verticalLayout_6;
+    QLabel *label_materialPreview;
+    QComboBox *comboBox_materialPreviewModel;
+    QOpenGLWidget *openGLWidget;
+    QWidget *widget_3;
+    QVBoxLayout *verticalLayout_4;
     QTreeWidget *treeWidget_texTree;
     QMenuBar *menubar;
     QMenu *menuFile;
@@ -95,71 +102,52 @@ public:
         actionLevel_Save_As->setObjectName(QString::fromUtf8("actionLevel_Save_As"));
         actionLevel_Save = new QAction(MainWindow);
         actionLevel_Save->setObjectName(QString::fromUtf8("actionLevel_Save"));
+        actionMaterial_Directory_Load = new QAction(MainWindow);
+        actionMaterial_Directory_Load->setObjectName(QString::fromUtf8("actionMaterial_Directory_Load"));
+        actionMaterial_Directory_Save_All = new QAction(MainWindow);
+        actionMaterial_Directory_Save_All->setObjectName(QString::fromUtf8("actionMaterial_Directory_Save_All"));
         centralwidget = new QWidget(MainWindow);
         centralwidget->setObjectName(QString::fromUtf8("centralwidget"));
-        horizontalLayout_2 = new QHBoxLayout(centralwidget);
-        horizontalLayout_2->setObjectName(QString::fromUtf8("horizontalLayout_2"));
+        gridLayout = new QGridLayout(centralwidget);
+        gridLayout->setObjectName(QString::fromUtf8("gridLayout"));
         tabWidget = new QTabWidget(centralwidget);
         tabWidget->setObjectName(QString::fromUtf8("tabWidget"));
         tabLevelView = new QWidget();
         tabLevelView->setObjectName(QString::fromUtf8("tabLevelView"));
-        openGLWidget = new QOpenGLWidget(tabLevelView);
-        openGLWidget->setObjectName(QString::fromUtf8("openGLWidget"));
-        openGLWidget->setGeometry(QRect(9, 9, 971, 611));
+        horizontalLayout_2 = new QHBoxLayout(tabLevelView);
+        horizontalLayout_2->setObjectName(QString::fromUtf8("horizontalLayout_2"));
+        frame = new QFrame(tabLevelView);
+        frame->setObjectName(QString::fromUtf8("frame"));
+        frame->setFrameShape(QFrame::StyledPanel);
+        frame->setFrameShadow(QFrame::Raised);
+
+        horizontalLayout_2->addWidget(frame);
+
         scrollArea = new QScrollArea(tabLevelView);
         scrollArea->setObjectName(QString::fromUtf8("scrollArea"));
-        scrollArea->setGeometry(QRect(990, 10, 281, 611));
         scrollArea->setWidgetResizable(true);
         scrollAreaWidgetContents = new QWidget();
         scrollAreaWidgetContents->setObjectName(QString::fromUtf8("scrollAreaWidgetContents"));
-        scrollAreaWidgetContents->setGeometry(QRect(0, 0, 277, 607));
-        treeWidget = new QTreeWidget(scrollAreaWidgetContents);
-        QTreeWidgetItem *__qtreewidgetitem = new QTreeWidgetItem();
-        __qtreewidgetitem->setText(0, QString::fromUtf8("1"));
-        treeWidget->setHeaderItem(__qtreewidgetitem);
-        treeWidget->setObjectName(QString::fromUtf8("treeWidget"));
-        treeWidget->setGeometry(QRect(10, 10, 256, 192));
-        labelX = new QLabel(scrollAreaWidgetContents);
-        labelX->setObjectName(QString::fromUtf8("labelX"));
-        labelX->setGeometry(QRect(20, 230, 21, 19));
-        labelY = new QLabel(scrollAreaWidgetContents);
-        labelY->setObjectName(QString::fromUtf8("labelY"));
-        labelY->setGeometry(QRect(20, 250, 21, 19));
-        labelZ = new QLabel(scrollAreaWidgetContents);
-        labelZ->setObjectName(QString::fromUtf8("labelZ"));
-        labelZ->setGeometry(QRect(20, 270, 21, 19));
-        pTextEdit_X = new QPlainTextEdit(scrollAreaWidgetContents);
-        pTextEdit_X->setObjectName(QString::fromUtf8("pTextEdit_X"));
-        pTextEdit_X->setGeometry(QRect(40, 230, 111, 21));
-        pTextEdit_Y = new QPlainTextEdit(scrollAreaWidgetContents);
-        pTextEdit_Y->setObjectName(QString::fromUtf8("pTextEdit_Y"));
-        pTextEdit_Y->setGeometry(QRect(40, 250, 111, 21));
-        pTextEdit_Z = new QPlainTextEdit(scrollAreaWidgetContents);
-        pTextEdit_Z->setObjectName(QString::fromUtf8("pTextEdit_Z"));
-        pTextEdit_Z->setGeometry(QRect(40, 270, 111, 21));
-        pTextEdit_xAngle = new QPlainTextEdit(scrollAreaWidgetContents);
-        pTextEdit_xAngle->setObjectName(QString::fromUtf8("pTextEdit_xAngle"));
-        pTextEdit_xAngle->setGeometry(QRect(150, 230, 111, 21));
-        pTextEdit_zAngle = new QPlainTextEdit(scrollAreaWidgetContents);
-        pTextEdit_zAngle->setObjectName(QString::fromUtf8("pTextEdit_zAngle"));
-        pTextEdit_zAngle->setGeometry(QRect(150, 270, 111, 21));
-        pTextEdit_yAngle = new QPlainTextEdit(scrollAreaWidgetContents);
-        pTextEdit_yAngle->setObjectName(QString::fromUtf8("pTextEdit_yAngle"));
-        pTextEdit_yAngle->setGeometry(QRect(150, 250, 111, 21));
-        labelPosition = new QLabel(scrollAreaWidgetContents);
-        labelPosition->setObjectName(QString::fromUtf8("labelPosition"));
-        labelPosition->setGeometry(QRect(70, 210, 67, 19));
-        labelAngle = new QLabel(scrollAreaWidgetContents);
-        labelAngle->setObjectName(QString::fromUtf8("labelAngle"));
-        labelAngle->setGeometry(QRect(180, 210, 41, 19));
+        scrollAreaWidgetContents->setGeometry(QRect(0, 0, 1228, 597));
+        verticalLayout_3 = new QVBoxLayout(scrollAreaWidgetContents);
+        verticalLayout_3->setObjectName(QString::fromUtf8("verticalLayout_3"));
+        comboBox = new QComboBox(scrollAreaWidgetContents);
+        comboBox->setObjectName(QString::fromUtf8("comboBox"));
+
+        verticalLayout_3->addWidget(comboBox);
+
         scrollArea->setWidget(scrollAreaWidgetContents);
+
+        horizontalLayout_2->addWidget(scrollArea);
+
         tabWidget->addTab(tabLevelView, QString());
-        tabAssetView = new QWidget();
-        tabAssetView->setObjectName(QString::fromUtf8("tabAssetView"));
-        horizontalLayout = new QHBoxLayout(tabAssetView);
+        tabMaterialView = new QWidget();
+        tabMaterialView->setObjectName(QString::fromUtf8("tabMaterialView"));
+        horizontalLayout = new QHBoxLayout(tabMaterialView);
         horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
-        matDirectoryframe = new QFrame(tabAssetView);
+        matDirectoryframe = new QFrame(tabMaterialView);
         matDirectoryframe->setObjectName(QString::fromUtf8("matDirectoryframe"));
+        matDirectoryframe->setMaximumSize(QSize(640, 16777215));
         matDirectoryframe->setFrameShape(QFrame::StyledPanel);
         matDirectoryframe->setFrameShadow(QFrame::Raised);
         verticalLayout = new QVBoxLayout(matDirectoryframe);
@@ -169,20 +157,26 @@ public:
         horizontalLayout_3 = new QHBoxLayout(widget);
         horizontalLayout_3->setObjectName(QString::fromUtf8("horizontalLayout_3"));
         horizontalLayout_3->setSizeConstraint(QLayout::SetDefaultConstraint);
-        label_materialsTitle = new QLabel(widget);
-        label_materialsTitle->setObjectName(QString::fromUtf8("label_materialsTitle"));
-        QFont font;
-        font.setPointSize(14);
-        label_materialsTitle->setFont(font);
+        pushButton_openDirectory = new QPushButton(widget);
+        pushButton_openDirectory->setObjectName(QString::fromUtf8("pushButton_openDirectory"));
 
-        horizontalLayout_3->addWidget(label_materialsTitle);
+        horizontalLayout_3->addWidget(pushButton_openDirectory);
 
-        horizontalSpacer = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+        pushButton_saveMat = new QPushButton(widget);
+        pushButton_saveMat->setObjectName(QString::fromUtf8("pushButton_saveMat"));
+        pushButton_saveMat->setEnabled(false);
 
-        horizontalLayout_3->addItem(horizontalSpacer);
+        horizontalLayout_3->addWidget(pushButton_saveMat);
+
+        pushButton_saveAllMat = new QPushButton(widget);
+        pushButton_saveAllMat->setObjectName(QString::fromUtf8("pushButton_saveAllMat"));
+        pushButton_saveAllMat->setEnabled(false);
+
+        horizontalLayout_3->addWidget(pushButton_saveAllMat);
 
         pushButton_subMat = new QPushButton(widget);
         pushButton_subMat->setObjectName(QString::fromUtf8("pushButton_subMat"));
+        pushButton_subMat->setEnabled(false);
         QSizePolicy sizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
         sizePolicy.setHorizontalStretch(0);
         sizePolicy.setVerticalStretch(0);
@@ -193,6 +187,10 @@ public:
 
         pushButton_addMat = new QPushButton(widget);
         pushButton_addMat->setObjectName(QString::fromUtf8("pushButton_addMat"));
+        pushButton_addMat->setEnabled(false);
+        sizePolicy.setHeightForWidth(pushButton_addMat->sizePolicy().hasHeightForWidth());
+        pushButton_addMat->setSizePolicy(sizePolicy);
+        pushButton_addMat->setMinimumSize(QSize(0, 0));
 
         horizontalLayout_3->addWidget(pushButton_addMat);
 
@@ -200,6 +198,9 @@ public:
         verticalLayout->addWidget(widget);
 
         treeWidget_materials = new QTreeWidget(matDirectoryframe);
+        QTreeWidgetItem *__qtreewidgetitem = new QTreeWidgetItem();
+        __qtreewidgetitem->setText(0, QString::fromUtf8("1"));
+        treeWidget_materials->setHeaderItem(__qtreewidgetitem);
         treeWidget_materials->setObjectName(QString::fromUtf8("treeWidget_materials"));
 
         verticalLayout->addWidget(treeWidget_materials);
@@ -207,56 +208,132 @@ public:
 
         horizontalLayout->addWidget(matDirectoryframe);
 
-        matEditorFrame = new QFrame(tabAssetView);
+        matEditorFrame = new QFrame(tabMaterialView);
         matEditorFrame->setObjectName(QString::fromUtf8("matEditorFrame"));
+        matEditorFrame->setEnabled(false);
         matEditorFrame->setFrameShape(QFrame::StyledPanel);
         matEditorFrame->setFrameShadow(QFrame::Raised);
-        verticalLayout_2 = new QVBoxLayout(matEditorFrame);
+        horizontalLayout_4 = new QHBoxLayout(matEditorFrame);
+        horizontalLayout_4->setObjectName(QString::fromUtf8("horizontalLayout_4"));
+        widget_2 = new QWidget(matEditorFrame);
+        widget_2->setObjectName(QString::fromUtf8("widget_2"));
+        verticalLayout_2 = new QVBoxLayout(widget_2);
         verticalLayout_2->setObjectName(QString::fromUtf8("verticalLayout_2"));
-        label_shaderFile = new QLabel(matEditorFrame);
+        verticalLayout_2->setContentsMargins(0, 0, 0, -1);
+        widget_4 = new QWidget(widget_2);
+        widget_4->setObjectName(QString::fromUtf8("widget_4"));
+        QSizePolicy sizePolicy1(QSizePolicy::Preferred, QSizePolicy::Fixed);
+        sizePolicy1.setHorizontalStretch(0);
+        sizePolicy1.setVerticalStretch(0);
+        sizePolicy1.setHeightForWidth(widget_4->sizePolicy().hasHeightForWidth());
+        widget_4->setSizePolicy(sizePolicy1);
+        verticalLayout_5 = new QVBoxLayout(widget_4);
+        verticalLayout_5->setSpacing(0);
+        verticalLayout_5->setObjectName(QString::fromUtf8("verticalLayout_5"));
+        verticalLayout_5->setContentsMargins(0, 0, 0, 0);
+        label_shaderFile = new QLabel(widget_4);
         label_shaderFile->setObjectName(QString::fromUtf8("label_shaderFile"));
+        sizePolicy1.setHeightForWidth(label_shaderFile->sizePolicy().hasHeightForWidth());
+        label_shaderFile->setSizePolicy(sizePolicy1);
+        label_shaderFile->setMinimumSize(QSize(0, 0));
+        label_shaderFile->setMaximumSize(QSize(16777215, 16777215));
 
-        verticalLayout_2->addWidget(label_shaderFile);
+        verticalLayout_5->addWidget(label_shaderFile);
 
-        lineEdit_shaderFile = new QLineEdit(matEditorFrame);
+        lineEdit_shaderFile = new QLineEdit(widget_4);
         lineEdit_shaderFile->setObjectName(QString::fromUtf8("lineEdit_shaderFile"));
 
-        verticalLayout_2->addWidget(lineEdit_shaderFile);
+        verticalLayout_5->addWidget(lineEdit_shaderFile);
 
-        label_textureCount = new QLabel(matEditorFrame);
+        label_textureCount = new QLabel(widget_4);
         label_textureCount->setObjectName(QString::fromUtf8("label_textureCount"));
+        sizePolicy1.setHeightForWidth(label_textureCount->sizePolicy().hasHeightForWidth());
+        label_textureCount->setSizePolicy(sizePolicy1);
 
-        verticalLayout_2->addWidget(label_textureCount);
+        verticalLayout_5->addWidget(label_textureCount);
 
-        label_frameCount = new QLabel(matEditorFrame);
-        label_frameCount->setObjectName(QString::fromUtf8("label_frameCount"));
-
-        verticalLayout_2->addWidget(label_frameCount);
-
-        spinBox_textureCount = new QSpinBox(matEditorFrame);
+        spinBox_textureCount = new QSpinBox(widget_4);
         spinBox_textureCount->setObjectName(QString::fromUtf8("spinBox_textureCount"));
 
-        verticalLayout_2->addWidget(spinBox_textureCount);
+        verticalLayout_5->addWidget(spinBox_textureCount);
 
-        spinBox_frameCount = new QSpinBox(matEditorFrame);
+        label_frameCount = new QLabel(widget_4);
+        label_frameCount->setObjectName(QString::fromUtf8("label_frameCount"));
+        sizePolicy1.setHeightForWidth(label_frameCount->sizePolicy().hasHeightForWidth());
+        label_frameCount->setSizePolicy(sizePolicy1);
+
+        verticalLayout_5->addWidget(label_frameCount);
+
+        spinBox_frameCount = new QSpinBox(widget_4);
         spinBox_frameCount->setObjectName(QString::fromUtf8("spinBox_frameCount"));
 
-        verticalLayout_2->addWidget(spinBox_frameCount);
+        verticalLayout_5->addWidget(spinBox_frameCount);
 
-        treeWidget_texTree = new QTreeWidget(matEditorFrame);
+        checkBox_saveInMaterial = new QCheckBox(widget_4);
+        checkBox_saveInMaterial->setObjectName(QString::fromUtf8("checkBox_saveInMaterial"));
+
+        verticalLayout_5->addWidget(checkBox_saveInMaterial);
+
+
+        verticalLayout_2->addWidget(widget_4);
+
+        widget_5 = new QWidget(widget_2);
+        widget_5->setObjectName(QString::fromUtf8("widget_5"));
+        verticalLayout_6 = new QVBoxLayout(widget_5);
+        verticalLayout_6->setObjectName(QString::fromUtf8("verticalLayout_6"));
+        label_materialPreview = new QLabel(widget_5);
+        label_materialPreview->setObjectName(QString::fromUtf8("label_materialPreview"));
+        sizePolicy1.setHeightForWidth(label_materialPreview->sizePolicy().hasHeightForWidth());
+        label_materialPreview->setSizePolicy(sizePolicy1);
+
+        verticalLayout_6->addWidget(label_materialPreview);
+
+        comboBox_materialPreviewModel = new QComboBox(widget_5);
+        comboBox_materialPreviewModel->addItem(QString());
+        comboBox_materialPreviewModel->addItem(QString());
+        comboBox_materialPreviewModel->addItem(QString());
+        comboBox_materialPreviewModel->setObjectName(QString::fromUtf8("comboBox_materialPreviewModel"));
+
+        verticalLayout_6->addWidget(comboBox_materialPreviewModel);
+
+        openGLWidget = new QOpenGLWidget(widget_5);
+        openGLWidget->setObjectName(QString::fromUtf8("openGLWidget"));
+        QSizePolicy sizePolicy2(QSizePolicy::Minimum, QSizePolicy::Minimum);
+        sizePolicy2.setHorizontalStretch(0);
+        sizePolicy2.setVerticalStretch(0);
+        sizePolicy2.setHeightForWidth(openGLWidget->sizePolicy().hasHeightForWidth());
+        openGLWidget->setSizePolicy(sizePolicy2);
+        openGLWidget->setMinimumSize(QSize(0, 160));
+
+        verticalLayout_6->addWidget(openGLWidget);
+
+
+        verticalLayout_2->addWidget(widget_5);
+
+
+        horizontalLayout_4->addWidget(widget_2);
+
+        widget_3 = new QWidget(matEditorFrame);
+        widget_3->setObjectName(QString::fromUtf8("widget_3"));
+        verticalLayout_4 = new QVBoxLayout(widget_3);
+        verticalLayout_4->setObjectName(QString::fromUtf8("verticalLayout_4"));
+        treeWidget_texTree = new QTreeWidget(widget_3);
         QTreeWidgetItem *__qtreewidgetitem1 = new QTreeWidgetItem();
         __qtreewidgetitem1->setText(0, QString::fromUtf8("1"));
         treeWidget_texTree->setHeaderItem(__qtreewidgetitem1);
         treeWidget_texTree->setObjectName(QString::fromUtf8("treeWidget_texTree"));
 
-        verticalLayout_2->addWidget(treeWidget_texTree);
+        verticalLayout_4->addWidget(treeWidget_texTree);
+
+
+        horizontalLayout_4->addWidget(widget_3);
 
 
         horizontalLayout->addWidget(matEditorFrame);
 
-        tabWidget->addTab(tabAssetView, QString());
+        tabWidget->addTab(tabMaterialView, QString());
 
-        horizontalLayout_2->addWidget(tabWidget);
+        gridLayout->addWidget(tabWidget, 0, 0, 1, 1);
 
         MainWindow->setCentralWidget(centralwidget);
         menubar = new QMenuBar(MainWindow);
@@ -276,6 +353,9 @@ public:
         menuFile->addAction(actionLevel_Load);
         menuFile->addAction(actionLevel_Save_As);
         menuFile->addAction(actionLevel_Save);
+        menuFile->addSeparator();
+        menuFile->addAction(actionMaterial_Directory_Load);
+        menuFile->addAction(actionMaterial_Directory_Save_All);
 
         retranslateUi(MainWindow);
 
@@ -291,19 +371,24 @@ public:
         actionLevel_Load->setText(QApplication::translate("MainWindow", "Level Load", nullptr));
         actionLevel_Save_As->setText(QApplication::translate("MainWindow", "Level Save As", nullptr));
         actionLevel_Save->setText(QApplication::translate("MainWindow", "Level Save", nullptr));
-        labelX->setText(QApplication::translate("MainWindow", "X:", nullptr));
-        labelY->setText(QApplication::translate("MainWindow", "Y:", nullptr));
-        labelZ->setText(QApplication::translate("MainWindow", "Z:", nullptr));
-        labelPosition->setText(QApplication::translate("MainWindow", "Position", nullptr));
-        labelAngle->setText(QApplication::translate("MainWindow", "Angle", nullptr));
+        actionMaterial_Directory_Load->setText(QApplication::translate("MainWindow", "Material Directory Load", nullptr));
+        actionMaterial_Directory_Save_All->setText(QApplication::translate("MainWindow", "Material Directory Save All", nullptr));
         tabWidget->setTabText(tabWidget->indexOf(tabLevelView), QApplication::translate("MainWindow", "Level", nullptr));
-        label_materialsTitle->setText(QApplication::translate("MainWindow", "Materials", nullptr));
+        pushButton_openDirectory->setText(QApplication::translate("MainWindow", "Open Directory", nullptr));
+        pushButton_saveMat->setText(QApplication::translate("MainWindow", "Save", nullptr));
+        pushButton_saveAllMat->setText(QApplication::translate("MainWindow", "Save All", nullptr));
         pushButton_subMat->setText(QApplication::translate("MainWindow", "-", nullptr));
         pushButton_addMat->setText(QApplication::translate("MainWindow", "+", nullptr));
         label_shaderFile->setText(QApplication::translate("MainWindow", "Shader File:", nullptr));
         label_textureCount->setText(QApplication::translate("MainWindow", "Textures:", nullptr));
         label_frameCount->setText(QApplication::translate("MainWindow", "Frames:", nullptr));
-        tabWidget->setTabText(tabWidget->indexOf(tabAssetView), QApplication::translate("MainWindow", "Asset Manager", nullptr));
+        checkBox_saveInMaterial->setText(QApplication::translate("MainWindow", "Save textures in file", nullptr));
+        label_materialPreview->setText(QApplication::translate("MainWindow", "Preview:", nullptr));
+        comboBox_materialPreviewModel->setItemText(0, QApplication::translate("MainWindow", "Sphere", nullptr));
+        comboBox_materialPreviewModel->setItemText(1, QApplication::translate("MainWindow", "Cube", nullptr));
+        comboBox_materialPreviewModel->setItemText(2, QApplication::translate("MainWindow", "Plane", nullptr));
+
+        tabWidget->setTabText(tabWidget->indexOf(tabMaterialView), QApplication::translate("MainWindow", "Materials", nullptr));
         menuFile->setTitle(QApplication::translate("MainWindow", "File", nullptr));
         menuEdit->setTitle(QApplication::translate("MainWindow", "Edit", nullptr));
     } // retranslateUi

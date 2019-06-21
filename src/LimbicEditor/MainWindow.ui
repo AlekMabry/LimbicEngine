@@ -94,6 +94,9 @@
               </item>
               <item>
                <widget class="QPushButton" name="pushButton_saveMat">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
                 <property name="text">
                  <string>Save</string>
                 </property>
@@ -101,6 +104,9 @@
               </item>
               <item>
                <widget class="QPushButton" name="pushButton_saveAllMat">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
                 <property name="text">
                  <string>Save All</string>
                 </property>
@@ -109,7 +115,7 @@
               <item>
                <widget class="QPushButton" name="pushButton_subMat">
                 <property name="enabled">
-                 <bool>true</bool>
+                 <bool>false</bool>
                 </property>
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
@@ -124,6 +130,9 @@
               </item>
               <item>
                <widget class="QPushButton" name="pushButton_addMat">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
                   <horstretch>0</horstretch>
@@ -145,13 +154,22 @@
             </widget>
            </item>
            <item>
-            <widget class="QTreeWidget" name="treeWidget_materials"/>
+            <widget class="QTreeWidget" name="treeWidget_materials">
+             <column>
+              <property name="text">
+               <string notr="true">1</string>
+              </property>
+             </column>
+            </widget>
            </item>
           </layout>
          </widget>
         </item>
         <item>
          <widget class="QFrame" name="matEditorFrame">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
           <property name="frameShape">
            <enum>QFrame::StyledPanel</enum>
           </property>
