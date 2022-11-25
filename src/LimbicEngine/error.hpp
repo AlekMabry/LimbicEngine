@@ -1,6 +1,0 @@
-#pragma once
-
-#define STATUS_SUCCESS 0
-#define STATUS_FAILED 1
-#define STATUS_FAILEDLOAD 2
-#define STATUS_FAILEDWRITE 3

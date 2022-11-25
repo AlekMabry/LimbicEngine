@@ -1,0 +1,12 @@
+<RCC>
+    <qresource prefix="/LimbicEngine"/>
+    <qresource prefix="/Icons">
+        <file alias="SceneTree-Point">Icons/16x16/SceneTree-Point.png</file>
+        <file alias="SceneTree-PointLight">Icons/16x16/SceneTree-PointLight.png</file>
+        <file alias="SceneTree-Prop">Icons/16x16/SceneTree-Prop.png</file>
+    </qresource>
+    <qresource prefix="/Thumbnails">
+        <file alias="Texture-Unused">Icons/128x128/Texture-Unused.png</file>
+        <file alias="Texture-Missing">Icons/128x128/Texture-Missing.png</file>
+    </qresource>
+</RCC>
