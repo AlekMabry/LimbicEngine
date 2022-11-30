@@ -43,71 +43,32 @@
     </QtUic>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Node.cpp">
-      <Filter>Source Files\Model</Filter>
-    </ClCompile>
-    <ClCompile Include="Map.cpp">
-      <Filter>Source Files\Model</Filter>
-    </ClCompile>
-    <ClCompile Include="QSceneTreeModel.cpp">
-      <Filter>Source Files\Model</Filter>
-    </ClCompile>
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="EditorWindow.cpp">
       <Filter>Source Files\UI</Filter>
     </ClCompile>
-    <ClCompile Include="ViewPortWidget.cpp">
+    <ClCompile Include="ViewportWidget.cpp">
       <Filter>Source Files\UI</Filter>
     </ClCompile>
     <ClCompile Include="SettingsDialog.cpp">
       <Filter>Source Files\UI</Filter>
     </ClCompile>
-    <ClCompile Include="TextureManagerWidget.cpp">
-      <Filter>Source Files\UI</Filter>
-    </ClCompile>
-    <ClCompile Include="ResourceManager.cpp">
-      <Filter>Source Files\Model</Filter>
-    </ClCompile>
-    <ClCompile Include="TextureGroupListModel.cpp">
-      <Filter>Source Files\UI</Filter>
-    </ClCompile>
-    <ClCompile Include="Resource.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <QtMoc Include="QSceneTreeModel.h">
-      <Filter>Header Files\Model</Filter>
-    </QtMoc>
     <QtMoc Include="EditorWindow.h">
       <Filter>Header Files\UI</Filter>
     </QtMoc>
-    <QtMoc Include="ViewPortWidget.h">
+    <QtMoc Include="ViewportWidget.h">
       <Filter>Header Files\UI</Filter>
     </QtMoc>
     <QtMoc Include="SettingsDialog.h">
       <Filter>Header Files\UI</Filter>
     </QtMoc>
-    <QtMoc Include="TextureManagerWidget.h">
-      <Filter>Header Files\UI</Filter>
-    </QtMoc>
-    <QtMoc Include="ResourceManager.h">
-      <Filter>Header Files\Model</Filter>
-    </QtMoc>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Node.h">
-      <Filter>Header Files\Model</Filter>
-    </ClInclude>
-    <ClInclude Include="Map.h">
-      <Filter>Header Files\Model</Filter>
-    </ClInclude>
-    <ClInclude Include="TextureGroupListModel.h">
-      <Filter>Header Files\UI</Filter>
-    </ClInclude>
-    <ClInclude Include="Resource.h">
+    <ClInclude Include="EditorTypes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -115,7 +76,7 @@
     <QtUic Include="Settings.ui">
       <Filter>Form Files</Filter>
     </QtUic>
-    <QtUic Include="TextureManager.ui">
+    <QtUic Include="Resources.ui">
       <Filter>Form Files</Filter>
     </QtUic>
   </ItemGroup>

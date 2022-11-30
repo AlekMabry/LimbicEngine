@@ -1,18 +1,17 @@
 #pragma once
 
 #include <QOpenGLExtraFunctions>
-#include <qopenglwidget.h>
+#include <QOpenGLWidget>
 
-class ViewPortWidget : public QOpenGLWidget, public QOpenGLExtraFunctions
+class ViewportWidget : public QOpenGLWidget, public QOpenGLExtraFunctions
 {
 	Q_OBJECT
 
 public:
-	ViewPortWidget(QWidget *parent = nullptr);
-	~ViewPortWidget();
+	ViewportWidget(QWidget* parent = nullptr);
+	~ViewportWidget();
 
 	void initializeGL() override;
 	void resizeGL(int w, int h) override;
 	void paintGL() override;
 };
-

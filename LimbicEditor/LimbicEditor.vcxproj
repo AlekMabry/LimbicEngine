@@ -106,35 +106,22 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Resource.cpp" />
-    <ClCompile Include="ResourceManager.cpp" />
     <ClCompile Include="SettingsDialog.cpp" />
-    <ClCompile Include="Node.cpp" />
-    <ClCompile Include="Map.cpp" />
-    <ClCompile Include="QSceneTreeModel.cpp" />
-    <ClCompile Include="TextureGroupListModel.cpp" />
-    <ClCompile Include="TextureManagerWidget.cpp" />
-    <ClCompile Include="ViewPortWidget.cpp" />
+    <ClCompile Include="ViewportWidget.cpp" />
     <QtRcc Include="LimbicEditor.qrc" />
     <QtUic Include="Settings.ui" />
     <QtUic Include="Editor.ui" />
     <QtMoc Include="EditorWindow.h" />
     <ClCompile Include="EditorWindow.cpp" />
     <ClCompile Include="main.cpp" />
-    <QtUic Include="TextureManager.ui" />
+    <QtUic Include="Resources.ui" />
   </ItemGroup>
   <ItemGroup>
-    <QtMoc Include="ViewPortWidget.h" />
+    <QtMoc Include="ViewportWidget.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Resource.h" />
-    <ClInclude Include="TextureGroupListModel.h" />
-    <QtMoc Include="ResourceManager.h" />
-    <QtMoc Include="TextureManagerWidget.h" />
+    <ClInclude Include="EditorTypes.h" />
     <QtMoc Include="SettingsDialog.h" />
-    <ClInclude Include="Node.h" />
-    <ClInclude Include="Map.h" />
-    <QtMoc Include="QSceneTreeModel.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">

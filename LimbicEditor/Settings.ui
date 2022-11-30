@@ -38,21 +38,21 @@
           <item row="0" column="0">
            <widget class="QLabel" name="label">
             <property name="text">
-             <string>Asset Import Directory:</string>
+             <string>Resource Import Directory:</string>
             </property>
            </widget>
           </item>
           <item row="0" column="1">
            <layout class="QHBoxLayout" name="horizontalLayout_2">
             <item>
-             <widget class="QLineEdit" name="lineEdit_assetImportDirectory">
+             <widget class="QLineEdit" name="lineEdit_resourceImportDirectory">
               <property name="readOnly">
                <bool>true</bool>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="QToolButton" name="toolButton_assetImportDirectory">
+             <widget class="QToolButton" name="toolButton_resourceImportDirectory">
               <property name="text">
                <string>...</string>
               </property>
@@ -63,21 +63,21 @@
           <item row="1" column="0">
            <widget class="QLabel" name="label_2">
             <property name="text">
-             <string>Asset Export Directory:</string>
+             <string>Resource Export Directory:</string>
             </property>
            </widget>
           </item>
           <item row="1" column="1">
            <layout class="QHBoxLayout" name="horizontalLayout_3">
             <item>
-             <widget class="QLineEdit" name="lineEdit_assetExportDirectory">
+             <widget class="QLineEdit" name="lineEdit_resourceExportDirectory">
               <property name="readOnly">
                <bool>true</bool>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="QToolButton" name="toolButton_assetExportDirectory">
+             <widget class="QToolButton" name="toolButton_resourceExportDirectory">
               <property name="text">
                <string>...</string>
               </property>

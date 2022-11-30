@@ -1,25 +1,24 @@
-#include "ViewPortWidget.h"
+#include "ViewportWidget.h"
 
-ViewPortWidget::ViewPortWidget(QWidget* parent)
+ViewportWidget::ViewportWidget(QWidget* parent)
 {
 }
 
-ViewPortWidget::~ViewPortWidget()
+ViewportWidget::~ViewportWidget()
 {
 }
 
-void ViewPortWidget::initializeGL()
+void ViewportWidget::initializeGL()
 {
 	initializeOpenGLFunctions();
 	glClearColor(0.0f, 1.0f, 1.0f, 1.0f);
-	
 }
 
-void ViewPortWidget::resizeGL(int w, int h)
+void ViewportWidget::resizeGL(int w, int h)
 {
 }
 
-void ViewPortWidget::paintGL()
+void ViewportWidget::paintGL()
 {
 	glClear(GL_COLOR_BUFFER_BIT);
 }

@@ -1,61 +1,49 @@
 #include "SettingsDialog.h"
 
-SettingsDialog::SettingsDialog(QWidget *parent)
-    : QDialog(parent)
+SettingsDialog::SettingsDialog(QWidget* parent) : QDialog(parent)
 {
-    ui.setupUi(this);
+	ui.setupUi(this);
 
-    QSettings settings;
+	QSettings settings;
 
-    if (settings.contains("Editor/AssetImportDirectory"))
-        ui.lineEdit_assetImportDirectory->setText(
-            settings.value("Editor/AssetImportDirectory").toString());
+	if (settings.contains("Editor/resourceImportDirectory"))
+		ui.lineEdit_resourceImportDirectory->setText(settings.value("Editor/resourceImportDirectory").toString());
 
-    connect(ui.toolButton_assetImportDirectory,
-            SIGNAL(clicked()),
-            this, SLOT(setAssetImportDirectory()));
+	connect(ui.toolButton_resourceImportDirectory, SIGNAL(clicked()), this, SLOT(setResourceImportDirectory()));
 
-    if (settings.contains("Editor/AssetExportDirectory"))
-        ui.lineEdit_assetExportDirectory->setText(
-            settings.value("Editor/AssetExportDirectory").toString());
+	if (settings.contains("Editor/resourceExportDirectory"))
+		ui.lineEdit_resourceExportDirectory->setText(settings.value("Editor/resourceExportDirectory").toString());
 
-    connect(ui.toolButton_assetExportDirectory,
-            SIGNAL(clicked()),
-            this,
-            SLOT(setAssetExportDirectory()));
+	connect(ui.toolButton_resourceExportDirectory, SIGNAL(clicked()), this, SLOT(setResourceExportDirectory()));
 
-    connect(ui.pushButton_save, SIGNAL(clicked()), this, SLOT(saveSettings()));
-    connect(ui.pushButton_close, SIGNAL(clicked()), this, SLOT(close()));
+	connect(ui.pushButton_save, SIGNAL(clicked()), this, SLOT(saveSettings()));
+	connect(ui.pushButton_close, SIGNAL(clicked()), this, SLOT(close()));
 }
 
-void SettingsDialog::setAssetImportDirectory()
+void SettingsDialog::setResourceImportDirectory()
 {
-    QString dir = QFileDialog::getExistingDirectory(this,
-        tr("Asset Import Directory"), "",
-        QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+	QString dir = QFileDialog::getExistingDirectory(
+		this, tr("Resource Import Directory"), "", QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
 
-    ui.lineEdit_assetImportDirectory->setText(dir);
-    ui.pushButton_save->setEnabled(true);
+	ui.lineEdit_resourceImportDirectory->setText(dir);
+	ui.pushButton_save->setEnabled(true);
 }
 
-void SettingsDialog::setAssetExportDirectory()
+void SettingsDialog::setResourceExportDirectory()
 {
-    QString dir = QFileDialog::getExistingDirectory(this,
-                                                    tr("Asset Export Directory"),
-                                                    "",
-                                                    QFileDialog::ShowDirsOnly
-                                                        | QFileDialog::DontResolveSymlinks);
+	QString dir = QFileDialog::getExistingDirectory(
+		this, tr("Resource Export Directory"), "", QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
 
-    ui.lineEdit_assetExportDirectory->setText(dir);
-    ui.pushButton_save->setEnabled(true);
+	ui.lineEdit_resourceExportDirectory->setText(dir);
+	ui.pushButton_save->setEnabled(true);
 }
 
 void SettingsDialog::saveSettings()
 {
-    QSettings settings;
+	QSettings settings;
 
-    settings.setValue("Editor/AssetImportDirectory", ui.lineEdit_assetImportDirectory->text());
-    settings.setValue("Editor/AssetExportDirectory", ui.lineEdit_assetExportDirectory->text());
+	settings.setValue("Editor/ResourceImportDirectory", ui.lineEdit_resourceImportDirectory->text());
+	settings.setValue("Editor/ResourceExportDirectory", ui.lineEdit_resourceExportDirectory->text());
 
-    ui.pushButton_save->setEnabled(false);
+	ui.pushButton_save->setEnabled(false);
 }
