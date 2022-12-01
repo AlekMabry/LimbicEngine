@@ -3,12 +3,12 @@
 Game::Game()
 {
 	resources = std::make_unique<ResourceManager>();
+	io = std::make_unique<GLFWIO>("Limbic Engine", 1280, 720);
+	renderer = std::make_unique<VulkanRenderer>();
 }
 
-void Game::Render()
+void Game::Run()
 {
-	glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT);
 }
 
 ResourceManager* Game::GetResourceManager() const
