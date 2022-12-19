@@ -13,7 +13,6 @@ public:
 	ResourceManager* GetResourceManager() const;
 
 protected:
-	std::string name;
 	std::unique_ptr<ResourceManager> resources;
 	std::unique_ptr<GLFWIO> io;
 	std::unique_ptr<VulkanRenderer> renderer;
