@@ -13,15 +13,13 @@
 #include <fstream>
 #include <vulkan/vulkan.hpp>
 #include <vulkan/vulkan_win32.h>
+#include "LimbicTypes.h"
 
 //#define GLM_FORCE_LEFT_HANDED
 //#define GLM_DEPTH_ZERO_TO_ONE
 #include <glm/vec3.hpp>
 #include <glm/vec2.hpp>
 #include <glm/mat4x4.hpp>
-#define GLM_FORCE_RADIANS
-#include <glm/gtc/matrix_transform.hpp>
-#include <chrono>
 
 using namespace glm;
 
@@ -83,9 +81,7 @@ const std::vector<uint16_t> indices = {0, 1, 2, 2, 3, 0, 4, 5, 6, 6, 7, 4};
 
 struct SUniformBufferObject
 {
-	mat4 model;
-	mat4 view;
-	mat4 proj;
+	mat4 transform;
 };
 
 struct SQueueFamilyIndices
@@ -106,31 +102,111 @@ struct SSwapChainSupportDetails
 	std::vector<VkPresentModeKHR> presentModes;
 };
 
+enum ETextureType
+{
+	TEXTURE_TYPE_DXT1
+};
+
+struct SDrawPBRMesh
+{
+	uint32 meshIndex;
+	uint32 albedoTextureIndex;
+	uint32 normalTextureIndex;
+	uint32 materialTextureIndex;
+	uint32 lightmapTextureIndex;
+	mat4 transform;
+};
+
+struct SLights
+{
+	vec4 lights[8];
+};
+
+enum EMemoryLocation
+{
+	MEMORY_LOCATION_HOST,
+	MEMORY_LOCATION_SHARED,
+	MEMORY_LOCATION_DEVICE
+};
+
+struct SMeshMemoryIndex
+{
+	EMemoryLocation location;
+	uint32 vertexBlock;
+	uint32 indexBlock;
+	uint32 vertexOffset;
+	uint32 vertices;
+	uint32 indexOffset;
+	uint32 indices;
+};
+
+struct SMemoryBlock
+{
+	VkBuffer buffer;
+	VkDeviceMemory memory;
+	size_t cursor;
+	size_t availableMemory;
+	void* mappedLocation;
+};
+
+const size_t MEMORY_BLOCK_SIZE = 32 * 1024;
+
 class VulkanRenderer
 {
 public:
 	VulkanRenderer(const char* applicationName, uint32 width, uint32 height, HWND window, HINSTANCE process);
+
 	~VulkanRenderer();
-	void DrawFrame();
-	void FramebufferResized();
+	
+	/* Call to tell renderer that the window surface has been resized. */
+	void Resize();
+
+	/* Creates static mesh, provides staging buffer to write vertices and indices to. */
+	void CreateStaticMesh(uint32 vertices, uint32 indices, uint32& meshIndex, SStaticVertex*& vertexBuffer, uint32*& indexBuffer);
+
+	/* Uploads data from staging buffer to device. */
+	void SubmitStaticMeshes();
+
+	/* Creates texture, provides staging buffer to write image to. */
+	void CreateTexture(uint32 width, uint32 height, ETextureType type, uint32& objectIndexIndex, void** textureBuffer);
+
+	/* Uploads data from texture buffer to device. */
+	void SubmitTexture(uint32 objectIndex);
+
+	/* Flags object for deletion. */
+	void DeleteObject(uint32 objectIndex);
+
+	/* Set lights for current frame. */
+	void FrameSetLights(SLights* lights);
+
+	/* Set static PBR mesh uniforms for current frame. */
+	void FrameSetStaticPBRMeshes(uint32 meshCount, SDrawPBRMesh* meshes);
+
+	/* Draw current frame. */
+	void FrameDraw();
 
 private:
+	/**** QUERYING/PICKING UTILITIES ****/
 	bool CheckInstanceExtensionSupport(const std::vector<const char*>& extensions);
-	bool CheckValidationLayerSupport(const std::vector<const char*>& layers);
-	void SetupDebugMessenger();
-	void CreateInstance();
-
 	bool CheckDeviceExtensionSupport(VkPhysicalDevice device, const std::vector<const char*>& extensions);
+	bool CheckValidationLayerSupport(const std::vector<const char*>& layers);
 	bool IsDeviceSuitable(VkPhysicalDevice device, const std::vector<const char*>& extensions);
 	void PickPhysicalDevice(const std::vector<const char*>& extensions);
 	SQueueFamilyIndices FindQueueFamilies(VkPhysicalDevice device);
-
-	void CreateLogicalDevice(const std::vector<const char*>& extensions);
-	void CreateSurface();
 	SSwapChainSupportDetails QuerySwapChainSupport(VkPhysicalDevice device);
 	VkSurfaceFormatKHR PickSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);
 	VkPresentModeKHR PickSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes);
 	VkExtent2D PickSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities);
+	uint32 FindMemoryType(uint32 typeFilter, VkMemoryPropertyFlags properties);
+	VkFormat FindSupportedFormat(const std::vector<VkFormat>& candidates, VkImageTiling tiling, VkFormatFeatureFlags features);
+	VkFormat FindDepthFormat();
+	bool HasStencilComponent(VkFormat format);
+
+	/**** CREATE *****/
+	void CreateInstance();
+	void CreateDebugMessenger();
+	void CreateLogicalDevice(const std::vector<const char*>& extensions);
+	void CreateSurface();
 	void CreateSwapChain();
 	VkImageView CreateImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags);
 	void CreateImageViews();
@@ -145,17 +221,17 @@ private:
 	void CreateSyncObjects();
 	void RecreateSwapChain();
 	void DestroySwapChain();
-	void CreateVertexBuffers();
-	uint32 FindMemoryType(uint32 typeFilter, VkMemoryPropertyFlags properties);
+	void CreateVertexBuffers();	
 	void CreateBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer,
 		VkDeviceMemory& bufferMemory);
 	void CopyBuffer(VkBuffer sourceBuffer, VkBuffer destinationBuffer, VkDeviceSize size);
 	void CreateIndexBuffers();
+
 	void CreateDescriptorSetLayout();
 	void CreateUniformBuffers();
-	void UpdateUniformBuffer(uint32 currentImage);
 	void CreateDescriptorPool();
 	void CreateDescriptorSets();
+
 	void CreateImage(uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage,
 		VkMemoryPropertyFlags properties, VkImage& image, VkDeviceMemory& imageMemory);
 	void CreateTextureImage();
@@ -167,15 +243,27 @@ private:
 	void CreateTextureImageView();
 	void CreateTextureSampler();
 	void CreateDepthResources();
-	VkFormat FindSupportedFormat(const std::vector<VkFormat>& candidates, VkImageTiling tiling, VkFormatFeatureFlags features);
-	VkFormat FindDepthFormat();
-	bool HasStencilComponent(VkFormat format);
+
+	/**** DESTROY ****/
+
+	/**** DYNAMIC ****/
+
+	/**** MEMORY MANAGER ***/
+
+	void CreateDeviceMemoryManager();
+	void DestroyDeviceMemoryManager();
+	void DeviceMalloc(size_t size, uint32 alignment, size_t& offset, uint32& block);
+
+	/**** DEBUG ****/
 
 	void ConfigureDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& info);
+
 	static VkResult CreateDebugUtilsMessengerEXT(VkInstance instance, const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo,
 		const VkAllocationCallbacks* pAllocator, VkDebugUtilsMessengerEXT* pDebugMessenger);
+
 	static void DestroyDebugUtilsMessengerEXT(
 		VkInstance instance, VkDebugUtilsMessengerEXT debugMessenger, const VkAllocationCallbacks* pAllocator);
+
 	static VKAPI_ATTR VkBool32 VKAPI_CALL DebugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
 		VkDebugUtilsMessageTypeFlagsEXT messageType, const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData);
 
@@ -224,4 +312,14 @@ private:
 	VkSampler textureSampler;
 	VkDeviceMemory depthImageMemory;
 	bool framebufferResized = false;
+
+	uint32 deviceVertexAlignment;
+	uint32 deviceIndexAlignment;
+
+	std::vector<SMeshMemoryIndex> meshes;
+	std::vector<uint32> meshesInStagingMemory;
+
+	std::vector<SMemoryBlock> deviceMemory;		/* GPU memory blocks. */
+	std::vector<SMemoryBlock> uniformMemory;	/* Local-visible GPU memory for changing values. */
+	std::vector<SMemoryBlock> stagingMemory;	/* Local memory-mapped staging blocks. */
 };

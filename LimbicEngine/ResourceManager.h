@@ -10,33 +10,7 @@
 #include <memory>
 #include <string>
 #include <unordered_map>
-
-struct STexture
-{
-};
-
-struct SMaterial
-{
-	STexture* albedo;
-	STexture* normal;
-	STexture* material;
-};
-
-struct SStaticVertex
-{
-	float position[3];
-	float normal[3];
-	float tangent[3];
-	float bitangent[3];
-	float uv[2];
-};
-
-struct SMesh
-{
-	uint32 vertexCount;
-	std::vector<SStaticVertex> vertices;
-	std::vector<uint32> indices;
-};
+#include "LimbicTypes.h"
 
 class ResourceManager
 {

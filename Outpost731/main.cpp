@@ -2,10 +2,6 @@
 
 int main()
 {
-	//std::string fbx = "C:/Users/alekm/Desktop/Assets/Static/Truss/Truss.fbx";
-	//std::string object = "Truss";
-	//resources->LoadMesh(fbx, object);
-
 	std::unique_ptr<Game> game;
 
 	try {
