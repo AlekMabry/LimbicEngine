@@ -59,11 +59,13 @@ SMesh* ResourceManager::LoadMesh(std::string& filename, std::string& nodeName)
 		return nullptr;
 	}
 
-	std::unique_ptr<SMesh> outputMesh = std::make_unique<SMesh>();
+	SMesh* outputMesh = new(SMesh);
 
 	FbxMesh* fbxMesh = fbxMeshNode->GetMesh();
 	uint32 fbxMeshPolygonCount = fbxMesh->GetPolygonCount();
 	uint32 fbxMeshControlPointCount = fbxMesh->GetControlPointsCount();
+	uint32 fbxMeshUVCount = fbxMesh->GetElementUVCount();
+	FbxGeometryElementUV* fbxMeshUV = fbxMesh->GetElementUV(0);
 
 	uint32 currentMeshIndex = 0;
 
@@ -76,10 +78,19 @@ SMesh* ResourceManager::LoadMesh(std::string& filename, std::string& nodeName)
 		for (uint32 j = 0; j < faceVertexCount; j++)
 		{
 			uint32 fbxControlPointIndex = fbxMesh->GetPolygonVertex(i, j);
+			uint32 fbxUVIndex = fbxMesh->GetTextureUVIndex(i, j);
 			FbxVector4 fbxControlPoint = fbxMesh->GetControlPointAt(fbxControlPointIndex);
-			SStaticVertex vertex;
+			FbxVector2 fbxUV = fbxMeshUV->GetDirectArray().GetAt(fbxUVIndex);
+			SStaticVertex vertex{};
 			for (uint32 k = 0; k < 3; k++)
-				vertex.position[k] = fbxControlPoint.mData[k];	// Double to float
+			{
+				vertex.position[k] = static_cast<float>(fbxControlPoint.mData[k]);	  // Double to float
+			}
+			for (uint32 k = 0; k < 2; k++)
+			{
+				vertex.textureUV[k] = static_cast<float>(fbxUV.mData[k]);
+			}
+
 			outputMesh->vertices.push_back(vertex);
 		}
 
@@ -94,7 +105,8 @@ SMesh* ResourceManager::LoadMesh(std::string& filename, std::string& nodeName)
 		currentMeshIndex += faceVertexCount;
 	}
 
-	meshes[nodeName] = std::move(outputMesh);
+	//meshes.insert(std::pair<std::string, SMesh>(nodeName, outputMesh));
+	return outputMesh;
 }
 
 FbxNode* ResourceManager::GetFbxNode(FbxNode* root, std::string& nodeName) const

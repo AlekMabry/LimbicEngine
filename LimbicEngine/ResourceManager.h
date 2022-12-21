@@ -26,5 +26,5 @@ protected:
 
 	FbxManager* fbxManager;
 	FbxIOSettings* fbxIOSettings;
-	std::unordered_map<std::string, std::unique_ptr<SMesh>> meshes;
+	std::unordered_map<std::string, SMesh> meshes;
 };

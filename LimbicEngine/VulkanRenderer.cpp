@@ -43,12 +43,17 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL DebugCallback(VkDebugUtilsMessageSeverityF
 			break;
 		case VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT:
 			SetConsoleTextAttribute(win32Console, FOREGROUND_GREEN | FOREGROUND_RED);
-			std::cout << "[WARNING] yellowblack{" << pCallbackData->pMessage << "}" << std::endl;
+			std::cout << "[WARNING] " << pCallbackData->pMessage << std::endl;
 			SetConsoleTextAttribute(win32Console, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
 			break;
 		case VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT:
 			SetConsoleTextAttribute(win32Console, FOREGROUND_RED);
-			std::cout << "[ERROR] redblack{" << pCallbackData->pMessage << "}" << std::endl;
+			std::cout << "[ERROR] " << pCallbackData->pMessage << std::endl;
+			SetConsoleTextAttribute(win32Console, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
+			break;
+		default:
+			SetConsoleTextAttribute(win32Console, FOREGROUND_RED);
+			std::cout << "[DEFAULT] " << pCallbackData->pMessage << std::endl;
 			SetConsoleTextAttribute(win32Console, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
 			break;
 	}
@@ -85,9 +90,7 @@ VulkanRenderer::VulkanRenderer(const char* applicationName, uint32 width, uint32
 	CreateCommandPool();
 	CreateTextureImage();
 	CreateTextureImage();
-	CreateVertexBuffers();
-	// CreateDeviceMemoryManager();
-	CreateIndexBuffers();
+	CreateDeviceMemoryManager();
 	CreateUniformBuffers();
 	CreateDescriptorPool();
 	CreateDescriptorSets();
@@ -621,6 +624,9 @@ void VulkanRenderer::CreateInstance()
 
 void VulkanRenderer::CreateDebugMessenger()
 {
+	if (!bEnableValidationLayers)
+		return;
+
 	VkDebugUtilsMessengerCreateInfoEXT createInfo;
 	ConfigureDebugMessengerCreateInfo(createInfo);
 
@@ -1155,8 +1161,8 @@ void VulkanRenderer::RecordCommandBuffer(VkCommandBuffer commandBuffer, uint32 i
 
 	VkBuffer vertexBuffers[] = {deviceMemory[meshes[0].vertexBlock].buffer};
 	VkDeviceSize vertexOffsets[] = {meshes[0].vertexOffset};
-	// vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, vertexOffsets);
-	// vkCmdBindIndexBuffer(commandBuffer, deviceMemory[meshes[0].indexBlock].buffer, meshes[0].indexOffset, VK_INDEX_TYPE_UINT32);
+	vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, vertexOffsets);
+	vkCmdBindIndexBuffer(commandBuffer, deviceMemory[meshes[0].indexBlock].buffer, meshes[0].indexOffset, VK_INDEX_TYPE_UINT32);
 
 	VkViewport viewport{};
 	viewport.x = 0.0f;
@@ -1174,8 +1180,7 @@ void VulkanRenderer::RecordCommandBuffer(VkCommandBuffer commandBuffer, uint32 i
 
 	vkCmdBindDescriptorSets(
 		commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSets[currentFrame], 0, nullptr);
-	// vkCmdDrawIndexed(commandBuffer, meshes[0].indices, 1, 0, 0, 0);
-	vkCmdDrawIndexed(commandBuffer, 0, 0, 0, 0, 0);
+	vkCmdDrawIndexed(commandBuffer, meshes[0].indices, 1, 0, 0, 0);
 	vkCmdEndRenderPass(commandBuffer);
 
 	if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS)
@@ -1235,52 +1240,6 @@ void VulkanRenderer::DestroySwapChain()
 	}
 
 	vkDestroySwapchainKHR(device, swapChain, nullptr);
-}
-
-void VulkanRenderer::CreateVertexBuffers()
-{
-	VkDeviceSize bufferSize = sizeof(vertices[0]) * vertices.size();
-
-	VkBuffer stagingBuffer;
-	VkDeviceMemory stagingBufferMemory;
-	CreateBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-		VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer, stagingBufferMemory);
-
-	void* data;
-	vkMapMemory(device, stagingBufferMemory, 0, bufferSize, 0, &data);
-	memcpy(data, vertices.data(), static_cast<size_t>(bufferSize));
-	vkUnmapMemory(device, stagingBufferMemory);
-
-	CreateBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
-		VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, vertexBuffer, vertexBufferMemory);
-
-	CopyBuffer(stagingBuffer, vertexBuffer, bufferSize);
-
-	vkDestroyBuffer(device, stagingBuffer, nullptr);
-	vkFreeMemory(device, stagingBufferMemory, nullptr);
-}
-
-void VulkanRenderer::CreateIndexBuffers()
-{
-	VkDeviceSize bufferSize = sizeof(indices[0]) * indices.size();
-
-	VkBuffer stagingBuffer;
-	VkDeviceMemory stagingBufferMemory;
-	CreateBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-		VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer, stagingBufferMemory);
-
-	void* data;
-	vkMapMemory(device, stagingBufferMemory, 0, bufferSize, 0, &data);
-	memcpy(data, indices.data(), (size_t) bufferSize);
-	vkUnmapMemory(device, stagingBufferMemory);
-
-	CreateBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
-		VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, indexBuffer, indexBufferMemory);
-
-	CopyBuffer(stagingBuffer, indexBuffer, bufferSize);
-
-	vkDestroyBuffer(device, stagingBuffer, nullptr);
-	vkFreeMemory(device, stagingBufferMemory, nullptr);
 }
 
 void VulkanRenderer::CreateBuffer(

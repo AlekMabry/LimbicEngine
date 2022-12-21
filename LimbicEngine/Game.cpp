@@ -11,18 +11,17 @@ Game::Game()
 
 void Game::Run()
 {
-	//std::string fbx = "C:/Users/alekm/Desktop/Assets/Static/Truss/Truss.fbx";
-	//std::string object = "Truss";
-	//resources->LoadMesh(fbx, object);
-	//uint32 trussMesh;
-	
-	//uint32 pyramidMesh;
-	//SStaticVertex* verticesPtr;
-	//uint32* indicesPtr;
-	//renderer->CreateStaticMesh(9, 9, pyramidMesh, verticesPtr, indicesPtr);
-	//memcpy(verticesPtr, pyramid, sizeof(SStaticVertex) * 9);
-	//memcpy(indicesPtr, pyramidIndices, sizeof(uint32) * 9);
-	//renderer->SubmitStaticMeshes();
+	std::string fbx = "C:/Users/alekm/Desktop/Assets/Static/Truss/Truss.fbx";
+	std::string object = "Truss";
+	SMesh* trussData = resources->LoadMesh(fbx, object);
+
+	uint32 trussMesh;
+	SStaticVertex* verticesPtr;
+	uint32* indicesPtr;
+	renderer->CreateStaticMesh(trussData->vertices.size(), trussData->indices.size(), trussMesh, verticesPtr, indicesPtr);
+	memcpy(verticesPtr, trussData->vertices.data(), sizeof(SStaticVertex) * trussData->vertices.size());
+	memcpy(indicesPtr, trussData->indices.data(), sizeof(uint32) * trussData->indices.size());
+	renderer->SubmitStaticMeshes();
 
 	auto lastTickTime = std::chrono::high_resolution_clock::now();
 	float angle = 0.0f;
@@ -49,10 +48,10 @@ void Game::Run()
 
 		mat4 mvp = proj * view * model;
 
-		//std::vector<SDrawPBRMesh> staticMeshes;
-		//staticMeshes.push_back({0, 0, 0, 0, 0, mvp});
-		//renderer->FrameSetStaticPBRMeshes(static_cast<uint32>(staticMeshes.size()), staticMeshes.data());
-		//renderer->FrameDraw();
+		std::vector<SDrawPBRMesh> staticMeshes;
+		staticMeshes.push_back({0, 0, 0, 0, 0, mvp});
+		renderer->FrameSetStaticPBRMeshes(static_cast<uint32>(staticMeshes.size()), staticMeshes.data());
+		renderer->FrameDraw();
 	}
 }
 
