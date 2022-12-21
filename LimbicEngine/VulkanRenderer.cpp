@@ -1,6 +1,62 @@
 #include "VulkanRenderer.h"
 
+static VkResult CreateDebugUtilsMessengerEXT(VkInstance instance, const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo,
+	const VkAllocationCallbacks* pAllocator, VkDebugUtilsMessengerEXT* pDebugMessenger)
+{
+	auto func = (PFN_vkCreateDebugUtilsMessengerEXT) vkGetInstanceProcAddr(instance, "vkCreateDebugUtilsMessengerEXT");
+	if (func != nullptr)
+	{
+		return func(instance, pCreateInfo, pAllocator, pDebugMessenger);
+	}
+	else
+	{
+		return VK_ERROR_EXTENSION_NOT_PRESENT;
+	}
+}
+
+static void DestroyDebugUtilsMessengerEXT(
+	VkInstance instance, VkDebugUtilsMessengerEXT debugMessenger, const VkAllocationCallbacks* pAllocator)
+{
+	auto func = (PFN_vkDestroyDebugUtilsMessengerEXT) vkGetInstanceProcAddr(instance, "vkDestroyDebugUtilsMessengerEXT");
+	if (func != nullptr)
+	{
+		func(instance, debugMessenger, pAllocator);
+	}
+}
+
+static VKAPI_ATTR VkBool32 VKAPI_CALL DebugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
+	VkDebugUtilsMessageTypeFlagsEXT messageType, const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData)
+{
+	HANDLE win32Console = static_cast<HANDLE>(pUserData);
+
+	switch (messageSeverity)
+	{
+		case VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT:
+			SetConsoleTextAttribute(win32Console, FOREGROUND_GREEN);
+			std::cout << "[VERBOSE] " << pCallbackData->pMessage << std::endl;
+			SetConsoleTextAttribute(win32Console, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
+			break;
+		case VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT:
+			SetConsoleTextAttribute(win32Console, FOREGROUND_GREEN | FOREGROUND_BLUE);
+			std::cout << "[INFO] " << pCallbackData->pMessage << std::endl;
+			SetConsoleTextAttribute(win32Console, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
+			break;
+		case VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT:
+			SetConsoleTextAttribute(win32Console, FOREGROUND_GREEN | FOREGROUND_RED);
+			std::cout << "[WARNING] yellowblack{" << pCallbackData->pMessage << "}" << std::endl;
+			SetConsoleTextAttribute(win32Console, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
+			break;
+		case VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT:
+			SetConsoleTextAttribute(win32Console, FOREGROUND_RED);
+			std::cout << "[ERROR] redblack{" << pCallbackData->pMessage << "}" << std::endl;
+			SetConsoleTextAttribute(win32Console, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
+			break;
+	}
+	return VK_FALSE;
+}
+
 /**** PUBLIC INTERFACE ****/
+
 VulkanRenderer::VulkanRenderer(const char* applicationName, uint32 width, uint32 height, HWND window, HINSTANCE process)
 {
 	this->applicationName = applicationName;
@@ -9,6 +65,8 @@ VulkanRenderer::VulkanRenderer(const char* applicationName, uint32 width, uint32
 	win32Window = window;
 	win32Process = process;
 	currentFrame = 0;
+
+	win32Console = GetStdHandle(STD_OUTPUT_HANDLE);
 
 	CreateInstance();
 	CreateSurface();
@@ -28,7 +86,7 @@ VulkanRenderer::VulkanRenderer(const char* applicationName, uint32 width, uint32
 	CreateTextureImage();
 	CreateTextureImage();
 	CreateVertexBuffers();
-	CreateDeviceMemoryManager();
+	// CreateDeviceMemoryManager();
 	CreateIndexBuffers();
 	CreateUniformBuffers();
 	CreateDescriptorPool();
@@ -113,7 +171,7 @@ void VulkanRenderer::CreateStaticMesh(
 	stage->cursor += indexSize;
 
 	meshes.push_back(mesh);
-	meshesInStagingMemory.push_back(meshes.size() - 1);
+	meshesInStagingMemory.push_back(static_cast<uint32>(meshes.size()) - 1);
 	meshIndex = meshes.size() - 1;
 }
 
@@ -129,13 +187,14 @@ void VulkanRenderer::SubmitStaticMeshes()
 		copyVertexRegion.size = meshes[meshIndex].vertices * sizeof(SStaticVertex);
 		copyVertexRegion.srcOffset = meshes[meshIndex].vertexOffset;
 		DeviceMalloc(copyVertexRegion.size, deviceVertexAlignment, copyVertexRegion.dstOffset, vertexBlock);
-		vkCmdCopyBuffer(commandBuffer, stagingMemory[meshes[meshIndex].vertexBlock].buffer, deviceMemory[vertexBlock].buffer, 1, &copyVertexRegion);
+		vkCmdCopyBuffer(commandBuffer, stagingMemory[meshes[meshIndex].vertexBlock].buffer, deviceMemory[vertexBlock].buffer, 1,
+			&copyVertexRegion);
 
 		copyIndexRegion.size = meshes[meshIndex].indices * sizeof(uint32);
 		copyIndexRegion.srcOffset = meshes[meshIndex].indexOffset;
 		DeviceMalloc(copyIndexRegion.size, deviceIndexAlignment, copyIndexRegion.dstOffset, indexBlock);
-		vkCmdCopyBuffer(commandBuffer, stagingMemory[meshes[meshIndex].indexBlock].buffer, deviceMemory[indexBlock].buffer,
-			1, &copyIndexRegion);
+		vkCmdCopyBuffer(commandBuffer, stagingMemory[meshes[meshIndex].indexBlock].buffer, deviceMemory[indexBlock].buffer, 1,
+			&copyIndexRegion);
 
 		// Update mesh indexing to new device memory location
 		meshes[meshIndex].location = MEMORY_LOCATION_DEVICE;
@@ -144,7 +203,7 @@ void VulkanRenderer::SubmitStaticMeshes()
 		meshes[meshIndex].vertexOffset = copyVertexRegion.dstOffset;
 		meshes[meshIndex].indexOffset = copyIndexRegion.dstOffset;
 	}
-	
+
 	EndSingleTimeCommands(commandBuffer);
 	meshesInStagingMemory.clear();
 }
@@ -545,7 +604,6 @@ void VulkanRenderer::CreateInstance()
 	{
 		createInfo.enabledLayerCount = static_cast<uint32>(validationLayers.size());
 		createInfo.ppEnabledLayerNames = validationLayers.data();
-
 		ConfigureDebugMessengerCreateInfo(debugCreateInfo);
 		createInfo.pNext = (VkDebugUtilsMessengerCreateInfoEXT*) &debugCreateInfo;
 	}
@@ -788,7 +846,6 @@ void VulkanRenderer::CreateGraphicsPipeline()
 	attributeDescriptions[5].location = 5;
 	attributeDescriptions[5].format = VK_FORMAT_R32G32_SFLOAT;
 	attributeDescriptions[5].offset = offsetof(SStaticVertex, lightmapUV);
-
 
 	VkPipelineVertexInputStateCreateInfo vertexInputCreateInfo{};
 	vertexInputCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
@@ -1096,10 +1153,10 @@ void VulkanRenderer::RecordCommandBuffer(VkCommandBuffer commandBuffer, uint32 i
 	vkCmdBeginRenderPass(commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 	vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline);
 
-	VkBuffer vertexBuffers[] = {stagingMemory[meshes[0].vertexBlock].buffer};
+	VkBuffer vertexBuffers[] = {deviceMemory[meshes[0].vertexBlock].buffer};
 	VkDeviceSize vertexOffsets[] = {meshes[0].vertexOffset};
-	vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, vertexOffsets);
-	vkCmdBindIndexBuffer(commandBuffer, stagingMemory[meshes[0].indexBlock].buffer, meshes[0].indexOffset, VK_INDEX_TYPE_UINT32);
+	// vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, vertexOffsets);
+	// vkCmdBindIndexBuffer(commandBuffer, deviceMemory[meshes[0].indexBlock].buffer, meshes[0].indexOffset, VK_INDEX_TYPE_UINT32);
 
 	VkViewport viewport{};
 	viewport.x = 0.0f;
@@ -1117,7 +1174,8 @@ void VulkanRenderer::RecordCommandBuffer(VkCommandBuffer commandBuffer, uint32 i
 
 	vkCmdBindDescriptorSets(
 		commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSets[currentFrame], 0, nullptr);
-	vkCmdDrawIndexed(commandBuffer, meshes[0].indices, 1, 0, 0, 0);
+	// vkCmdDrawIndexed(commandBuffer, meshes[0].indices, 1, 0, 0, 0);
+	vkCmdDrawIndexed(commandBuffer, 0, 0, 0, 0, 0);
 	vkCmdEndRenderPass(commandBuffer);
 
 	if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS)
@@ -1622,8 +1680,7 @@ void VulkanRenderer::CreateDeviceMemoryManager()
 {
 	SMemoryBlock deviceBlock{};
 	CreateBuffer(MEMORY_BLOCK_SIZE,
-		VK_IMAGE_USAGE_SAMPLED_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT |
-			VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
+		VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
 		VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, deviceBlock.buffer, deviceBlock.memory);
 	deviceMemory.push_back(deviceBlock);
 
@@ -1634,9 +1691,8 @@ void VulkanRenderer::CreateDeviceMemoryManager()
 
 	SMemoryBlock stagingBlock{};
 	CreateBuffer(MEMORY_BLOCK_SIZE, VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-		VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBlock.buffer,
-		stagingBlock.memory);
-	vkMapMemory(device, stagingBlock.memory, 0, 1024 * 16, 0, &stagingBlock.mappedLocation);
+		VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBlock.buffer, stagingBlock.memory);
+	vkMapMemory(device, stagingBlock.memory, 0, MEMORY_BLOCK_SIZE, 0, &stagingBlock.mappedLocation);
 	stagingMemory.push_back(stagingBlock);
 }
 
@@ -1656,88 +1712,45 @@ void VulkanRenderer::DestroyDeviceMemoryManager()
 	}
 }
 
-void VulkanRenderer::DeviceMalloc(size_t size, uint32 alignment, size_t& offset, uint32& block)
+void VulkanRenderer::DeviceMalloc(VkDeviceSize size, uint32 alignment, size_t& offset, uint32& block)
 {
 	for (size_t i = 0; i < deviceMemory.size(); i++)
 	{
-		size_t potentialOffset = deviceMemory[i].cursor + (alignment - (deviceMemory[i].cursor % alignment) + 1);
+		size_t potentialOffset = deviceMemory[i].cursor % alignment == 0
+									 ? deviceMemory[i].cursor
+									 : deviceMemory[i].cursor + (alignment - (deviceMemory[i].cursor % alignment));
 		size_t available = MEMORY_BLOCK_SIZE - potentialOffset - 1;
 
 		if (available >= size)
 		{
-			block = i;
+			block = static_cast<uint32>(i);
 			offset = potentialOffset;
-			deviceMemory[i].cursor += size;
+			deviceMemory[i].cursor = potentialOffset + size;
 			return;
 		}
 	}
 
-	block = deviceMemory.size();
+	block = static_cast<uint32>(deviceMemory.size());
 	offset = 0;
 	deviceMemory[block].cursor += size;
 
 	SMemoryBlock deviceBlock{};
 	CreateBuffer(MEMORY_BLOCK_SIZE,
-		VK_IMAGE_USAGE_SAMPLED_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT |
-			VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
+		VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
 		VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, deviceBlock.buffer, deviceBlock.memory);
 	deviceMemory.push_back(deviceBlock);
 }
 
-/**** PRIVATE DEBUG ****/
+/**** DEBUG ****/
 
 void VulkanRenderer::ConfigureDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& info)
 {
 	info = {};
 	info.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
 	info.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT |
-						   VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
+						   VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT;
 	info.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT |
 					   VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
 	info.pfnUserCallback = DebugCallback;
-}
-
-VkResult VulkanRenderer::CreateDebugUtilsMessengerEXT(VkInstance instance, const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo,
-	const VkAllocationCallbacks* pAllocator, VkDebugUtilsMessengerEXT* pDebugMessenger)
-{
-	auto func = (PFN_vkCreateDebugUtilsMessengerEXT) vkGetInstanceProcAddr(instance, "vkCreateDebugUtilsMessengerEXT");
-	if (func != nullptr)
-	{
-		return func(instance, pCreateInfo, pAllocator, pDebugMessenger);
-	}
-	else
-	{
-		return VK_ERROR_EXTENSION_NOT_PRESENT;
-	}
-}
-
-void VulkanRenderer::DestroyDebugUtilsMessengerEXT(
-	VkInstance instance, VkDebugUtilsMessengerEXT debugMessenger, const VkAllocationCallbacks* pAllocator)
-{
-	auto func = (PFN_vkDestroyDebugUtilsMessengerEXT) vkGetInstanceProcAddr(instance, "vkDestroyDebugUtilsMessengerEXT");
-	if (func != nullptr)
-	{
-		func(instance, debugMessenger, pAllocator);
-	}
-}
-
-VKAPI_ATTR VkBool32 VKAPI_CALL VulkanRenderer::DebugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
-	VkDebugUtilsMessageTypeFlagsEXT messageType, const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData)
-{
-	if (messageSeverity >= VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT)
-	{
-		switch (messageSeverity)
-		{
-			case (VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT):
-				std::cerr << "[WARNING] ";
-				break;
-
-			case (VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT):
-				std::cerr << "[ERROR] ";
-				break;
-		}
-		std::cerr << pCallbackData->pMessage << std::endl;
-	}
-
-	return VK_FALSE;
+	info.pUserData = win32Console;
 }

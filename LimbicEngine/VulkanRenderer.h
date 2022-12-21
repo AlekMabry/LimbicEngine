@@ -13,7 +13,6 @@
 #include <fstream>
 #include <vulkan/vulkan.hpp>
 #include <vulkan/vulkan_win32.h>
-#include "LimbicTypes.h"
 
 //#define GLM_FORCE_LEFT_HANDED
 //#define GLM_DEPTH_ZERO_TO_ONE
@@ -134,9 +133,9 @@ struct SMeshMemoryIndex
 	EMemoryLocation location;
 	uint32 vertexBlock;
 	uint32 indexBlock;
-	uint32 vertexOffset;
+	VkDeviceSize vertexOffset;
 	uint32 vertices;
-	uint32 indexOffset;
+	VkDeviceSize indexOffset;
 	uint32 indices;
 };
 
@@ -144,12 +143,12 @@ struct SMemoryBlock
 {
 	VkBuffer buffer;
 	VkDeviceMemory memory;
-	size_t cursor;
-	size_t availableMemory;
+	VkDeviceSize cursor;
+	VkDeviceSize availableMemory;
 	void* mappedLocation;
 };
 
-const size_t MEMORY_BLOCK_SIZE = 32 * 1024;
+const VkDeviceSize MEMORY_BLOCK_SIZE = 32 * 1024;
 
 class VulkanRenderer
 {
@@ -252,31 +251,33 @@ private:
 
 	void CreateDeviceMemoryManager();
 	void DestroyDeviceMemoryManager();
-	void DeviceMalloc(size_t size, uint32 alignment, size_t& offset, uint32& block);
+	void DeviceMalloc(VkDeviceSize size, uint32 alignment, size_t& offset, uint32& block);
 
 	/**** DEBUG ****/
-
 	void ConfigureDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& info);
-
-	static VkResult CreateDebugUtilsMessengerEXT(VkInstance instance, const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo,
+	
+	/*
+	VkResult CreateDebugUtilsMessengerEXT(VkInstance instance, const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo,
 		const VkAllocationCallbacks* pAllocator, VkDebugUtilsMessengerEXT* pDebugMessenger);
-
-	static void DestroyDebugUtilsMessengerEXT(
+	void DestroyDebugUtilsMessengerEXT(
 		VkInstance instance, VkDebugUtilsMessengerEXT debugMessenger, const VkAllocationCallbacks* pAllocator);
-
 	static VKAPI_ATTR VkBool32 VKAPI_CALL DebugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
 		VkDebugUtilsMessageTypeFlagsEXT messageType, const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData);
+	*/
+
+	HWND win32Window;
+	HINSTANCE win32Process;
+	HANDLE win32Console;
 
 	uint32 currentFrame;
 	uint32 width;
 	uint32 height;
 	std::string applicationName;
+
 	VkInstance instance;
 	VkDevice device;
 	VkQueue graphicsQueue;
 	VkQueue presentQueue;
-	HWND win32Window;
-	HINSTANCE win32Process;
 	VkSurfaceKHR surface;
 	VkSwapchainKHR swapChain;
 	std::vector<VkImage> swapChainImages;
@@ -313,8 +314,8 @@ private:
 	VkDeviceMemory depthImageMemory;
 	bool framebufferResized = false;
 
-	uint32 deviceVertexAlignment;
-	uint32 deviceIndexAlignment;
+	VkDeviceSize deviceVertexAlignment;
+	VkDeviceSize deviceIndexAlignment;
 
 	std::vector<SMeshMemoryIndex> meshes;
 	std::vector<uint32> meshesInStagingMemory;
