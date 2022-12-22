@@ -54,10 +54,13 @@ struct SSwapChainSupportDetails
 	std::vector<VkPresentModeKHR> presentModes;
 };
 
-enum ETextureType
+enum ETextureFormat
 {
-	TEXTURE_TYPE_DXT1
+	eTextureFormatRGBA,
+	eTextureFormatDXT1
 };
+
+const VkFormat textureFormatVkFormat[2] = {VK_FORMAT_R8G8B8A8_SRGB, VK_FORMAT_BC1_RGB_UNORM_BLOCK};
 
 struct SDrawPBRMesh
 {
@@ -76,12 +79,30 @@ struct SLights
 
 enum EMemoryLocation
 {
-	MEMORY_LOCATION_HOST,
-	MEMORY_LOCATION_SHARED,
-	MEMORY_LOCATION_DEVICE
+	eMemoryLocationHost,
+	eMemoryLocationDevice
 };
 
-struct SMeshMemoryIndex
+/* Maps EMemoryLocation enums to the Vulkan memory property flags. */
+const VkMemoryType memoryLocationVkFlags[2] = {VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+	VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT | VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT};
+
+enum EMemoryBlockUsage
+{
+	eMemoryBlockUsageGeometry,
+	eMemoryBlockUsageUniforms,
+	eMemoryBlockUsageImages,
+	eMemoryBlockUsageStaging
+};
+
+/* Maps EMemoryBlockUsage enums to the Vulkan buffer usage flags. */
+const VkBufferUsageFlags memoryBlockUsageVkFlags[4] = {
+	VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
+	VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
+	VK_BUFFER_USAGE_TRANSFER_SRC_BIT
+};
+
+struct SMeshMemoryHandle
 {
 	EMemoryLocation location;
 	uint32 vertexBlock;
@@ -92,9 +113,20 @@ struct SMeshMemoryIndex
 	uint32 indices;
 };
 
+struct STextureMemoryHandle
+{
+	EMemoryLocation location;
+	uint32 block;
+	VkDeviceSize offset;
+	VkDeviceSize size;
+	VkImage image;
+};
+
 struct SMemoryBlock
 {
+	EMemoryBlockUsage usage;
 	VkBuffer buffer;
+	VkImage image;
 	VkDeviceMemory memory;
 	VkDeviceSize cursor;
 	VkDeviceSize availableMemory;
@@ -114,16 +146,13 @@ public:
 	void Resize();
 
 	/* Creates static mesh, provides staging buffer to write vertices and indices to. */
-	void CreateStaticMesh(uint32 vertices, uint32 indices, uint32& meshIndex, SStaticVertex*& vertexBuffer, uint32*& indexBuffer);
-
-	/* Uploads data from staging buffer to device. */
-	void SubmitStaticMeshes();
+	void CreateStaticMesh(uint32 vertices, uint32 indices, uint32& meshHandle, SStaticVertex*& vertexBuffer, uint32*& indexBuffer);
 
 	/* Creates texture, provides staging buffer to write image to. */
-	void CreateTexture(uint32 width, uint32 height, ETextureType type, uint32& objectIndexIndex, void** textureBuffer);
+	void CreateTexture(uint32 width, uint32 height, ETextureFormat format, uint32& textureHandle, void*& textureBuffer);
 
-	/* Uploads data from texture buffer to device. */
-	void SubmitTexture(uint32 objectIndex);
+	/* Uploads data from staging buffer to device. */
+	void SubmitAssets();
 
 	/* Flags object for deletion. */
 	void DeleteObject(uint32 objectIndex);
@@ -153,30 +182,31 @@ private:
 	VkFormat FindSupportedFormat(const std::vector<VkFormat>& candidates, VkImageTiling tiling, VkFormatFeatureFlags features);
 	VkFormat FindDepthFormat();
 	bool HasStencilComponent(VkFormat format);
-
-	/**** CREATE *****/
-	void CreateInstance();
-	void CreateDebugMessenger();
-	void CreateLogicalDevice(const std::vector<const char*>& extensions);
-	void CreateSurface();
-	void CreateSwapChain();
+	void PickDeviceMemoryHeaps();
 	VkImageView CreateImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags);
-	void CreateImageViews();
-	void CreateGraphicsPipeline();
 	std::vector<char> LoadSPIRV(const std::string& filename);
 	VkShaderModule CreateShaderModule(const std::vector<char>& code);
-	void CreateRenderPass();
-	void CreateFramebuffers();
-	void CreateCommandPool();
-	void CreateCommandBuffers();
 	void RecordCommandBuffer(VkCommandBuffer commandBuffer, uint32 imageIndex);
-	void CreateSyncObjects();
+
+	/**** INITIALIZE *****/
+	void InitInstance();
+	void InitDebugMessenger();
+	void InitDevice(const std::vector<const char*>& extensions);
+	void InitSurface();
+	void InitSwapChain();
+	void InitGraphicsPipeline();
+	void InitRenderPass();
+	void InitSwapChainFramebuffers();
+	void InitGraphicsCommandPool();
+	void InitCommandBuffers();
+	void InitSyncObjects();
+	
+
 	void RecreateSwapChain();
 	void DestroySwapChain();
 	void CreateBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer,
 		VkDeviceMemory& bufferMemory);
 	void CopyBuffer(VkBuffer sourceBuffer, VkBuffer destinationBuffer, VkDeviceSize size);
-
 	void CreateDescriptorSetLayout();
 	void CreateUniformBuffers();
 	void CreateDescriptorPool();
@@ -202,19 +232,15 @@ private:
 
 	void CreateDeviceMemoryManager();
 	void DestroyDeviceMemoryManager();
-	void DeviceMalloc(VkDeviceSize size, uint32 alignment, size_t& offset, uint32& block);
+
+	/* Creates new device memory block, returns index. */
+	uint32 CreateDeviceMemoryBlock(EMemoryBlockUsage usage);
+
+	/* Allocates memory on device, returns block index and offset to available memory. */
+	void DeviceMalloc(VkDeviceSize size, EMemoryBlockUsage usage, VkDeviceSize& offset, uint32& block);
 
 	/**** DEBUG ****/
 	void ConfigureDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& info);
-	
-	/*
-	VkResult CreateDebugUtilsMessengerEXT(VkInstance instance, const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo,
-		const VkAllocationCallbacks* pAllocator, VkDebugUtilsMessengerEXT* pDebugMessenger);
-	void DestroyDebugUtilsMessengerEXT(
-		VkInstance instance, VkDebugUtilsMessengerEXT debugMessenger, const VkAllocationCallbacks* pAllocator);
-	static VKAPI_ATTR VkBool32 VKAPI_CALL DebugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
-		VkDebugUtilsMessageTypeFlagsEXT messageType, const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData);
-	*/
 
 	HWND win32Window;
 	HINSTANCE win32Process;
@@ -248,10 +274,7 @@ private:
 	std::vector<VkSemaphore> imageAvailableSemaphores;
 	std::vector<VkSemaphore> renderFinishedSemaphores;
 	std::vector<VkFence> inFlightFences;
-	VkBuffer vertexBuffer;
-	VkBuffer indexBuffer;
-	VkDeviceMemory vertexBufferMemory;
-	VkDeviceMemory indexBufferMemory;
+
 	std::vector<VkBuffer> uniformBuffers;
 	std::vector<VkDeviceMemory> uniformBuffersMemory;
 	std::vector<void*> uniformBuffersMapped;
@@ -265,11 +288,14 @@ private:
 	VkDeviceMemory depthImageMemory;
 	bool framebufferResized = false;
 
-	VkDeviceSize deviceVertexAlignment;
-	VkDeviceSize deviceIndexAlignment;
+	VkDeviceSize deviceDataAlignment[4];	/* Data memory-alignment requirement (indexed by EMemoryBlockUsage). */
+	uint32 memoryBlockTypeIndex[4];		 /* Memory type used to allocate a block when indexed by EMemoryBlockUsage. */	
+	uint32 memoryBlockHeapIndex[4];		 /* Memory heap used to allocate a block when indexed by EMemoryBlockUsage.*/
 
-	std::vector<SMeshMemoryIndex> meshes;
+	std::vector<SMeshMemoryHandle> meshes;
 	std::vector<uint32> meshesInStagingMemory;
+	std::vector<STextureMemoryHandle> textures;
+	std::vector<uint32> texturesInStagingMemory;
 
 	std::vector<SMemoryBlock> deviceMemory;		/* GPU memory blocks. */
 	std::vector<SMemoryBlock> uniformMemory;	/* Local-visible GPU memory for changing values. */

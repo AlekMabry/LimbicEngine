@@ -21,7 +21,7 @@ void Game::Run()
 	renderer->CreateStaticMesh(trussData->vertices.size(), trussData->indices.size(), trussMesh, verticesPtr, indicesPtr);
 	memcpy(verticesPtr, trussData->vertices.data(), sizeof(SStaticVertex) * trussData->vertices.size());
 	memcpy(indicesPtr, trussData->indices.data(), sizeof(uint32) * trussData->indices.size());
-	renderer->SubmitStaticMeshes();
+	renderer->SubmitAssets();
 
 	auto lastTickTime = std::chrono::high_resolution_clock::now();
 	float angle = 0.0f;
