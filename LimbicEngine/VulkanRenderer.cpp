@@ -81,7 +81,7 @@ VulkanRenderer::VulkanRenderer(const char* applicationName, uint32 width, uint32
 	std::vector<const char*> deviceExtensions = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
 	PickPhysicalDevice(deviceExtensions);
 	InitDevice(deviceExtensions);
-
+	PickDeviceMemoryBlockTypes();
 	InitSwapChain();
 	InitRenderPass();
 	InitDescriptorSetLayout();
@@ -89,7 +89,6 @@ VulkanRenderer::VulkanRenderer(const char* applicationName, uint32 width, uint32
 	InitDepthbuffer();
 	InitSwapChainFramebuffers();
 	InitGraphicsCommandPool();
-	InitTextureImage();
 	InitTextureImage();
 	InitDeviceMemoryManager();
 	InitUniformBuffers();
@@ -131,14 +130,13 @@ VulkanRenderer::~VulkanRenderer()
 
 	vkDestroyCommandPool(device, commandPool, nullptr);
 
-	vkDestroyDevice(device, nullptr);
-
 	if (bEnableValidationLayers)
 	{
 		DestroyDebugUtilsMessengerEXT(instance, debugMessenger, nullptr);
 	}
 
 	vkDestroySurfaceKHR(instance, surface, nullptr);
+	vkDestroyDevice(device, nullptr);
 	vkDestroyInstance(instance, nullptr);
 }
 
@@ -175,6 +173,36 @@ void VulkanRenderer::CreateStaticMesh(
 	meshes.push_back(mesh);
 }
 
+void VulkanRenderer::CreateTexture(uint32 width, uint32 height, ETextureFormat format, uint32& textureHandle, void*& textureBuffer)
+{
+	STextureMemoryHandle texture;
+	texture.width = width;
+	texture.height = height;
+	texture.format = format;
+	switch (format)
+	{
+		case eTextureFormatRGBA:
+			texture.size = width * height * 4;
+			break;
+		case eTextureFormatDXT1:
+			texture.size = (width * height) / 2;
+			break;
+	}
+
+	// Todo - pick a block with enough memory.
+	SMemoryBlock* stage = &stagingMemory[1];
+	texture.block = 1;
+	texture.location = eMemoryLocationHost;
+
+	texture.offset = stage->cursor;
+	textureBuffer = reinterpret_cast<void*>((uint8*) stage->mappedLocation + stage->cursor);
+	stage->cursor += texture.size;
+
+	texturesInStagingMemory.push_back(static_cast<uint32>(textures.size()));
+	textureHandle = static_cast<uint32>(textures.size());
+	textures.push_back(texture);
+}
+
 void VulkanRenderer::SubmitAssets()
 {
 	VkCommandBuffer commandBuffer = BeginSingleTimeCommands();
@@ -204,47 +232,88 @@ void VulkanRenderer::SubmitAssets()
 		meshes[meshIndex].indexOffset = copyIndexRegion.dstOffset;
 	}
 
+	uint32 textureSubmitCount = texturesInStagingMemory.size();
+	std::vector<VkImageMemoryBarrier> stagingBarriers;
+	std::vector<VkImageMemoryBarrier> shaderBarriers;
+	for (uint32 textureIndex : texturesInStagingMemory)
+	{
+		STextureMemoryHandle* texture = &textures[textureIndex];
+		VkImageCreateInfo imageInfo{};
+		imageInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
+		imageInfo.imageType = VK_IMAGE_TYPE_2D;
+		imageInfo.extent.width = texture->width;
+		imageInfo.extent.height = texture->height;
+		imageInfo.extent.depth = 1;
+		imageInfo.mipLevels = 1;
+		imageInfo.arrayLayers = 1;
+		imageInfo.format = textureFormatVkFormat[texture->format];
+		imageInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
+		imageInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+		imageInfo.usage = memoryBlockUsageVkFlags[eMemoryBlockUsageImages];
+		imageInfo.samples = VK_SAMPLE_COUNT_1_BIT;
+		imageInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+
+		if (vkCreateImage(device, &imageInfo, nullptr, &texture->image) != VK_SUCCESS)
+		{
+			std::cout << "[ERROR] Failed to create a texture's VkImage!" << std::endl;
+		}
+
+		VkMemoryRequirements memoryRequirements;
+		vkGetImageMemoryRequirements(device, texture->image, &memoryRequirements);
+		deviceDataAlignment[eMemoryBlockUsageImages] = memoryRequirements.alignment;	// This should be passed to the DeviceMalloc
+
+		VkImageMemoryBarrier stagingBarrier{}, shaderBarrier{};
+		CreateTextureMemoryBarrier(
+			texture->image, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, stagingBarrier);
+		CreateTextureMemoryBarrier(texture->image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+			VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, shaderBarrier);
+		stagingBarriers.push_back(stagingBarrier);
+		shaderBarriers.push_back(shaderBarrier);
+
+		VkDeviceSize imageDstOffset;
+		uint32 deviceBlock;
+		DeviceMalloc(memoryRequirements.size, eMemoryBlockUsageImages, imageDstOffset, deviceBlock);
+		vkBindImageMemory(device, texture->image, deviceMemory[deviceBlock].memory, imageDstOffset);
+
+		VkBufferImageCopy region{};
+		region.bufferOffset = 0;	// imageDstOffset;
+		region.bufferRowLength = 0;
+		region.bufferImageHeight = 0;
+
+		region.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+		region.imageSubresource.mipLevel = 0;
+		region.imageSubresource.baseArrayLayer = 0;
+		region.imageSubresource.layerCount = 1;
+
+		region.imageOffset = {0, 0, 0};
+		region.imageExtent = {texture->width, texture->height, 1};
+
+		vkCmdPipelineBarrier(commandBuffer, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT, 0, 0, nullptr, 0,
+			nullptr, 1, &stagingBarrier);
+		vkCmdCopyBufferToImage(
+			commandBuffer, stagingMemory[texture->block].buffer, texture->image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &region);
+		vkCmdPipelineBarrier(commandBuffer, VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, 0, 0, nullptr, 0,
+			nullptr, 1, &shaderBarrier);
+
+		// Update mesh indexing to new device memory location
+		texture->location = eMemoryLocationDevice;
+		texture->offset = 0;
+		texture->size = memoryRequirements.size;
+		texture->block = deviceBlock;
+	}
+	/*
+	if (texturesInStagingMemory.size() > 0)
+	{
+		vkCmdPipelineBarrier(commandBuffer, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT, 0,
+							 0, nullptr, 0, nullptr, textureSubmitCount, stagingBarriers.data());
+		vkCmdPipelineBarrier(commandBuffer, VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, 0, 0, nullptr, 0, nullptr, textureSubmitCount,
+							 shaderBarriers.data());
+	}
+	*/
+
 	EndSingleTimeCommands(commandBuffer);
 	meshesInStagingMemory.clear();
-}
-
-void VulkanRenderer::CreateTexture(uint32 width, uint32 height, ETextureFormat format, uint32& textureHandle, void*& textureBuffer)
-{
-	VkDeviceSize size = width * height * 4;
-	STextureMemoryHandle texture;
-
-	VkImageCreateInfo imageInfo{};
-	imageInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
-	imageInfo.imageType = VK_IMAGE_TYPE_2D;
-	imageInfo.extent.width = width;
-	imageInfo.extent.height = height;
-	imageInfo.extent.depth = 1;
-	imageInfo.mipLevels = 1;
-	imageInfo.arrayLayers = 1;
-	imageInfo.format = textureFormatVkFormat[format];
-	imageInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
-	imageInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-	imageInfo.usage = memoryBlockUsageVkFlags[eMemoryBlockUsageImages];
-	imageInfo.samples = VK_SAMPLE_COUNT_1_BIT;
-	imageInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
-
-	if (vkCreateImage(device, &imageInfo, nullptr, &texture.image) != VK_SUCCESS)
-	{
-		throw std::runtime_error("[ERROR] Failed to create image!");
-	}
-
-	// Todo - pick a block with enough memory.
-	SMemoryBlock* stage = &stagingMemory[0];
-	texture.block = 0;
-	texture.location = eMemoryLocationHost;
-
-	texture.offset = stage->cursor;
-	textureBuffer = reinterpret_cast<void*>((uint8*) stage->mappedLocation + stage->cursor);
-	stage->cursor += size;
-
-	texturesInStagingMemory.push_back(static_cast<uint32>(textures.size()));
-	textureHandle = static_cast<uint32>(textures.size());
-	textures.push_back(texture);
+	texturesInStagingMemory.clear();
 }
 
 void VulkanRenderer::DeleteObject(uint32 objectIndex)
@@ -260,6 +329,38 @@ void VulkanRenderer::FrameSetStaticPBRMeshes(uint32 meshCount, SDrawPBRMesh* mes
 	SUniformBufferObject ubo{};
 	ubo.transform = meshes[0].transform;
 	memcpy(uniformBuffersMapped[currentFrame], &ubo, sizeof(ubo));
+
+	VkImageView albedoView = CreateImageView(textures[0].image, textureFormatVkFormat[eTextureFormatDXT1], VK_IMAGE_ASPECT_COLOR_BIT);
+	
+	VkDescriptorBufferInfo bufferInfo{};
+	bufferInfo.buffer = uniformBuffers[currentFrame];
+	bufferInfo.offset = 0;
+	bufferInfo.range = sizeof(SUniformBufferObject);
+
+	VkDescriptorImageInfo imageInfo{};
+	imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+	imageInfo.imageView = albedoView;
+	imageInfo.sampler = textureSampler;
+
+	std::array<VkWriteDescriptorSet, 2> descriptorWrites{};
+
+	descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+	descriptorWrites[0].dstSet = descriptorSets[currentFrame];
+	descriptorWrites[0].dstBinding = 0;
+	descriptorWrites[0].dstArrayElement = 0;
+	descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+	descriptorWrites[0].descriptorCount = 1;
+	descriptorWrites[0].pBufferInfo = &bufferInfo;
+
+	descriptorWrites[1].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+	descriptorWrites[1].dstSet = descriptorSets[currentFrame];
+	descriptorWrites[1].dstBinding = 1;
+	descriptorWrites[1].dstArrayElement = 0;
+	descriptorWrites[1].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+	descriptorWrites[1].descriptorCount = 1;
+	descriptorWrites[1].pImageInfo = &imageInfo;
+
+	vkUpdateDescriptorSets(device, static_cast<uint32>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
 }
 
 void VulkanRenderer::FrameDraw()
@@ -604,8 +705,25 @@ VkExtent2D VulkanRenderer::PickSwapExtent(const VkSurfaceCapabilitiesKHR& capabi
 	}
 }
 
-void VulkanRenderer::PickDeviceMemoryHeaps()
+void VulkanRenderer::PickDeviceMemoryBlockTypes()
 {
+	VkPhysicalDeviceMemoryProperties memoryProperties;
+	vkGetPhysicalDeviceMemoryProperties(physicalDevice, &memoryProperties);
+
+	for (uint32 memoryLocation = 0; memoryLocation < EMemoryLocationCount; memoryLocation++)
+	{
+		/* Todo - Sort potential candidates by heap size, smaller sizes are more likely
+		to be device-local instead of "virtual" memory. */
+		for (uint32 i = 0; i < memoryProperties.memoryTypeCount; i++)
+		{
+			// Assume there is a memory type with the exact flags we need.
+			if (memoryProperties.memoryTypes[i].propertyFlags == memoryLocationVkFlags[memoryLocation])
+			{
+				deviceMemoryTypeByLocation[memoryLocation] = i;
+				break;
+			}
+		}
+	}
 }
 
 /**** Initialize/destroy class members. *****/
@@ -1163,14 +1281,18 @@ void VulkanRenderer::InitDeviceMemoryManager()
 	VkMemoryRequirements memRequirements;
 	vkGetBufferMemoryRequirements(device, deviceMemory[0].buffer, &memRequirements);
 	deviceDataAlignment[eMemoryBlockUsageGeometry] = memRequirements.alignment;
-	// vkGetBufferMemoryRequirements(device, deviceMemory[1].buffer, &memRequirements);
-	// deviceDataAlignment[eMemoryBlockUsageImages] = memRequirements.alignment;
 
 	SMemoryBlock stagingBlock{};
-	CreateBuffer(MEMORY_BLOCK_SIZE, VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+	CreateBuffer(MEMORY_BLOCK_SIZE, eMemoryBlockUsageStaging,
 		VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBlock.buffer, stagingBlock.memory);
 	vkMapMemory(device, stagingBlock.memory, 0, MEMORY_BLOCK_SIZE, 0, &stagingBlock.mappedLocation);
 	stagingMemory.push_back(stagingBlock);
+
+	SMemoryBlock stagingBlockB{};
+	CreateBuffer(MEMORY_BLOCK_SIZE, eMemoryBlockUsageStaging,
+		VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBlockB.buffer, stagingBlockB.memory);
+	vkMapMemory(device, stagingBlockB.memory, 0, MEMORY_BLOCK_SIZE, 0, &stagingBlockB.mappedLocation);
+	stagingMemory.push_back(stagingBlockB);
 }
 
 void VulkanRenderer::DestroyDeviceMemoryManager()
@@ -1199,7 +1321,7 @@ void VulkanRenderer::InitUniformBuffers()
 
 	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
 	{
-		CreateBuffer(bufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+		CreateBuffer(bufferSize, eMemoryBlockUsageUniforms,
 			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, uniformBuffers[i], uniformBuffersMemory[i]);
 
 		vkMapMemory(device, uniformBuffersMemory[i], 0, bufferSize, 0, &uniformBuffersMapped[i]);
@@ -1212,7 +1334,7 @@ void VulkanRenderer::InitTextureImage()
 
 	VkBuffer stagingBuffer;
 	VkDeviceMemory stagingBufferMemory;
-	CreateBuffer(imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+	CreateBuffer(imageSize, eMemoryBlockUsageStaging,
 		VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer, stagingBufferMemory);
 
 	void* data;
@@ -1373,17 +1495,19 @@ void VulkanRenderer::InitDescriptorSets()
 uint32 VulkanRenderer::CreateDeviceMemoryBlock(EMemoryBlockUsage usage)
 {
 	SMemoryBlock deviceBlock{};
+	deviceBlock.usage = usage;
 	switch (usage)
 	{
 		case eMemoryBlockUsageGeometry:
-			CreateBuffer(MEMORY_BLOCK_SIZE, memoryBlockUsageVkFlags[usage], VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, deviceBlock.buffer,
+			CreateBuffer(MEMORY_BLOCK_SIZE, usage, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, deviceBlock.buffer,
 				deviceBlock.memory);
 			break;
 		case eMemoryBlockUsageUniforms:
-			CreateBuffer(MEMORY_BLOCK_SIZE, memoryBlockUsageVkFlags[usage], VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, deviceBlock.buffer,
+			CreateBuffer(MEMORY_BLOCK_SIZE, usage, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, deviceBlock.buffer,
 				deviceBlock.memory);
 			break;
 		case eMemoryBlockUsageImages:
+			AllocateDeviceMemory(MEMORY_BLOCK_SIZE, memoryBlockUsageLocation[usage], deviceBlock.memory);
 			break;
 		case eMemoryBlockUsageStaging:
 			break;
@@ -1420,6 +1544,19 @@ void VulkanRenderer::DeviceMalloc(VkDeviceSize size, EMemoryBlockUsage usage, Vk
 	deviceMemory[block].cursor += size;
 
 	CreateDeviceMemoryBlock(usage);
+}
+
+void VulkanRenderer::AllocateDeviceMemory(VkDeviceSize size, EMemoryLocation location, VkDeviceMemory& deviceMemory)
+{
+	VkMemoryAllocateInfo allocInfo{};
+	allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+	allocInfo.allocationSize = size;
+	allocInfo.memoryTypeIndex = deviceMemoryTypeByLocation[location];
+
+	if (vkAllocateMemory(device, &allocInfo, nullptr, &deviceMemory) != VK_SUCCESS)
+	{
+		throw std::runtime_error("[ERROR] Failed to allocate device memory!");
+	}
 }
 
 void VulkanRenderer::CreateImage(uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage,
@@ -1462,12 +1599,12 @@ void VulkanRenderer::CreateImage(uint32_t width, uint32_t height, VkFormat forma
 }
 
 void VulkanRenderer::CreateBuffer(
-	VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory)
+	VkDeviceSize size, EMemoryBlockUsage usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory)
 {
 	VkBufferCreateInfo bufferInfo{};
 	bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
 	bufferInfo.size = size;
-	bufferInfo.usage = usage;
+	bufferInfo.usage = memoryBlockUsageVkFlags[usage];
 	bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
 	if (vkCreateBuffer(device, &bufferInfo, nullptr, &buffer) != VK_SUCCESS)
@@ -1475,19 +1612,9 @@ void VulkanRenderer::CreateBuffer(
 		throw std::runtime_error("[ERROR] Failed to create buffer!");
 	}
 
-	VkMemoryRequirements memRequirements;
-	vkGetBufferMemoryRequirements(device, buffer, &memRequirements);
-
-	VkMemoryAllocateInfo allocInfo{};
-	allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-	allocInfo.allocationSize = memRequirements.size;
-	allocInfo.memoryTypeIndex = FindMemoryType(memRequirements.memoryTypeBits, properties);
-
-	if (vkAllocateMemory(device, &allocInfo, nullptr, &bufferMemory) != VK_SUCCESS)
-	{
-		throw std::runtime_error("[ERROR] Failed to allocate buffer memory!");
-	}
-
+	VkMemoryRequirements memoryRequirements;
+	vkGetBufferMemoryRequirements(device, buffer, &memoryRequirements);
+	AllocateDeviceMemory(memoryRequirements.size, memoryBlockUsageLocation[usage], bufferMemory);
 	vkBindBufferMemory(device, buffer, bufferMemory, 0);
 }
 
@@ -1522,6 +1649,36 @@ void VulkanRenderer::CopyBufferToImage(VkBuffer buffer, VkImage image, uint32 wi
 	vkCmdCopyBufferToImage(commandBuffer, buffer, image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &region);
 
 	EndSingleTimeCommands(commandBuffer);
+}
+
+void VulkanRenderer::CreateTextureMemoryBarrier(VkImage image, VkImageLayout oldLayout, VkImageLayout newLayout, VkImageMemoryBarrier &barrier)
+{
+	barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+	barrier.oldLayout = oldLayout;
+	barrier.newLayout = newLayout;
+	barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+	barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+	barrier.image = image;
+	barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+	barrier.subresourceRange.baseMipLevel = 0;
+	barrier.subresourceRange.levelCount = 1;
+	barrier.subresourceRange.baseArrayLayer = 0;
+	barrier.subresourceRange.layerCount = 1;
+
+	if (oldLayout == VK_IMAGE_LAYOUT_UNDEFINED && newLayout == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL)
+	{
+		barrier.srcAccessMask = 0;
+		barrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+	}
+	else if (oldLayout == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL && newLayout == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL)
+	{
+		barrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+		barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
+	}
+	else
+	{
+		std::cout << "[ERROR] Unsupported image layout transition!" << std::endl;
+	}
 }
 
 void VulkanRenderer::TransitionImageLayout(VkImage image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout)

@@ -14,6 +14,13 @@
 #define GLM_FORCE_RADIANS
 #include <glm/gtc/matrix_transform.hpp>
 
+#pragma pack(1)
+struct SBC1Block
+{
+	unsigned short color[2];
+	char indices[4];
+};
+
 using namespace glm;
 
 class Game

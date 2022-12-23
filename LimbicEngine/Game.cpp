@@ -21,6 +21,13 @@ void Game::Run()
 	renderer->CreateStaticMesh(trussData->vertices.size(), trussData->indices.size(), trussMesh, verticesPtr, indicesPtr);
 	memcpy(verticesPtr, trussData->vertices.data(), sizeof(SStaticVertex) * trussData->vertices.size());
 	memcpy(indicesPtr, trussData->indices.data(), sizeof(uint32) * trussData->indices.size());
+
+	uint32 trussTexture;
+	void* texPtr;
+	renderer->CreateTexture(1024, 1024, eTextureFormatDXT1, trussTexture, texPtr);
+	std::string ktx = "C:/Users/alekm/Desktop/Outpost731/Textures/Truss_BaseColor.KTX2";
+	resources->LoadTextureKTX2(ktx, texPtr);
+
 	renderer->SubmitAssets();
 
 	auto lastTickTime = std::chrono::high_resolution_clock::now();

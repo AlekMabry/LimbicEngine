@@ -109,6 +109,33 @@ SMesh* ResourceManager::LoadMesh(std::string& filename, std::string& nodeName)
 	return outputMesh;
 }
 
+void ResourceManager::LoadTextureKTX2(std::string& filename, void* buffer)
+{
+	FILE* file;
+	fopen_s(&file, filename.c_str(), "rb");
+
+	SKTX2Header header;
+	SKTX2Index index;
+	fread_s(&header, sizeof(SKTX2Header), sizeof(SKTX2Header), 1, file);
+
+	if (strncmp(header.identifier, ktx2FileIdentifier, 12))
+	{
+		std::cout << "[WARNING] " << filename << " is not a valid KTX2 file!" << std::endl;
+	}
+
+	fread_s(&index, sizeof(SKTX2Index), sizeof(SKTX2Index), 1, file);
+
+	// Levels array starts with the base mip level (largest image)
+	std::vector<SKTX2LevelIndex> levels(header.levelCount);
+	fread_s(levels.data(), header.levelCount * sizeof(SKTX2LevelIndex), sizeof(SKTX2LevelIndex), header.levelCount, file);
+
+	// Load first mip level
+	fseek(file, levels[0].byteOffset + (27 * 8), SEEK_SET);
+	fread(buffer, 8, (header.pixelWidth * header.pixelHeight) / 16, file);
+
+	fclose(file);
+}
+
 FbxNode* ResourceManager::GetFbxNode(FbxNode* root, std::string& nodeName) const
 {
 	if (root)

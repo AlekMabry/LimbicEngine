@@ -76,6 +76,8 @@ enum ETextureFormat
 	eTextureFormatDXT1
 };
 
+const uint32 ETextureFormatCount = 2;
+
 /* Maps ETextureFormat enums to the Vulkan image formats. */
 const VkFormat textureFormatVkFormat[2] = {VK_FORMAT_R8G8B8A8_SRGB, VK_FORMAT_BC1_RGB_UNORM_BLOCK};
 
@@ -85,8 +87,10 @@ enum EMemoryLocation
 	eMemoryLocationDevice
 };
 
+const uint32 EMemoryLocationCount = 2;
+
 /* Maps EMemoryLocation enums to the Vulkan memory property flags. */
-const VkMemoryType memoryLocationVkFlags[2] = {VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+const VkMemoryPropertyFlags memoryLocationVkFlags[2] = {VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
 	VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT | VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT};
 
 enum EMemoryBlockUsage
@@ -97,11 +101,17 @@ enum EMemoryBlockUsage
 	eMemoryBlockUsageStaging
 };
 
+const uint32 EMemoryBlockUsageCount = 4;
+
 /* Maps EMemoryBlockUsage enums to the Vulkan buffer usage flags. */
 const VkBufferUsageFlags memoryBlockUsageVkFlags[4] = {
 	VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
 	VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
 	VK_BUFFER_USAGE_TRANSFER_SRC_BIT};
+
+/* Mape EMemoryBlockUsage enums to EMemoryLocation enums. */
+const EMemoryLocation memoryBlockUsageLocation[4] = {
+	eMemoryLocationDevice, eMemoryLocationHost, eMemoryLocationDevice, eMemoryLocationHost};
 
 struct SMeshMemoryHandle
 {
@@ -121,6 +131,9 @@ struct STextureMemoryHandle
 	VkDeviceSize offset;
 	VkDeviceSize size;
 	VkImage image;
+	uint32 width;
+	uint32 height;
+	ETextureFormat format;
 };
 
 /* Handle and state of a memory block in host or device memory. */
@@ -135,7 +148,7 @@ struct SMemoryBlock
 	void* mappedLocation; /* Host-mapped location (only defined for eMemoryBlockUsageStaging/eMemoryBlockUsageUniforms).*/
 };
 
-const VkDeviceSize MEMORY_BLOCK_SIZE = 32 * 1024;
+const VkDeviceSize MEMORY_BLOCK_SIZE = 1024 * 1024;
 
 class VulkanRenderer
 {
@@ -201,7 +214,7 @@ private:
 
 	VkExtent2D PickSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities);
 
-	void PickDeviceMemoryHeaps();
+	void PickDeviceMemoryBlockTypes();
 
 	/**** Initialize/destroy class members. *****/
 	void InitInstance();
@@ -256,15 +269,19 @@ private:
 	/* Allocates memory on device, returns block index and offset to available memory. */
 	void DeviceMalloc(VkDeviceSize size, EMemoryBlockUsage usage, VkDeviceSize& offset, uint32& block);
 
+	void AllocateDeviceMemory(VkDeviceSize size, EMemoryLocation location, VkDeviceMemory& deviceMemory);
+
 	void CreateImage(uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage,
 		VkMemoryPropertyFlags properties, VkImage& image, VkDeviceMemory& imageMemory);
 
-	void CreateBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer,
+	void CreateBuffer(VkDeviceSize size, EMemoryBlockUsage usage, VkMemoryPropertyFlags properties, VkBuffer& buffer,
 		VkDeviceMemory& bufferMemory);
 
 	void CopyBuffer(VkBuffer sourceBuffer, VkBuffer destinationBuffer, VkDeviceSize size);
 
 	void CopyBufferToImage(VkBuffer buffer, VkImage image, uint32 width, uint32 height);
+
+	void CreateTextureMemoryBarrier(VkImage image, VkImageLayout oldLayout, VkImageLayout newLayout, VkImageMemoryBarrier& barrier);
 
 	void TransitionImageLayout(VkImage image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout);
 
@@ -333,8 +350,7 @@ private:
 	bool framebufferResized = false;
 
 	VkDeviceSize deviceDataAlignment[4]; /* Data memory-alignment requirement (indexed by EMemoryBlockUsage). */
-	uint32 memoryBlockTypeIndex[4];		 /* Memory type used to allocate a block when indexed by EMemoryBlockUsage. */
-	uint32 memoryBlockHeapIndex[4];		 /* Memory heap used to allocate a block when indexed by EMemoryBlockUsage.*/
+	uint32 deviceMemoryTypeByLocation[2];	/* Memory type used to allocate a block when indexed by EMemoryLocation. */
 
 	std::vector<SMeshMemoryHandle> meshes;
 	std::vector<uint32> meshesInStagingMemory;
