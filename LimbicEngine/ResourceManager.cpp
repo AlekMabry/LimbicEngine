@@ -127,10 +127,11 @@ void ResourceManager::LoadTextureKTX2(std::string& filename, void* buffer)
 
 	// Levels array starts with the base mip level (largest image)
 	std::vector<SKTX2LevelIndex> levels(header.levelCount);
+	fseek(file, 8, SEEK_CUR);
 	fread_s(levels.data(), header.levelCount * sizeof(SKTX2LevelIndex), sizeof(SKTX2LevelIndex), header.levelCount, file);
 
 	// Load first mip level
-	fseek(file, levels[0].byteOffset + (27 * 8), SEEK_SET);
+	fseek(file, levels[0].byteOffset, SEEK_SET);
 	fread(buffer, 8, (header.pixelWidth * header.pixelHeight) / 16, file);
 
 	fclose(file);

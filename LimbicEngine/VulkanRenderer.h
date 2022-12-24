@@ -29,6 +29,16 @@ const bool bEnableValidationLayers = true;
 const std::vector<const char*> validationLayers = {"VK_LAYER_KHRONOS_validation"};
 #endif
 
+#define VK_CHECK(f)                                                 \
+	{                                                               \
+		VkResult res = (f);                                         \
+		if (res != VK_SUCCESS)                                      \
+		{                                                           \
+			std::cout << "[ERROR] Line: " << __LINE__ << std::endl; \
+			assert(res == VK_SUCCESS);                              \
+		}                                                           \
+	}
+
 const uint32 MAX_FRAMES_IN_FLIGHT = 2;
 
 struct SUniformBufferObject
@@ -54,14 +64,17 @@ struct SSwapChainSupportDetails
 	std::vector<VkPresentModeKHR> presentModes;
 };
 
-struct SDrawPBRMesh
+struct SPushConstants
 {
-	uint32 meshIndex;
-	uint32 albedoTextureIndex;
-	uint32 normalTextureIndex;
-	uint32 materialTextureIndex;
-	uint32 lightmapTextureIndex;
-	mat4 transform;
+	mat4 camera;
+	mat4 model;
+};
+
+struct SDrawStaticPBR
+{
+	RStaticMesh mesh;
+	RMaterial material;
+	SPushConstants transform;
 };
 
 struct SLights
@@ -124,6 +137,11 @@ struct SMeshMemoryHandle
 	uint32 indices;
 };
 
+struct SMaterialHandle
+{
+	VkDescriptorSet descriptor;
+};
+
 struct STextureMemoryHandle
 {
 	EMemoryLocation location;
@@ -131,6 +149,7 @@ struct STextureMemoryHandle
 	VkDeviceSize offset;
 	VkDeviceSize size;
 	VkImage image;
+	VkImageView imageView;
 	uint32 width;
 	uint32 height;
 	ETextureFormat format;
@@ -148,7 +167,7 @@ struct SMemoryBlock
 	void* mappedLocation; /* Host-mapped location (only defined for eMemoryBlockUsageStaging/eMemoryBlockUsageUniforms).*/
 };
 
-const VkDeviceSize MEMORY_BLOCK_SIZE = 1024 * 1024;
+const VkDeviceSize MEMORY_BLOCK_SIZE = 8 * 1024 * 1024;
 
 class VulkanRenderer
 {
@@ -166,6 +185,9 @@ public:
 	/* Creates texture, provides staging buffer to write image to. */
 	void CreateTexture(uint32 width, uint32 height, ETextureFormat format, uint32& textureHandle, void*& textureBuffer);
 
+	/* Creates material from texture handles. */
+	void CreateMaterial(RTexture baseColor, RTexture normal, RTexture properties, RMaterial& material);
+
 	/* Uploads data from staging buffer to device. */
 	void SubmitAssets();
 
@@ -175,11 +197,8 @@ public:
 	/* Set lights for current frame. */
 	void FrameSetLights(SLights* lights);
 
-	/* Set static PBR mesh uniforms for current frame. */
-	void FrameSetStaticPBRMeshes(uint32 meshCount, SDrawPBRMesh* meshes);
-
 	/* Draw current frame. */
-	void FrameDraw();
+	void FrameDraw(uint32 modelCount, SDrawStaticPBR* models);
 
 private:
 	/**** Support checking utilities. ****/
@@ -229,6 +248,10 @@ private:
 
 	void DestroySwapChain();
 
+	void InitDescriptorPool();
+
+	void InitDescriptorSetLayout();
+
 	void InitGraphicsPipeline();
 
 	void InitRenderPass();
@@ -247,19 +270,7 @@ private:
 
 	void DestroyDeviceMemoryManager();
 
-	void InitUniformBuffers();
-
-	void InitTextureImage();
-
-	void InitTextureImageView();
-
 	void InitDefaultTextureSampler();
-
-	void InitDescriptorPool();
-
-	void InitDescriptorSetLayout();
-
-	void InitDescriptorSets();
 
 	/* Utility */
 
@@ -297,7 +308,7 @@ private:
 
 	VkShaderModule CreateShaderModule(const std::vector<char>& code);
 
-	void RecordCommandBuffer(VkCommandBuffer commandBuffer, uint32 imageIndex);
+	void RecordCommandBuffer(VkCommandBuffer commandBuffer, uint32 imageIndex, uint32 modelCount, SDrawStaticPBR* models);
 
 	void RecreateSwapChain();
 
@@ -320,18 +331,21 @@ private:
 	VkSwapchainKHR swapChain;
 	std::vector<VkImage> swapChainImages;
 	VkImage depthImage;
+	VkImageView depthImageView;
+	VkDeviceMemory depthImageMemory;
 	VkFormat swapChainImageFormat;
 	VkExtent2D swapChainExtent;
 	std::vector<VkImageView> swapChainImageViews;
 	std::vector<VkFramebuffer> swapChainFramebuffers;
 	VkDebugUtilsMessengerEXT debugMessenger;
 	VkPhysicalDevice physicalDevice;
-	VkDescriptorSetLayout descriptorSetLayout;
-	VkPipelineLayout pipelineLayout;
 	VkRenderPass renderPass;
-	VkPipeline graphicsPipeline;
 	VkCommandPool commandPool;
 	std::vector<VkCommandBuffer> commandBuffers;
+	VkSampler textureSampler;
+	bool framebufferResized = false;
+
+	// Sync
 	std::vector<VkSemaphore> imageAvailableSemaphores;
 	std::vector<VkSemaphore> renderFinishedSemaphores;
 	std::vector<VkFence> inFlightFences;
@@ -339,24 +353,28 @@ private:
 	std::vector<VkBuffer> uniformBuffers;
 	std::vector<VkDeviceMemory> uniformBuffersMemory;
 	std::vector<void*> uniformBuffersMapped;
-	VkDescriptorPool descriptorPool;
-	std::vector<VkDescriptorSet> descriptorSets;
-	VkImage textureImage;
-	VkDeviceMemory textureImageMemory;
-	VkImageView textureImageView;
-	VkImageView depthImageView;
-	VkSampler textureSampler;
-	VkDeviceMemory depthImageMemory;
-	bool framebufferResized = false;
 
-	VkDeviceSize deviceDataAlignment[4]; /* Data memory-alignment requirement (indexed by EMemoryBlockUsage). */
-	uint32 deviceMemoryTypeByLocation[2];	/* Memory type used to allocate a block when indexed by EMemoryLocation. */
+	// Pipelines
+	VkDescriptorPool descriptorPool_PBR;
+	VkDescriptorSetLayout descriptorSetLayout_PBR;
+	VkPipelineLayout pipelineLayout;
+	VkPipeline graphicsPipeline;
 
+	// Uniforms
+	std::vector<SPushConstants> pushConstants;
+	
+	// Resource Manager
+	std::vector<SMaterialHandle> materials;
 	std::vector<SMeshMemoryHandle> meshes;
 	std::vector<uint32> meshesInStagingMemory;
 	std::vector<STextureMemoryHandle> textures;
 	std::vector<uint32> texturesInStagingMemory;
 
+	// Memory Requirements
+	VkDeviceSize deviceDataAlignment[4];  /* Data memory-alignment requirement (indexed by EMemoryBlockUsage). */
+	uint32 deviceMemoryTypeByLocation[2]; /* Memory type used to allocate a block when indexed by EMemoryLocation. */
+
+	// Memory
 	std::vector<SMemoryBlock> deviceMemory;	 /* GPU memory blocks. */
 	std::vector<SMemoryBlock> uniformMemory; /* Local-visible GPU memory for changing values. */
 	std::vector<SMemoryBlock> stagingMemory; /* Local memory-mapped staging blocks. */

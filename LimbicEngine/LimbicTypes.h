@@ -15,6 +15,10 @@ typedef int int32;
 typedef unsigned long long uint64;
 typedef long int64;
 
+typedef unsigned int RMaterial;
+typedef unsigned int RTexture;
+typedef unsigned int RStaticMesh;
+
 struct STexture
 {
 };
