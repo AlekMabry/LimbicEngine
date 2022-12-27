@@ -2,10 +2,32 @@
 
 EEntity::EEntity()
 {
-	rootComponent = std::make_unique<EntityComponent>();
+	bPendingKill = false;
+	SetTickEnabled(true);
 }
 
-EntityComponent* EEntity::GetRootComponent() const
+EEntity::EEntity()
 {
-	return rootComponent.get();
+	delete root;
+}
+
+template <class TComponentClass>
+TComponentClass* EEntity::CreateRoot(TComponentClass componentClass)
+{
+	if (root == nullptr)
+	{
+		root = new TComponentClass();
+	}
+	root->SetGameManagers(GetGameManagers());
+	return root;
+}
+
+LEntityComponent* EEntity::GetRoot() const
+{
+	return root;
+}
+
+bool EEntity::IsPendingKill() const
+{
+	return bPendingKill;
 }

@@ -1,15 +1,24 @@
 #pragma once
 
-#include "EntityComponent.h"
+#include "LObject.h"
+#include "LEntityComponent.h"
 
-class EEntity
+class EEntity : public LObject
 {
+public:
 	EEntity();
 
-	EntityComponent* GetRootComponent() const;
+	/** Recommended way to spawn a root component. */
+	template <class TComponentClass>
+	TComponentClass* CreateRoot(TComponentClass componentClass);
+
+	LEntityComponent* GetRoot() const;
+
+	bool IsPendingKill() const;
 
 protected:
-	bool bIsTickEnabled;
-	std::unique_ptr<EntityComponent> rootComponent;
+	bool bTickEnabled;
+	bool bPendingKill;
+	LEntityComponent* root;
+	SGameManagers* managers;
 };
-

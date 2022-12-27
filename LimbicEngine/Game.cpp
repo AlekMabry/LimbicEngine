@@ -7,10 +7,13 @@ Game::Game()
 	uint32 width, height;
 	io->GetFramebufferSize(width, height);
 	renderer = std::make_unique<VulkanRenderer>("Limbic Engine", width, height, io->GetWindow(), io->GetProcess());
+	world = std::make_unique<World>();
 }
 
 void Game::Run()
 {
+	world->
+
 	std::string fbx = "C:/Users/alekm/Desktop/Assets/Static/Truss/Truss.fbx";
 	std::string object = "Truss";
 	SMesh* trussData = resources->LoadMesh(fbx, object);
@@ -83,7 +86,9 @@ void Game::Run()
 	}
 }
 
-ResourceManager* Game::GetResourceManager() const
+void Game::GetGameManagers(SGameManagers& managers)
 {
-	return resources.get();
+	managers.resources = resources.get();
+	managers.world = world.get();
+	managers.game = this;
 }

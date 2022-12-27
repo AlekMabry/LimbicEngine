@@ -1,7 +1,8 @@
 #include "ResourceManager.h"
 
-ResourceManager::ResourceManager()
+ResourceManager::ResourceManager(VulkanRenderer* renderer)
 {
+	this->renderer = renderer;
 	fbxManager = FbxManager::Create();
 	fbxIOSettings = FbxIOSettings::Create(fbxManager, IOSROOT);
 	fbxManager->SetIOSettings(fbxIOSettings);
@@ -11,6 +12,76 @@ ResourceManager::~ResourceManager()
 {
 	fbxIOSettings->Destroy();
 	fbxManager->Destroy();
+}
+
+RStaticMesh ResourceManager::RequestStaticMesh(std::string& filename, std::string& nodeName)
+{
+	if (resourceLookup.count(filename) == 0)
+	{
+		SMesh* mesh = LoadMesh(filename, nodeName);
+		RStaticMesh hMesh;
+		SStaticVertex* vertexBuffer;
+		uint32* indexBuffer;
+		renderer->CreateStaticMesh(static_cast<uint32>(mesh->vertices.size()), static_cast<uint32>(mesh->indices.size()), hMesh, vertexBuffer, indexBuffer);
+		memcpy(vertexBuffer, mesh->vertices.data(), mesh->vertices.size() * sizeof(SStaticVertex));
+		memcpy(indexBuffer, mesh->indices.data(), mesh->indices.size() * sizeof(uint32));
+		delete mesh;
+		renderer->SubmitAssets();
+		resourceLookup.insert(std::make_pair(filename, hMesh));
+		return hMesh;
+	}
+	else
+	{
+		return resourceLookup[filename];
+	}
+}
+
+RTexture ResourceManager::RequestTexture(std::string& filename)
+{
+	if (resourceLookup.count(filename) == 0)
+	{
+		RTexture hTexture;
+		void* textureBuffer;
+		renderer->CreateTexture(1024, 1024, eTextureFormatDXT1, hTexture, textureBuffer);
+		LoadTextureKTX2(filename, textureBuffer);
+		renderer->SubmitAssets();
+		resourceLookup.insert(std::make_pair(filename, hTexture));
+		return hTexture;
+	}
+	else
+	{
+		return resourceLookup[filename];
+	}
+}
+
+RMaterial ResourceManager::RequestMaterial(std::string& baseColorFilename, std::string& normalFilename, std::string& propertiesFilename)
+{
+	RTexture baseColor = RequestTexture(baseColorFilename);
+	RTexture normal = RequestTexture(normalFilename);
+	RTexture properties = RequestTexture(propertiesFilename);
+
+	RMaterial material;
+	renderer->CreateMaterial(baseColor, normal, properties, material);
+	return material;
+}
+
+FbxNode* ResourceManager::GetFbxNode(FbxNode* root, std::string& nodeName) const
+{
+	if (root)
+	{
+		if (nodeName == root->GetName())
+			return root;
+		else
+		{
+			for (int i = 0; i < root->GetChildCount(); i++)
+			{
+				FbxNode* node = GetFbxNode(root->GetChild(i), nodeName);
+				if (node)
+					return node;
+			}
+		}
+	}
+	return nullptr;
 }
 
 void ResourceManager::PrintNode(FbxNode* node, int indent)
@@ -59,7 +130,7 @@ SMesh* ResourceManager::LoadMesh(std::string& filename, std::string& nodeName)
 		return nullptr;
 	}
 
-	SMesh* outputMesh = new(SMesh);
+	SMesh* outputMesh = new (SMesh);
 
 	FbxMesh* fbxMesh = fbxMeshNode->GetMesh();
 	uint32 fbxMeshPolygonCount = fbxMesh->GetPolygonCount();
@@ -105,7 +176,7 @@ SMesh* ResourceManager::LoadMesh(std::string& filename, std::string& nodeName)
 		currentMeshIndex += faceVertexCount;
 	}
 
-	//meshes.insert(std::pair<std::string, SMesh>(nodeName, outputMesh));
+	// meshes.insert(std::pair<std::string, SMesh>(nodeName, outputMesh));
 	return outputMesh;
 }
 
@@ -135,23 +206,4 @@ void ResourceManager::LoadTextureKTX2(std::string& filename, void* buffer)
 	fread(buffer, 8, (header.pixelWidth * header.pixelHeight) / 16, file);
 
 	fclose(file);
-}
-
-FbxNode* ResourceManager::GetFbxNode(FbxNode* root, std::string& nodeName) const
-{
-	if (root)
-	{
-		if (nodeName == root->GetName())
-			return root;
-		else
-		{
-			for (int i = 0; i < root->GetChildCount(); i++)
-			{
-				FbxNode* node = GetFbxNode(root->GetChild(i), nodeName);
-				if (node)
-					return node;
-			}
-		}
-	}
-	return nullptr;
 }
