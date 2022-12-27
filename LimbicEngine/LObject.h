@@ -1,7 +1,5 @@
 #pragma once
 
-#include "Game.h"
-
 class LObject
 {
 public:
@@ -11,19 +9,8 @@ public:
 
 	void SetTickEnabled(bool bIsTickEnabled);
 
-	void SetGameManagers(SGameManagers* managers);
-
 	bool IsTickEnabled();
 
-	World* GetWorld();
-
-	ResourceManager* GetResourceManager();
-
-	Game* GetGame();
-
-	SGameManagers* GetGameManagers();
-
 private:
-	SGameManagers* managers;
 	bool bIsTickEnabled;
 };

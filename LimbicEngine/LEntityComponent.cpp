@@ -14,13 +14,12 @@ LEntityComponent::~LEntityComponent()
 	}
 }
 
-template <class TComponentClass>
-TComponentClass* LEntityComponent::CreateChild(TComponentClass componentClass)
+template <typename TComponentClass>
+TComponentClass* LEntityComponent::CreateChild()
 {
 	static_assert(
-		std::is_base_of<LEntityComponent, componentClass>::value, "Child object should be derived from LEntityComponent!");
+		std::is_base_of<LEntityComponent, TComponentClass>::value, "Child object should be derived from LEntityComponent!");
 	LEntityComponent* child = new TComponentClass();
-	child->SetGameManagers(GetGameManagers());
 	child->parent = this;
 	children.push_back(child);
 	return child;

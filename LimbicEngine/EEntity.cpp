@@ -3,23 +3,12 @@
 EEntity::EEntity()
 {
 	bPendingKill = false;
-	SetTickEnabled(true);
+	SetTickEnabled(false);
 }
 
-EEntity::EEntity()
+EEntity::~EEntity()
 {
 	delete root;
-}
-
-template <class TComponentClass>
-TComponentClass* EEntity::CreateRoot(TComponentClass componentClass)
-{
-	if (root == nullptr)
-	{
-		root = new TComponentClass();
-	}
-	root->SetGameManagers(GetGameManagers());
-	return root;
 }
 
 LEntityComponent* EEntity::GetRoot() const

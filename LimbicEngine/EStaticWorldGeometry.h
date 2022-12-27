@@ -1,7 +1,7 @@
 #pragma once
 
 #include "EEntity.h"
-#include "StaticMeshComponent.h"
+#include "LStaticMeshComponent.h"
 
 class EStaticWorldGeometry : public EEntity
 {
@@ -9,5 +9,5 @@ public:
 	EStaticWorldGeometry();
 
 protected:
-	std::unique_ptr<StaticMeshComponent> trussMesh;
+	LStaticMeshComponent* worldMesh;
 };

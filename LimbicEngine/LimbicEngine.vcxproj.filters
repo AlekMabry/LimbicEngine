@@ -19,18 +19,24 @@
     <Filter Include="Source Files\Components">
       <UniqueIdentifier>{fb085dcb-c95a-4586-bc11-c6f552bd49d1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Entities">
+      <UniqueIdentifier>{f8d58dde-1380-4d25-a7ab-3180f5ec7d79}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Entities">
+      <UniqueIdentifier>{6158ea7c-c263-40be-b83f-08365ac0052d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EEntity.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="EntityComponent.h">
+    <ClInclude Include="LEntityComponent.h">
       <Filter>Header Files\Components</Filter>
     </ClInclude>
     <ClInclude Include="LimbicTypes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="WorldComponent.h">
+    <ClInclude Include="LWorldComponent.h">
       <Filter>Header Files\Components</Filter>
     </ClInclude>
     <ClInclude Include="ResourceManager.h">
@@ -45,15 +51,24 @@
     <ClInclude Include="GLFWIO.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="EStaticWorldGeometry.h">
+      <Filter>Header Files\Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="LStaticMeshComponent.h">
+      <Filter>Header Files\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="LObject.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="EEntity.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="EntityComponent.cpp">
+    <ClCompile Include="LEntityComponent.cpp">
       <Filter>Source Files\Components</Filter>
     </ClCompile>
-    <ClCompile Include="WorldComponent.cpp">
+    <ClCompile Include="LWorldComponent.cpp">
       <Filter>Source Files\Components</Filter>
     </ClCompile>
     <ClCompile Include="ResourceManager.cpp">
@@ -66,6 +81,15 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="GLFWIO.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="EStaticWorldGeometry.cpp">
+      <Filter>Source Files\Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="LStaticMeshComponent.cpp">
+      <Filter>Source Files\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="LObject.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

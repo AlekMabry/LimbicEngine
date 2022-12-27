@@ -3,7 +3,7 @@
 #include "LObject.h"
 #include <vector>
 
-class LEntityComponent : LObject
+class LEntityComponent : public LObject
 {
 public:
 	LEntityComponent();
@@ -11,8 +11,8 @@ public:
 	~LEntityComponent();
 
 	/** Create and attach child component to this component. */
-	template <class TComponentClass>
-	TComponentClass* CreateChild(TComponentClass componentClass);
+	template <typename TComponentClass>
+	TComponentClass* CreateChild();
 
 	std::vector<LEntityComponent*>* GetChildren();
 

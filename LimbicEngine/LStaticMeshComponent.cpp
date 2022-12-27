@@ -7,15 +7,38 @@ LStaticMeshComponent::LStaticMeshComponent() : LWorldComponent()
 	bCollisionEnabled = false;
 }
 
-void LStaticMeshComponent::SetStaticMesh(std::string& filename, std::string& nodename)
+void LStaticMeshComponent::SetStaticMesh(const std::string& filename, const std::string& nodename)
 {
-	staticMeshID = GetResourceManager()->RequestStaticMesh(filename)
-	this->mesh = mesh;
-	this->material = material;
+	this->meshFilename = filename;
+	this->nodeName = nodename;
 }
 
-void StaticMeshComponent::GetDrawInfo(RStaticMesh& mesh, RMaterial& material, mat4& transform)
+void LStaticMeshComponent::SetMaterial(
+	const std::string& baseColorFilename, const std::string& normalFilename, const std::string& propertiesFilename)
 {
-	mesh = this->mesh;
-	material = this->material;
+	this->baseColorFilename = baseColorFilename;
+	this->normalFilename = normalFilename;
+	this->propertiesFilename = propertiesFilename;
+}
+
+void LStaticMeshComponent::SetResources(RStaticMesh staticMeshID, RMaterial materialID)
+{
+	this->staticMeshID = staticMeshID;
+	this->materialID = materialID;
+}
+
+void LStaticMeshComponent::GetResourceInfo(
+	std::string& mesh, std::string& node, std::string& baseColor, std::string& normal, std::string& properties)
+{
+	mesh = this->meshFilename;
+	node = this->nodeName;
+	baseColor = this->baseColorFilename;
+	normal = this->normalFilename;
+	properties = this->propertiesFilename;
+}
+
+void LStaticMeshComponent::GetDrawInfo(RStaticMesh& mesh, RMaterial& material)
+{
+	mesh = this->staticMeshID;
+	material = this->materialID;
 }

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "LEntityComponent.h"
-#include "glm/mat4x4.hpp"
+#include "LimbicTypes.h"
 #include "glm/gtc/matrix_transform.hpp"
 
 class LWorldComponent : public LEntityComponent
