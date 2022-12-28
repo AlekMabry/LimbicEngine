@@ -1,16 +1,8 @@
 #include "Game.h"
 
-Game::Game()
+Game::Game(std::string applicationName)
 {
-	io = std::make_unique<GLFWIO>("Limbic Engine", 1280, 720);
-	uint32 width, height;
-	io->GetFramebufferSize(width, height);
-	renderer = std::make_unique<VulkanRenderer>("Limbic Engine", width, height, io->GetWindow(), io->GetProcess());
-	resources = std::make_unique<ResourceManager>(renderer.get());
-
-	EStaticWorldGeometry* truss1 = SpawnEntity<EStaticWorldGeometry>();
-	EStaticWorldGeometry* truss2 = SpawnEntity<EStaticWorldGeometry>();
-	static_cast<LStaticMeshComponent*>(truss2->GetRoot())->SetPosition(vec3(0.0f, 0.0f, 3.0f));
+	this->applicationName = applicationName;
 }
 
 Game::~Game()
@@ -21,8 +13,23 @@ Game::~Game()
 	}
 }
 
+void Game::SetIO(IOSystem* ioSystem)
+{
+	this->ioSystem = ioSystem;
+}
+
 void Game::Run()
 {
+	renderSystem = std::make_unique<RenderSystem>();
+	resourceSystem = std::make_unique<ResourceSystem>(renderSystem.get());
+	uint32 w, h;
+	ioSystem->GetFramebufferSize(w, h);
+	renderSystem->Init(applicationName.c_str(), w, h, ioSystem->GetWindow(), ioSystem->GetProcess());
+
+	EStaticWorldGeometry* truss1 = SpawnEntity<EStaticWorldGeometry>();
+	EStaticWorldGeometry* truss2 = SpawnEntity<EStaticWorldGeometry>();
+	static_cast<LStaticMeshComponent*>(truss2->GetRoot())->SetPosition(vec3(0.0f, 0.0f, 3.0f));
+
 	for (EEntity* entity : entities)
 	{
 		LStaticMeshComponent* root = dynamic_cast<LStaticMeshComponent*>(entity->GetRoot());
@@ -35,32 +42,32 @@ void Game::Run()
 			std::string properties;
 			root->GetResourceInfo(mesh, node, baseColor, normal, properties);
 			root->SetResources(
-				resources->RequestStaticMesh(mesh, node), resources->RequestMaterial(baseColor, normal, properties));
+				resourceSystem->RequestStaticMesh(mesh, node), resourceSystem->RequestMaterial(baseColor, normal, properties));
 		}
 	}
 
 	auto lastTickTime = std::chrono::high_resolution_clock::now();
 	float angle = 0.0f;
 
-	while (!io->PollExitEvent())
+	while (!ioSystem->PollExitEvent())
 	{
 		auto currentTickTime = std::chrono::high_resolution_clock::now();
 		dt = std::chrono::duration<float, std::chrono::seconds::period>(currentTickTime - lastTickTime).count();
 		lastTickTime = currentTickTime;
 
-		angle += dt * radians(15.0f);
-		if (angle > radians(360.0f))
+		angle += dt * glm::radians(15.0f);
+		if (angle > glm::radians(360.0f))
 		{
-			angle -= radians(360.0f);
+			angle -= glm::radians(360.0f);
 		}
 
 		uint32 width, height;
-		io->GetFramebufferSize(width, height);
+		ioSystem->GetFramebufferSize(width, height);
 
 		mat4 modelA = rotate(mat4(1.0f), angle, vec3(0.0f, 0.0f, 1.0f));
 		mat4 modelB = translate(rotate(mat4(1.0f), angle, vec3(0.0f, 0.0f, 1.0f)), vec3(0.0f, 0.0f, 2.0f));
 		mat4 view = lookAt(vec3(0.0f, 10.0f, 5.0f), vec3(0.0f, 0.0f, 2.0f), vec3(0.0f, 0.0f, 1.0f));
-		mat4 proj = perspective(radians(45.0f), (float) width / (float) height, 0.1f, 128.0f);
+		mat4 proj = glm::perspective(glm::radians(45.0f), (float) width / (float) height, 0.1f, 128.0f);
 		proj[1][1] *= -1;
 
 		std::vector<SDrawStaticPBR> drawInfo;
@@ -78,7 +85,7 @@ void Game::Run()
 			}
 		}
 
-		renderer->FrameDraw(drawInfo.size(), drawInfo.data());
+		renderSystem->FrameDraw(drawInfo.size(), drawInfo.data());
 	}
 }
 

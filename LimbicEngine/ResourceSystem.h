@@ -1,7 +1,7 @@
 #pragma once
 
 #include "LimbicTypes.h"
-#include "VulkanRenderer.h"
+#include "RenderSystem.h"
 
 #include <fbxsdk.h>
 
@@ -45,12 +45,12 @@ struct SKTX2LevelIndex
 	uint64 uncompressedByteLength;
 };
 
-class ResourceManager
+class ResourceSystem
 {
 public:
-	ResourceManager(VulkanRenderer* renderer);
+	ResourceSystem(RenderSystem* renderSystem);
 
-	~ResourceManager();
+	~ResourceSystem();
 
 	RStaticMesh RequestStaticMesh(std::string& filename, std::string& nodeName);
 
@@ -70,6 +70,6 @@ protected:
 
 	FbxManager* fbxManager;
 	FbxIOSettings* fbxIOSettings;
-	VulkanRenderer* renderer;
+	RenderSystem* renderSystem;
 	std::unordered_map<std::string, uint32_t> resourceLookup;
 };

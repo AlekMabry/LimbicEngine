@@ -4,9 +4,9 @@
 #include "LimbicTypes.h"
 #include "EEntity.h"
 #include "LWorldComponent.h"
-#include "GLFWIO.h"
-#include "ResourceManager.h"
-#include "VulkanRenderer.h"
+#include "IOSystem.h"
+#include "ResourceSystem.h"
+#include "RenderSystem.h"
 #include <chrono>
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
@@ -19,9 +19,11 @@
 class Game
 {
 public:
-	Game();
+	Game(std::string applicationName);
 
 	~Game();
+
+	void SetIO(IOSystem* ioSystem);
 
 	void Run();
 
@@ -32,8 +34,9 @@ public:
 
 protected:
 	float dt;
-	std::unique_ptr<ResourceManager> resources;
-	std::unique_ptr<GLFWIO> io;
-	std::unique_ptr<VulkanRenderer> renderer;
+	std::unique_ptr<ResourceSystem> resourceSystem;
+	std::unique_ptr<RenderSystem> renderSystem;
+	IOSystem* ioSystem;
 	std::vector<EEntity*> entities;
+	std::string applicationName;
 };

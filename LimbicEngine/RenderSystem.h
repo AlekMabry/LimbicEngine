@@ -15,14 +15,6 @@
 #include <vulkan/vulkan.hpp>
 #include <vulkan/vulkan_win32.h>
 
-//#define GLM_FORCE_LEFT_HANDED
-//#define GLM_DEPTH_ZERO_TO_ONE
-#include <glm/mat4x4.hpp>
-#include <glm/vec2.hpp>
-#include <glm/vec3.hpp>
-
-using namespace glm;
-
 #ifdef NDEBUG
 const bool bEnableValidationLayers = false;
 #else
@@ -170,12 +162,12 @@ struct SMemoryBlock
 
 const VkDeviceSize MEMORY_BLOCK_SIZE = 8 * 1024 * 1024;
 
-class VulkanRenderer
+class RenderSystem
 {
 public:
-	VulkanRenderer(const char* applicationName, uint32 width, uint32 height, HWND window, HINSTANCE process);
+	~RenderSystem();
 
-	~VulkanRenderer();
+	void Init(const char* applicationName, uint32 width, uint32 height, HWND window, HINSTANCE process);
 
 	/* Call to tell renderer that the window surface has been resized. */
 	void Resize();

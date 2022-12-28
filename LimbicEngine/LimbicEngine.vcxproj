@@ -153,27 +153,30 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="EEntity.h" />
+    <ClInclude Include="EventSystem.h" />
+    <ClInclude Include="IOSystem.h" />
     <ClInclude Include="LEntityComponent.h" />
     <ClInclude Include="EStaticWorldGeometry.h" />
     <ClInclude Include="Game.h" />
-    <ClInclude Include="GLFWIO.h" />
+    <ClInclude Include="IOSystem_GLFW.h" />
     <ClInclude Include="LimbicTypes.h" />
     <ClInclude Include="LObject.h" />
-    <ClInclude Include="ResourceManager.h" />
+    <ClInclude Include="ResourceSystem.h" />
     <ClInclude Include="LStaticMeshComponent.h" />
-    <ClInclude Include="VulkanRenderer.h" />
+    <ClInclude Include="RenderSystem.h" />
     <ClInclude Include="LWorldComponent.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="EEntity.cpp" />
+    <ClCompile Include="EventSystem.cpp" />
     <ClCompile Include="LEntityComponent.cpp" />
     <ClCompile Include="EStaticWorldGeometry.cpp" />
     <ClCompile Include="Game.cpp" />
-    <ClCompile Include="GLFWIO.cpp" />
+    <ClCompile Include="IOSystem_GLFW.cpp" />
     <ClCompile Include="LObject.cpp" />
-    <ClCompile Include="ResourceManager.cpp" />
+    <ClCompile Include="ResourceSystem.cpp" />
     <ClCompile Include="LStaticMeshComponent.cpp" />
-    <ClCompile Include="VulkanRenderer.cpp" />
+    <ClCompile Include="RenderSystem.cpp" />
     <ClCompile Include="LWorldComponent.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

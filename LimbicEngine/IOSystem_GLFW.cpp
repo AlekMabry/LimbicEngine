@@ -1,6 +1,6 @@
-#include "GLFWIO.h"
+#include "IOSystem_GLFW.h"
 
-GLFWIO::GLFWIO(const char* applicationName, uint32 width, uint32 height)
+IOSystem_GLFW::IOSystem_GLFW(const char* applicationName, uint32 width, uint32 height)
 {
 	this->windowWidth = width;
 	this->windowHeight = height;
@@ -11,17 +11,17 @@ GLFWIO::GLFWIO(const char* applicationName, uint32 width, uint32 height)
 	window = glfwCreateWindow(width, height, applicationName, nullptr, nullptr);
 }
 
-HWND GLFWIO::GetWindow()
+HWND IOSystem_GLFW::GetWindow()
 {
 	return glfwGetWin32Window(window);
 }
 
-HINSTANCE GLFWIO::GetProcess()
+HINSTANCE IOSystem_GLFW::GetProcess()
 {
 	return GetModuleHandle(nullptr);
 }
 
-void GLFWIO::GetFramebufferSize(uint32& width, uint32& height)
+void IOSystem_GLFW::GetFramebufferSize(uint32& width, uint32& height)
 {
 	int w, h;
 	glfwGetFramebufferSize(window, &w, &h);
@@ -29,13 +29,13 @@ void GLFWIO::GetFramebufferSize(uint32& width, uint32& height)
 	height = h;
 }
 
-GLFWIO::~GLFWIO()
+IOSystem_GLFW::~IOSystem_GLFW()
 {
 	glfwDestroyWindow(window);
 	glfwTerminate();
 }
 
-bool GLFWIO::PollExitEvent()
+bool IOSystem_GLFW::PollExitEvent()
 {
 	glfwPollEvents();
 	return glfwWindowShouldClose(window);

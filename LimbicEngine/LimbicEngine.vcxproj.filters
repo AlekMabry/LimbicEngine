@@ -39,16 +39,16 @@
     <ClInclude Include="LWorldComponent.h">
       <Filter>Header Files\Components</Filter>
     </ClInclude>
-    <ClInclude Include="ResourceManager.h">
+    <ClInclude Include="ResourceSystem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Game.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="VulkanRenderer.h">
+    <ClInclude Include="RenderSystem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="GLFWIO.h">
+    <ClInclude Include="IOSystem_GLFW.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="EStaticWorldGeometry.h">
@@ -58,6 +58,12 @@
       <Filter>Header Files\Components</Filter>
     </ClInclude>
     <ClInclude Include="LObject.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EventSystem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="IOSystem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -71,16 +77,16 @@
     <ClCompile Include="LWorldComponent.cpp">
       <Filter>Source Files\Components</Filter>
     </ClCompile>
-    <ClCompile Include="ResourceManager.cpp">
+    <ClCompile Include="ResourceSystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Game.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="VulkanRenderer.cpp">
+    <ClCompile Include="RenderSystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="GLFWIO.cpp">
+    <ClCompile Include="IOSystem_GLFW.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="EStaticWorldGeometry.cpp">
@@ -90,6 +96,9 @@
       <Filter>Source Files\Components</Filter>
     </ClCompile>
     <ClCompile Include="LObject.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="EventSystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

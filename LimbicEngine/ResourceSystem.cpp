@@ -1,20 +1,20 @@
-#include "ResourceManager.h"
+#include "ResourceSystem.h"
 
-ResourceManager::ResourceManager(VulkanRenderer* renderer)
+ResourceSystem::ResourceSystem(RenderSystem* renderSystem)
 {
-	this->renderer = renderer;
+	this->renderSystem = renderSystem;
 	fbxManager = FbxManager::Create();
 	fbxIOSettings = FbxIOSettings::Create(fbxManager, IOSROOT);
 	fbxManager->SetIOSettings(fbxIOSettings);
 }
 
-ResourceManager::~ResourceManager()
+ResourceSystem::~ResourceSystem()
 {
 	fbxIOSettings->Destroy();
 	fbxManager->Destroy();
 }
 
-RStaticMesh ResourceManager::RequestStaticMesh(std::string& filename, std::string& nodeName)
+RStaticMesh ResourceSystem::RequestStaticMesh(std::string& filename, std::string& nodeName)
 {
 	if (resourceLookup.count(filename) == 0)
 	{
@@ -22,11 +22,11 @@ RStaticMesh ResourceManager::RequestStaticMesh(std::string& filename, std::strin
 		RStaticMesh hMesh;
 		SStaticVertex* vertexBuffer;
 		uint32* indexBuffer;
-		renderer->CreateStaticMesh(static_cast<uint32>(mesh->vertices.size()), static_cast<uint32>(mesh->indices.size()), hMesh, vertexBuffer, indexBuffer);
+		renderSystem->CreateStaticMesh(static_cast<uint32>(mesh->vertices.size()), static_cast<uint32>(mesh->indices.size()), hMesh, vertexBuffer, indexBuffer);
 		memcpy(vertexBuffer, mesh->vertices.data(), mesh->vertices.size() * sizeof(SStaticVertex));
 		memcpy(indexBuffer, mesh->indices.data(), mesh->indices.size() * sizeof(uint32));
 		delete mesh;
-		renderer->SubmitAssets();
+		renderSystem->SubmitAssets();
 		resourceLookup.insert(std::make_pair(filename, hMesh));
 		return hMesh;
 	}
@@ -36,15 +36,15 @@ RStaticMesh ResourceManager::RequestStaticMesh(std::string& filename, std::strin
 	}
 }
 
-RTexture ResourceManager::RequestTexture(std::string& filename)
+RTexture ResourceSystem::RequestTexture(std::string& filename)
 {
 	if (resourceLookup.count(filename) == 0)
 	{
 		RTexture hTexture;
 		void* textureBuffer;
-		renderer->CreateTexture(1024, 1024, eTextureFormatDXT1, hTexture, textureBuffer);
+		renderSystem->CreateTexture(1024, 1024, eTextureFormatDXT1, hTexture, textureBuffer);
 		LoadTextureKTX2(filename, textureBuffer);
-		renderer->SubmitAssets();
+		renderSystem->SubmitAssets();
 		resourceLookup.insert(std::make_pair(filename, hTexture));
 		return hTexture;
 	}
@@ -54,18 +54,18 @@ RTexture ResourceManager::RequestTexture(std::string& filename)
 	}
 }
 
-RMaterial ResourceManager::RequestMaterial(std::string& baseColorFilename, std::string& normalFilename, std::string& propertiesFilename)
+RMaterial ResourceSystem::RequestMaterial(std::string& baseColorFilename, std::string& normalFilename, std::string& propertiesFilename)
 {
 	RTexture baseColor = RequestTexture(baseColorFilename);
 	RTexture normal = RequestTexture(normalFilename);
 	RTexture properties = RequestTexture(propertiesFilename);
 
 	RMaterial material;
-	renderer->CreateMaterial(baseColor, normal, properties, material);
+	renderSystem->CreateMaterial(baseColor, normal, properties, material);
 	return material;
 }
 
-FbxNode* ResourceManager::GetFbxNode(FbxNode* root, std::string& nodeName) const
+FbxNode* ResourceSystem::GetFbxNode(FbxNode* root, std::string& nodeName) const
 {
 	if (root)
 	{
@@ -84,7 +84,7 @@ FbxNode* ResourceManager::GetFbxNode(FbxNode* root, std::string& nodeName) const
 	return nullptr;
 }
 
-void ResourceManager::PrintNode(FbxNode* node, int indent)
+void ResourceSystem::PrintNode(FbxNode* node, int indent)
 {
 	for (int i = 0; i < indent; i++)
 		std::cout << "\t";
@@ -102,7 +102,7 @@ void ResourceManager::PrintNode(FbxNode* node, int indent)
 		PrintNode(node->GetChild(j), indent + 1);
 }
 
-SMesh* ResourceManager::LoadMesh(std::string& filename, std::string& nodeName)
+SMesh* ResourceSystem::LoadMesh(std::string& filename, std::string& nodeName)
 {
 	FbxImporter* fbxImporter = FbxImporter::Create(fbxManager, "");
 	if (!fbxImporter->Initialize(filename.c_str(), -1, fbxManager->GetIOSettings()))
@@ -180,7 +180,7 @@ SMesh* ResourceManager::LoadMesh(std::string& filename, std::string& nodeName)
 	return outputMesh;
 }
 
-void ResourceManager::LoadTextureKTX2(std::string& filename, void* buffer)
+void ResourceSystem::LoadTextureKTX2(std::string& filename, void* buffer)
 {
 	FILE* file;
 	fopen_s(&file, filename.c_str(), "rb");
