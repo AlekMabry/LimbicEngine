@@ -67,7 +67,7 @@ struct SDrawStaticPBR
 {
 	RStaticMesh mesh;
 	RMaterial material;
-	SPushConstants transform;
+	mat4 modelTransform;
 };
 
 struct SLights
@@ -184,14 +184,17 @@ public:
 	/* Uploads data from staging buffer to device. */
 	void SubmitAssets();
 
-	/* Flags object for deletion. */
-	void DeleteObject(uint32 objectIndex);
+	/* Executed at start of frame before entity draw events are called. */
+	void OnDrawStart();
 
-	/* Set lights for current frame. */
-	void FrameSetLights(SLights* lights);
+	/* Executed after entity draw events are called, draws frame. */
+	void OnDrawEnd();
 
-	/* Draw current frame. */
-	void FrameDraw(uint32 modelCount, SDrawStaticPBR* models);
+	/* Draw static mesh. */
+	void DrawStaticMesh(RStaticMesh meshId, RMaterial materialId, mat4 modelTransform);
+
+	/* Set camera. */
+	void DrawSetCamera(mat4 transform);
 
 private:
 	/**** Support checking utilities. ****/
@@ -301,7 +304,7 @@ private:
 
 	VkShaderModule CreateShaderModule(const std::vector<char>& code);
 
-	void RecordCommandBuffer(VkCommandBuffer commandBuffer, uint32 imageIndex, uint32 modelCount, SDrawStaticPBR* models);
+	void RecordCommandBuffer(VkCommandBuffer commandBuffer, uint32 imageIndex);
 
 	void RecreateSwapChain();
 
@@ -337,6 +340,10 @@ private:
 	std::vector<VkCommandBuffer> commandBuffers;
 	VkSampler textureSampler;
 	bool framebufferResized = false;
+
+	// Cached Draw Commands
+	std::vector<SDrawStaticPBR> drawStaticCommands;
+	mat4 camera;
 
 	// Sync
 	std::vector<VkSemaphore> imageAvailableSemaphores;

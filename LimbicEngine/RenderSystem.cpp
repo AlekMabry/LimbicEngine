@@ -347,15 +347,12 @@ void RenderSystem::SubmitAssets()
 	texturesInStagingMemory.clear();
 }
 
-void RenderSystem::DeleteObject(uint32 objectIndex)
+void RenderSystem::OnDrawStart()
 {
+	drawStaticCommands.clear();
 }
 
-void RenderSystem::FrameSetLights(SLights* lights)
-{
-}
-
-void RenderSystem::FrameDraw(uint32 modelCount, SDrawStaticPBR* models)
+void RenderSystem::OnDrawEnd()
 {
 	vkWaitForFences(device, 1, &inFlightFences[currentFrame], VK_TRUE, UINT64_MAX);
 
@@ -375,7 +372,7 @@ void RenderSystem::FrameDraw(uint32 modelCount, SDrawStaticPBR* models)
 	vkResetFences(device, 1, &inFlightFences[currentFrame]);
 
 	vkResetCommandBuffer(commandBuffers[currentFrame], 0);
-	RecordCommandBuffer(commandBuffers[currentFrame], imageIndex, modelCount, models);
+	RecordCommandBuffer(commandBuffers[currentFrame], imageIndex);
 
 	VkSubmitInfo submitInfo{};
 	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
@@ -417,6 +414,17 @@ void RenderSystem::FrameDraw(uint32 modelCount, SDrawStaticPBR* models)
 	}
 
 	currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
+}
+
+void RenderSystem::DrawStaticMesh(RStaticMesh meshId, RMaterial materialId, mat4 modelTransform)
+{
+	SDrawStaticPBR drawCommand = {meshId, materialId, modelTransform};
+	drawStaticCommands.push_back(drawCommand);
+}
+
+void RenderSystem::DrawSetCamera(mat4 transform)
+{
+	camera = transform;
 }
 
 /**** Support checking utilities. ****/
@@ -1727,8 +1735,7 @@ VkShaderModule RenderSystem::CreateShaderModule(const std::vector<char>& code)
 	return shaderModule;
 }
 
-void RenderSystem::RecordCommandBuffer(
-	VkCommandBuffer commandBuffer, uint32 imageIndex, uint32 modelCount, SDrawStaticPBR* models)
+void RenderSystem::RecordCommandBuffer(VkCommandBuffer commandBuffer, uint32 imageIndex)
 {
 	VkCommandBufferBeginInfo beginInfo{};
 	beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
@@ -1768,18 +1775,23 @@ void RenderSystem::RecordCommandBuffer(
 	scissor.extent = swapChainExtent;
 	vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
 
-	for (uint32 i = 0; i < modelCount; i++)
+	for (size_t i = 0; i < drawStaticCommands.size(); i++)
 	{
+		SPushConstants pushConstant = {camera, drawStaticCommands[i].modelTransform};	
 		vkCmdPushConstants(
-			commandBuffer, pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(SPushConstants), &models[i].transform);
-		vkCmdBindDescriptorSets(
-			commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &materials[models[i].material].descriptor, 0, nullptr);
-		VkBuffer vertexBuffer = deviceMemory[meshes[models[i].mesh].vertexBlock].buffer;
-		VkDeviceSize vertexOffset = meshes[models[i].mesh].vertexOffset;
+			commandBuffer, pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(SPushConstants), &pushConstant);
+		
+		vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1,
+			&materials[drawStaticCommands[i].material].descriptor, 0, nullptr);
+		
+		VkBuffer vertexBuffer = deviceMemory[meshes[drawStaticCommands[i].mesh].vertexBlock].buffer;
+		VkDeviceSize vertexOffset = meshes[drawStaticCommands[i].mesh].vertexOffset;
 		vkCmdBindVertexBuffers(commandBuffer, 0, 1, &vertexBuffer, &vertexOffset);
-		vkCmdBindIndexBuffer(commandBuffer, deviceMemory[meshes[models[i].mesh].indexBlock].buffer,
-			meshes[models[i].mesh].indexOffset, VK_INDEX_TYPE_UINT32);
-		vkCmdDrawIndexed(commandBuffer, meshes[models[i].mesh].indices, 1, 0, 0, 0);
+		
+		vkCmdBindIndexBuffer(commandBuffer, deviceMemory[meshes[drawStaticCommands[i].mesh].indexBlock].buffer,
+			meshes[drawStaticCommands[i].mesh].indexOffset, VK_INDEX_TYPE_UINT32);
+
+		vkCmdDrawIndexed(commandBuffer, meshes[drawStaticCommands[i].mesh].indices, 1, 0, 0, 0);
 	}
 
 	vkCmdEndRenderPass(commandBuffer);

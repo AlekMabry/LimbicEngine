@@ -3,17 +3,12 @@
 EEntity::EEntity()
 {
 	bPendingKill = false;
-	SetTickEnabled(false);
+	enabledEventFlags = 0;
 }
 
-EEntity::~EEntity()
+uint32 EEntity::GetEnabledEventFlags() const
 {
-	delete root;
-}
-
-LEntityComponent* EEntity::GetRoot() const
-{
-	return root;
+	return enabledEventFlags;
 }
 
 bool EEntity::IsPendingKill() const

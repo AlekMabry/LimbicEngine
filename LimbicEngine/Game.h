@@ -3,9 +3,9 @@
 #include "EStaticWorldGeometry.h"
 #include "LimbicTypes.h"
 #include "EEntity.h"
-#include "LWorldComponent.h"
 #include "IOSystem.h"
 #include "ResourceSystem.h"
+#include "WorldSystem.h"
 #include "RenderSystem.h"
 #include <chrono>
 #include <glm/vec2.hpp>
@@ -21,22 +21,17 @@ class Game
 public:
 	Game(std::string applicationName);
 
-	~Game();
+	void OnInit();
 
 	void SetIO(IOSystem* ioSystem);
 
 	void Run();
 
-	template <typename TEntityClass>
-	TEntityClass* SpawnEntity();
-
-	void CleanPendingKills();
-
 protected:
 	float dt;
 	std::unique_ptr<ResourceSystem> resourceSystem;
 	std::unique_ptr<RenderSystem> renderSystem;
+	std::unique_ptr<WorldSystem> worldSystem;
 	IOSystem* ioSystem;
-	std::vector<EEntity*> entities;
 	std::string applicationName;
 };
