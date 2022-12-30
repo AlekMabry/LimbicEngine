@@ -30,42 +30,14 @@ void EStaticWorldGeometry::OnDraw(RenderSystem* hRender)
 	hRender->DrawStaticMesh(trussMesh, trussMaterial, transform);
 }
 
-void EStaticWorldGeometry::GetPropertyInfo(SPropertyInfo*& propertyInfo, uint32& propertyCount) const
+void EStaticWorldGeometry::GetPropertyInfo(SPropertyInfo* propertyInfo, uint32& propertyCount)
 {
+	LPROPERTY(propertyInfo[0], "staticMeshFilename", "Static Mesh Filename", ePropertyTypeFilename, staticMeshFilename)
+	LPROPERTY(propertyInfo[1], "staticMeshNode", "Mesh Node Name", ePropertyTypeFilename, staticMeshNode)
+	LPROPERTY(propertyInfo[2], "baseColorFilename", "Base Color Texture Filename", ePropertyTypeFilename, baseColorFilename)
+	LPROPERTY(propertyInfo[3], "normalFilename", "Normal Texture Filename", ePropertyTypeFilename, normalFilename)
+	LPROPERTY(propertyInfo[4], "propertiesFilename", "Properties Texture Filename", ePropertyTypeFilename, propertiesFilename)
+	LPROPERTY(propertyInfo[5], "position", "Position", ePropertyTypeVec3, position);
+
 	propertyCount = 6;
-
-	propertyInfo[0].label = std::string("Static Mesh Filename");
-	propertyInfo[0].name = std::string("staticMeshFilename");
-	propertyInfo[0].type = ePropertyTypeFilename;
-
-	propertyInfo[1].label = std::string("Mesh Node Name");
-	propertyInfo[1].name = std::string("staticMeshNode");
-	propertyInfo[1].type = ePropertyTypeFilename;
-	
-	propertyInfo[2].label = std::string("Base Color Texture Filename");
-	propertyInfo[2].name = std::string("baseColorFilename");
-	propertyInfo[2].type = ePropertyTypeFilename;
-
-	propertyInfo[3].label = std::string("Normal Texture Filename");
-	propertyInfo[3].name = std::string("normalFilename");
-	propertyInfo[3].type = ePropertyTypeFilename;
-
-	propertyInfo[4].label = std::string("Properties Texture Filename");
-	propertyInfo[4].name = std::string("propertiesFilename");
-	propertyInfo[4].type = ePropertyTypeFilename;
-
-	propertyInfo[5].label = std::string("Position");
-	propertyInfo[5].name = std::string("position");
-	propertyInfo[5].type = ePropertyTypeVec3;
-}
-
-
-void EStaticWorldGeometry::GetPropertyHandles(void**& handles)
-{
-	handles[0] = static_cast<void*>(&staticMeshFilename);
-	handles[1] = static_cast<void*>(&staticMeshNode);
-	handles[2] = static_cast<void*>(&baseColorFilename);
-	handles[3] = static_cast<void*>(&normalFilename);
-	handles[4] = static_cast<void*>(&propertiesFilename);
-	handles[5] = static_cast<void*>(&position);
 }

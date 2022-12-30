@@ -20,6 +20,9 @@ void Game::OnInit()
 	ioSystem->GetFramebufferSize(w, h);
 	renderSystem->Init(applicationName.c_str(), w, h, ioSystem->GetWindow(), ioSystem->GetProcess());
 
+	worldSystem->LoadFromJSON("C:/Users/alekm/Desktop/Outpost731/Map/Test.json");
+
+	/*
 	EStaticWorldGeometry* truss[2];
 	for (uint32 i = 0; i < 2; i++)
 	{
@@ -33,6 +36,7 @@ void Game::OnInit()
 		truss[i]->position = vec3(0.0f, 0.0f, 0.0f);
 	}
 	truss[1]->position = vec3(0.0f, 0.0f, 2.0f);
+	*/
 
 	EEntity** entities;
 	uint32 entityCount;

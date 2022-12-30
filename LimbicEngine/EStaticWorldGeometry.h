@@ -14,9 +14,7 @@ public:
 
 	void OnDraw(RenderSystem* hRender) override;
 
-	void GetPropertyInfo(SPropertyInfo*& propertyInfo, uint32& propertyCount) const;
-
-	void GetPropertyHandles(void**& handles);
+	void GetPropertyInfo(SPropertyInfo* propertyInfo, uint32& propertyCount) override;
 
 	std::string staticMeshFilename;
 	std::string staticMeshNode;

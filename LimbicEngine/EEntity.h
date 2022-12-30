@@ -23,10 +23,7 @@ public:
 	virtual void OnDraw(RenderSystem* hRender) = 0;
 
 	/**	Returns initialization properties available in the map file or editor. */
-	virtual void GetPropertyInfo(SPropertyInfo*& propertyInfo, uint32& propertyCount) const = 0;
-
-	/** Returns pointers to member variables described by GetProperties(). */
-	virtual void GetPropertyHandles(void**& handles) = 0;
+	virtual void GetPropertyInfo(SPropertyInfo* propertyInfo, uint32& propertyCount) = 0;
 
 	uint32 GetEnabledEventFlags() const;
 
