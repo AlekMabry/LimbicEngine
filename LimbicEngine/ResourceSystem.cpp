@@ -16,7 +16,8 @@ ResourceSystem::~ResourceSystem()
 
 RStaticMesh ResourceSystem::RequestStaticMesh(std::string& filename, std::string& nodeName)
 {
-	if (resourceLookup.count(filename) == 0)
+	std::string meshName = filename + nodeName;
+	if (resourceLookup.count(meshName) == 0)
 	{
 		SMesh* mesh = LoadMesh(filename, nodeName);
 		RStaticMesh hMesh;
@@ -27,12 +28,12 @@ RStaticMesh ResourceSystem::RequestStaticMesh(std::string& filename, std::string
 		memcpy(indexBuffer, mesh->indices.data(), mesh->indices.size() * sizeof(uint32));
 		delete mesh;
 		renderSystem->SubmitAssets();
-		resourceLookup.insert(std::make_pair(filename, hMesh));
+		resourceLookup.insert(std::make_pair(meshName, hMesh));
 		return hMesh;
 	}
 	else
 	{
-		return resourceLookup[filename];
+		return resourceLookup[meshName];
 	}
 }
 

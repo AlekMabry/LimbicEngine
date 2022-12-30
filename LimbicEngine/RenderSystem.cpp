@@ -335,7 +335,7 @@ void RenderSystem::SubmitAssets()
 		vkCmdPipelineBarrier(commandBuffer, VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, 0, 0, nullptr, 0,
 			nullptr, 1, &shaderBarrier);
 
-		// Update mesh indexing to new device memory location
+		// Update texture indexing to new device memory location
 		texture->location = eMemoryLocationDevice;
 		texture->offset = 0;
 		texture->size = memoryRequirements.size;
@@ -345,6 +345,8 @@ void RenderSystem::SubmitAssets()
 	EndSingleTimeCommands(commandBuffer);
 	meshesInStagingMemory.clear();
 	texturesInStagingMemory.clear();
+	stagingMemory[0].cursor = 0;
+	stagingMemory[1].cursor = 0;
 }
 
 void RenderSystem::OnDrawStart()

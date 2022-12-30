@@ -153,6 +153,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="EEntity.h" />
+    <ClInclude Include="EPlayer.h" />
     <ClInclude Include="EventSystem.h" />
     <ClInclude Include="IOSystem.h" />
     <ClInclude Include="EStaticWorldGeometry.h" />
@@ -166,6 +167,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="EEntity.cpp" />
+    <ClCompile Include="EPlayer.cpp" />
     <ClCompile Include="EventSystem.cpp" />
     <ClCompile Include="EStaticWorldGeometry.cpp" />
     <ClCompile Include="Game.cpp" />

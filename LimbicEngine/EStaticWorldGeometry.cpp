@@ -10,23 +10,19 @@ void EStaticWorldGeometry::OnInit(ResourceSystem* hResource)
 {
 	trussMesh = hResource->RequestStaticMesh(staticMeshFilename, staticMeshNode);
 	trussMaterial = hResource->RequestMaterial(baseColorFilename, normalFilename, propertiesFilename);
-	angle = 0.0f;
+
+	transform = glm::rotate(mat4(1.0f), glm::radians(rotation.z), vec3(0.0f, 0.0f, 1.0f));
+	transform = glm::rotate(transform, glm::radians(rotation.y), vec3(0.0f, 1.0f, 0.0f));
+	transform = glm::rotate(transform, glm::radians(rotation.x), vec3(1.0f, 0.0f, 0.0f));
+	transform = glm::translate(transform, position);
 }
 
 void EStaticWorldGeometry::OnTick(float dt)
 {
-	angle += dt * glm::radians(15.0f);
-	if (angle > glm::radians(360.0f))
-	{
-		angle -= glm::radians(360.0f);
-	}
 }
 
 void EStaticWorldGeometry::OnDraw(RenderSystem* hRender)
 {
-	transform = glm::rotate(mat4(1.0f), angle, vec3(0.0f, 0.0f, 1.0f));
-	transform = glm::translate(transform, position);
-
 	hRender->DrawStaticMesh(trussMesh, trussMaterial, transform);
 }
 
@@ -38,6 +34,7 @@ void EStaticWorldGeometry::GetPropertyInfo(SPropertyInfo* propertyInfo, uint32& 
 	LPROPERTY(propertyInfo[3], "normalFilename", "Normal Texture Filename", ePropertyTypeFilename, normalFilename)
 	LPROPERTY(propertyInfo[4], "propertiesFilename", "Properties Texture Filename", ePropertyTypeFilename, propertiesFilename)
 	LPROPERTY(propertyInfo[5], "position", "Position", ePropertyTypeVec3, position);
+	LPROPERTY(propertyInfo[6], "rotation", "Rotation", ePropertyTypeVec3, rotation);
 
-	propertyCount = 6;
+	propertyCount = 7;
 }

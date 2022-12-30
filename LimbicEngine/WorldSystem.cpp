@@ -1,10 +1,12 @@
 #include "WorldSystem.h"
 #include "rapidjson/document.h"
+#include "EPlayer.h"
 #include <stdlib.h>
 
 WorldSystem::WorldSystem()
 {
 	LREGISTER(EStaticWorldGeometry)
+	LREGISTER(EPlayer)
 }
 
 void WorldSystem::LoadFromJSON(const char* filename)

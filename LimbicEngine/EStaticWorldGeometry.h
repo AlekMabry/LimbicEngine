@@ -22,10 +22,10 @@ public:
 	std::string normalFilename;
 	std::string propertiesFilename;
 	vec3 position;
+	vec3 rotation;
 
 protected:
 	RStaticMesh trussMesh;
 	RMaterial trussMaterial;
 	mat4 transform;
-	float angle;
 };

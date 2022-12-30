@@ -22,22 +22,6 @@ void Game::OnInit()
 
 	worldSystem->LoadFromJSON("C:/Users/alekm/Desktop/Outpost731/Map/Test.json");
 
-	/*
-	EStaticWorldGeometry* truss[2];
-	for (uint32 i = 0; i < 2; i++)
-	{
-		uint32 id;
-		truss[i] = worldSystem->SpawnEntity<EStaticWorldGeometry>(std::string("Truss"), id);
-		truss[i]->staticMeshFilename = std::string("C:/Users/alekm/Desktop/Assets/Static/Truss/Truss.fbx");
-		truss[i]->staticMeshNode = std::string("Truss");
-		truss[i]->baseColorFilename = std::string("C:/Users/alekm/Desktop/Outpost731/Textures/Truss_BaseColor.KTX2");
-		truss[i]->normalFilename = std::string("C:/Users/alekm/Desktop/Outpost731/Textures/Truss_Normal.KTX2");
-		truss[i]->propertiesFilename = std::string("C:/Users/alekm/Desktop/Outpost731/Textures/Truss_Properties.KTX2");
-		truss[i]->position = vec3(0.0f, 0.0f, 0.0f);
-	}
-	truss[1]->position = vec3(0.0f, 0.0f, 2.0f);
-	*/
-
 	EEntity** entities;
 	uint32 entityCount;
 	worldSystem->GetEntities(entities, entityCount);
@@ -68,15 +52,6 @@ void Game::Run()
 		}
 
 		renderSystem->OnDrawStart();
-
-		uint32 width, height;
-		ioSystem->GetFramebufferSize(width, height);
-
-		mat4 view = lookAt(vec3(0.0f, 10.0f, 5.0f), vec3(0.0f, 0.0f, 2.0f), vec3(0.0f, 0.0f, 1.0f));
-		mat4 proj = glm::perspective(glm::radians(45.0f), (float) width / (float) height, 0.1f, 128.0f);
-		proj[1][1] *= -1;
-
-		renderSystem->DrawSetCamera(proj * view);
 
 		for (uint32 i = 0; i < entityCount; i++)
 		{
