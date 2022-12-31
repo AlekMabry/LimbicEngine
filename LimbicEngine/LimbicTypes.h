@@ -6,6 +6,8 @@
 #include <glm/vec3.hpp>
 #include <glm/vec2.hpp>
 
+#define LSTRINGIFY(s) #s
+
 typedef unsigned char uint8;
 typedef signed char int8;
 typedef unsigned short uint16;

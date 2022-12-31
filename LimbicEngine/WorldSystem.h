@@ -1,11 +1,12 @@
 #pragma once
 
+#include "LimbicTypes.h"
 #include "EEntity.h"
-#include "EStaticWorldGeometry.h"
+#include "ResourceSystem.h"
+#include "RenderSystem.h"
+#include "IOSystem.h"
 
 #include <functional>
-
-#define LSTRINGIFY(s) #s
 
 #define LREGISTER(entityClass) \
 	NewEntity.insert(std::make_pair(std::string(LSTRINGIFY(entityClass)), [this]() -> EEntity* { return SpawnEntityCast<entityClass>(); }));
@@ -20,20 +21,26 @@ public:
 	void GetEntities(EEntity**& entities, uint32& entityCount);
 
 	template <typename TEntityClass>
-	TEntityClass* SpawnEntity(std::string name, uint32& entityId)
+	TEntityClass* SpawnEntity()
 	{
 		TEntityClass* entity = new TEntityClass();
 		entities.push_back(static_cast<EEntity*>(entity));
+		entity->hIO = hIO;
+		entity->hResource = hResource;
+		entity->hRender = hRender;
 		return entity;
 	}
 
 	template <typename TEntityClass>
 	EEntity* SpawnEntityCast()
 	{
-		TEntityClass* entity = new TEntityClass();
-		entities.push_back(static_cast<EEntity*>(entity));
+		TEntityClass* entity = SpawnEntity<TEntityClass>();
 		return static_cast<EEntity*>(entity);
 	}
+
+	IOSystem* hIO;
+	RenderSystem* hRender;
+	ResourceSystem* hResource;
 
 protected:
 	std::vector<EEntity*> entities;

@@ -22,6 +22,12 @@
     <Filter Include="Header Files\Common">
       <UniqueIdentifier>{e0ec56a4-a10c-4211-856e-15c7ec996cd9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\IOSystem">
+      <UniqueIdentifier>{8f384d96-9bac-48d3-aa0f-3772d5ecd5b1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\IOSystem">
+      <UniqueIdentifier>{fdb06499-7b1d-442f-abd9-f2ea22eb669b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ResourceSystem.h">
@@ -33,16 +39,10 @@
     <ClInclude Include="RenderSystem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="IOSystem_GLFW.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="EStaticWorldGeometry.h">
       <Filter>Header Files\Entities</Filter>
     </ClInclude>
     <ClInclude Include="EventSystem.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="IOSystem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="WorldSystem.h">
@@ -57,8 +57,23 @@
     <ClInclude Include="EEntity.h">
       <Filter>Header Files\Entities</Filter>
     </ClInclude>
-    <ClInclude Include="EPlayer.h">
+    <ClInclude Include="ETestCamera.h">
       <Filter>Header Files\Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="IOSystem.h">
+      <Filter>Header Files\IOSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="IOSystem_GLFW.h">
+      <Filter>Header Files\IOSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="IOSystem_InputBinds.h">
+      <Filter>Header Files\IOSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="IOSystem_GLFWBinds.h">
+      <Filter>Header Files\IOSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="EPlayer.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -69,9 +84,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="RenderSystem.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="IOSystem_GLFW.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="EStaticWorldGeometry.cpp">
@@ -86,8 +98,14 @@
     <ClCompile Include="EEntity.cpp">
       <Filter>Source Files\Entities</Filter>
     </ClCompile>
-    <ClCompile Include="EPlayer.cpp">
+    <ClCompile Include="ETestCamera.cpp">
       <Filter>Source Files\Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="IOSystem_GLFW.cpp">
+      <Filter>Source Files\IOSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="EPlayer.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

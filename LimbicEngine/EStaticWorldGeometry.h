@@ -8,11 +8,11 @@ class EStaticWorldGeometry : public EEntity
 public:
 	EStaticWorldGeometry();
 
-	void OnInit(ResourceSystem* hResource) override;
+	void OnInit() override;
 
 	void OnTick(float dt) override;
 
-	void OnDraw(RenderSystem* hRender) override;
+	void OnDraw() override;
 
 	void GetPropertyInfo(SPropertyInfo* propertyInfo, uint32& propertyCount) override;
 

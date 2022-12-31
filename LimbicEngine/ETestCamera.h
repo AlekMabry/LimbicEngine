@@ -2,10 +2,10 @@
 
 #include "EEntity.h"
 
-class EPlayer : public EEntity
+class ETestCamera : public EEntity
 {
 public:
-	EPlayer();
+	ETestCamera();
 
 	void OnInit() override;
 
@@ -15,8 +15,6 @@ public:
 
 	void GetPropertyInfo(SPropertyInfo* propertyInfo, uint32& propertyCount) override;
 
-	vec3 position;
-
 protected:
-	mat4 transform;
+	float angle;
 };

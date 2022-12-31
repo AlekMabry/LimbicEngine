@@ -1,11 +1,17 @@
 #include "WorldSystem.h"
-#include "rapidjson/document.h"
+
+#include "ETestCamera.h"
+#include "EStaticWorldGeometry.h"
 #include "EPlayer.h"
+
+#include "rapidjson/document.h"
+
 #include <stdlib.h>
 
 WorldSystem::WorldSystem()
 {
 	LREGISTER(EStaticWorldGeometry)
+	LREGISTER(ETestCamera)
 	LREGISTER(EPlayer)
 }
 
@@ -48,7 +54,7 @@ void WorldSystem::LoadFromJSON(const char* filename)
 		// Spawn entity using spawn function in the lookup table
 		EEntity* spawned = NewEntity[entityTypeString]();
 
-		// Ask entity for properties information 
+		// Ask entity for properties information
 		spawned->GetPropertyInfo(entityPropertyInfo.data(), entityPropertyCount);
 
 		// For each property the entity requests, find it in the JSON file and write to entity with property handles.

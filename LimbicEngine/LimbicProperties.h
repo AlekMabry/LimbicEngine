@@ -4,11 +4,11 @@
 
 #include <string>
 
-#define LPROPERTY(propertyInfo, nameLiteral, labelLiteral, typeEnum, propertyVariable) \
-	propertyInfo.name = std::string(nameLiteral);                                      \
-	propertyInfo.label = std::string(labelLiteral);                                    \
-	propertyInfo.type = typeEnum;                                                      \
-	propertyInfo.handle = static_cast<void*>(&propertyVariable);
+#define LPROPERTY(propertyInfo, variable, editorLabel, typeEnum) \
+	propertyInfo.name = std::string(LSTRINGIFY(variable));       \
+	propertyInfo.label = std::string(editorLabel);               \
+	propertyInfo.type = typeEnum;                                \
+	propertyInfo.handle = static_cast<void*>(&variable);
 
 enum EPropertyType
 {
