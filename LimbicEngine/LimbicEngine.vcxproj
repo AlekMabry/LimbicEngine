@@ -159,8 +159,6 @@
     <ClInclude Include="IOSystem.h" />
     <ClInclude Include="EStaticWorldGeometry.h" />
     <ClInclude Include="Game.h" />
-    <ClInclude Include="IOSystem_GLFWBinds.h" />
-    <ClInclude Include="IOSystem_InputBinds.h" />
     <ClInclude Include="IOSystem_GLFW.h" />
     <ClInclude Include="LimbicProperties.h" />
     <ClInclude Include="LimbicTypes.h" />

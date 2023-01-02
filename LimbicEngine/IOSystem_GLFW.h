@@ -3,36 +3,92 @@
 #include "IOSystem.h"
 
 #include <GLFW/glfw3.h>
-#define GLFW_EXPOSE_NATIVE_WIN32
-#include <GLFW/glfw3native.h>
 
 #include <map>
 #include <memory>
 
+struct SWindowGlfw
+{
+	std::string title;
+	GLFWwindow* window;
+	VkSurfaceKHR surface;
+	uint32 drawOptionFlags;
+	uint32 updateFlags;
+	mat4 cameraTransform;
+};
+
 class IOSystem_GLFW : public IOSystem
 {
 public:
-	IOSystem_GLFW(const char* applicationName, uint32 width, uint32 height);
+	IOSystem_GLFW();
 
 	~IOSystem_GLFW();
 
+	HWindow SpawnWindow(const char* title, int32 width, int32 height, uint32 drawOptionFlags) override;
+
 	void OnTick(float dt) override;
 
-	void BindActions(EKey* keys, uint32 actionCount) override;
+	void BindActions(EInput* inputs, uint32 actionCount) override;
 
-	HWND GetWindow() override;
+	void SetWindowCamera(HWindow window, mat4& cameraTransform) override;
 
-	HINSTANCE GetProcess() override;
+	VkSurfaceKHR* GetVkSurfaceKHR(HWindow window) override;
 
-	void GetFramebufferSize(uint32& width, uint32& height) override;
+	void GetFramebufferSize(HWindow window, int32& width, int32& height) override;
+
+	uint32 GetWindowUpdateFlags(HWindow window) override;
+
+	uint32 GetWindowDrawOptionFlags(HWindow window) override;
 
 	bool IsActionHeld(uint64 action) override;
 
 protected:
-	GLFWwindow* window;
-	uint32 windowWidth;
-	uint32 windowHeight;
-
+	std::vector<SWindowGlfw> windows;
 	uint64 heldActionFlags;				/** Currently held action flags. */
 	std::vector<uint32> getKeyByAction;	/** Get EKey by action index. */
+};
+
+const uint32 getGlfwKeyByKey[] = {
+	GLFW_KEY_LEFT_CONTROL,
+	GLFW_KEY_LEFT_SHIFT,
+	GLFW_KEY_LEFT_ALT,
+	GLFW_KEY_SPACE,
+	GLFW_KEY_TAB,
+	GLFW_KEY_GRAVE_ACCENT,
+	GLFW_KEY_0,
+	GLFW_KEY_1,
+	GLFW_KEY_2,
+	GLFW_KEY_3,
+	GLFW_KEY_4,
+	GLFW_KEY_5,
+	GLFW_KEY_6,
+	GLFW_KEY_7,
+	GLFW_KEY_8,
+	GLFW_KEY_9,
+	GLFW_KEY_A,
+	GLFW_KEY_B,
+	GLFW_KEY_C,
+	GLFW_KEY_D,
+	GLFW_KEY_E,
+	GLFW_KEY_F,
+	GLFW_KEY_G,
+	GLFW_KEY_H,
+	GLFW_KEY_I,
+	GLFW_KEY_J,
+	GLFW_KEY_K,
+	GLFW_KEY_L,
+	GLFW_KEY_M,
+	GLFW_KEY_N,
+	GLFW_KEY_O,
+	GLFW_KEY_P,
+	GLFW_KEY_Q,
+	GLFW_KEY_R,
+	GLFW_KEY_S,
+	GLFW_KEY_T,
+	GLFW_KEY_U,
+	GLFW_KEY_V,
+	GLFW_KEY_W,
+	GLFW_KEY_X,
+	GLFW_KEY_Y,
+	GLFW_KEY_Z
 };

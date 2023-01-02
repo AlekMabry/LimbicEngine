@@ -1,7 +1,5 @@
 #include "EPlayer.h"
 
-#include "IOSystem_InputBinds.h"
-
 #define GLM_FORCE_RADIANS
 #define GLM_DEPTH_ZERO_TO_ONE
 #include <glm/gtc/matrix_transform.hpp>
@@ -21,11 +19,11 @@ EPlayer::EPlayer()
 
 void EPlayer::OnInit()
 {
-	std::array<EKey,4> keys;
-	keys[ePlayerActionForward] = eKey_W;
-	keys[ePlayerActionBackward] = eKey_S;
-	keys[ePlayerActionLeft] = eKey_A;
-	keys[ePlayerActionRight] = eKey_D;
+	std::array<EInput,4> keys;
+	keys[ePlayerActionForward] = eInput_W;
+	keys[ePlayerActionBackward] = eInput_S;
+	keys[ePlayerActionLeft] = eInput_A;
+	keys[ePlayerActionRight] = eInput_D;
 
 	hIO->BindActions(keys.data(), static_cast<uint32>(keys.size()));
 }

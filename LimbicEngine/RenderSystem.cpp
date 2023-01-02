@@ -29,34 +29,22 @@ static void DestroyDebugUtilsMessengerEXT(
 static VKAPI_ATTR VkBool32 VKAPI_CALL DebugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
 	VkDebugUtilsMessageTypeFlagsEXT messageType, const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData)
 {
-	HANDLE win32Console = static_cast<HANDLE>(pUserData);
-
 	switch (messageSeverity)
 	{
 		case VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT:
-			SetConsoleTextAttribute(win32Console, FOREGROUND_GREEN);
 			std::cout << "[VERBOSE] " << pCallbackData->pMessage << std::endl;
-			SetConsoleTextAttribute(win32Console, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
 			break;
 		case VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT:
-			SetConsoleTextAttribute(win32Console, FOREGROUND_GREEN | FOREGROUND_BLUE);
 			std::cout << "[INFO] " << pCallbackData->pMessage << std::endl;
-			SetConsoleTextAttribute(win32Console, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
 			break;
 		case VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT:
-			SetConsoleTextAttribute(win32Console, FOREGROUND_GREEN | FOREGROUND_RED);
 			std::cout << "[WARNING] " << pCallbackData->pMessage << std::endl;
-			SetConsoleTextAttribute(win32Console, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
 			break;
 		case VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT:
-			SetConsoleTextAttribute(win32Console, FOREGROUND_RED);
 			std::cout << "[ERROR] " << pCallbackData->pMessage << std::endl;
-			SetConsoleTextAttribute(win32Console, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
 			break;
 		default:
-			SetConsoleTextAttribute(win32Console, FOREGROUND_RED);
 			std::cout << "[DEFAULT] " << pCallbackData->pMessage << std::endl;
-			SetConsoleTextAttribute(win32Console, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
 			break;
 	}
 	return VK_FALSE;
@@ -96,16 +84,11 @@ RenderSystem::~RenderSystem()
 	vkDestroyInstance(instance, nullptr);
 }
 
-void RenderSystem::Init(const char* applicationName, uint32 width, uint32 height, HWND window, HINSTANCE process)
+void RenderSystem::Init(const char* applicationName, IOSystem* pIO)
 {
 	this->applicationName = applicationName;
-	this->width = width;
-	this->height = height;
-	win32Window = window;
-	win32Process = process;
+	this->pIO = pIO;
 	currentFrame = 0;
-
-	win32Console = GetStdHandle(STD_OUTPUT_HANDLE);
 
 	InitInstance();
 	InitSurface();

@@ -66,14 +66,8 @@
     <ClInclude Include="IOSystem_GLFW.h">
       <Filter>Header Files\IOSystem</Filter>
     </ClInclude>
-    <ClInclude Include="IOSystem_InputBinds.h">
-      <Filter>Header Files\IOSystem</Filter>
-    </ClInclude>
-    <ClInclude Include="IOSystem_GLFWBinds.h">
-      <Filter>Header Files\IOSystem</Filter>
-    </ClInclude>
     <ClInclude Include="EPlayer.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Entities</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -105,7 +99,7 @@
       <Filter>Source Files\IOSystem</Filter>
     </ClCompile>
     <ClCompile Include="EPlayer.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Entities</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

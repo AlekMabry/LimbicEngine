@@ -1,8 +1,7 @@
 #pragma once
 
 #include "LimbicTypes.h"
-
-#include <Windows.h>
+#include "IOSystem.h"
 
 #include <cstdint>
 #include <cstring>
@@ -83,6 +82,11 @@ enum ETextureFormat
 };
 
 const uint32 ETextureFormatCount = 2;
+
+struct SRenderWindow
+{
+	HWindow windowId;
+};
 
 /* Maps ETextureFormat enums to the Vulkan image formats. */
 const VkFormat textureFormatVkFormat[2] = {VK_FORMAT_R8G8B8A8_SRGB, VK_FORMAT_BC1_RGB_UNORM_BLOCK};
@@ -167,7 +171,7 @@ class RenderSystem
 public:
 	~RenderSystem();
 
-	void Init(const char* applicationName, uint32 width, uint32 height, HWND window, HINSTANCE process);
+	void Init(const char* applicationName, IOSystem* pIO);
 
 	/* Call to tell renderer that the window surface has been resized. */
 	void Resize();
@@ -310,20 +314,16 @@ private:
 
 	void ConfigureDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& info);
 
-	HWND win32Window;
-	HINSTANCE win32Process;
-	HANDLE win32Console;
+	IOSystem* pIO;
+	VkSurfaceKHR surface;
 
 	uint32 currentFrame;
-	uint32 width;
-	uint32 height;
 	std::string applicationName;
 
 	VkInstance instance;
 	VkDevice device;
 	VkQueue graphicsQueue;
 	VkQueue presentQueue;
-	VkSurfaceKHR surface;
 	VkSwapchainKHR swapChain;
 	std::vector<VkImage> swapChainImages;
 	VkImage depthImage;
@@ -339,7 +339,6 @@ private:
 	VkCommandPool commandPool;
 	std::vector<VkCommandBuffer> commandBuffers;
 	VkSampler textureSampler;
-	bool framebufferResized = false;
 
 	// Cached Draw Commands
 	std::vector<SDrawStaticPBR> drawStaticCommands;

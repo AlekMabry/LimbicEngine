@@ -1,32 +1,50 @@
 #include "IOSystem_GLFW.h"
-#include "IOSystem_GLFWBinds.h"
 
 #include <bitset>
 #include <iostream>
 
-IOSystem_GLFW::IOSystem_GLFW(const char* applicationName, uint32 width, uint32 height)
+IOSystem_GLFW::IOSystem_GLFW()
 {
 	heldActionFlags = 0;
-	this->windowWidth = width;
-	this->windowHeight = height;
 	glfwInit();
+}
+
+IOSystem_GLFW::~IOSystem_GLFW()
+{
+	for (SWindowGlfw window : windows)
+	{
+		glfwDestroyWindow(window.window);
+	}
+	glfwTerminate();
+}
+
+
+HWindow IOSystem_GLFW::SpawnWindow(const char* title, int32 width, int32 height, uint32 drawOptionFlags)
+{
+	SWindowGlfw window;
+	window.drawOptionFlags = drawOptionFlags;
+	window.updateFlags = WINDOW_UPDATE_DRAW_FLAG;
 
 	glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 	glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
-	window = glfwCreateWindow(width, height, applicationName, nullptr, nullptr);
-	glfwSetWindowUserPointer(window, static_cast<void*>(this));
+	window.window = glfwCreateWindow(width, height, title, nullptr, nullptr);
+	glfwSetWindowUserPointer(window.window, static_cast<void*>(this));
+
+	glfwCreateWindowSurface(*pInstance, window.window, NULL, &window.surface);
+
+	HWindow hWindow = static_cast<uint32>(windows.size());
+	windows.push_back(window);
+	return hWindow;
 }
 
 void IOSystem_GLFW::OnTick(float dt)
 {
 	glfwPollEvents();
 
-	if (glfwWindowShouldClose(window))
-		abort;
-
+	// For now only receive input from the first window
 	for (size_t action = 0; action < getKeyByAction.size(); action++)
 	{
-		int32 state = glfwGetKey(window, getGlfwKeyByKey[getKeyByAction[action]]);
+		int32 state = glfwGetKey(windows[0].window, getGlfwKeyByKey[getKeyByAction[action]]);
 		switch (state)
 		{
 		case GLFW_RELEASE:
@@ -39,37 +57,38 @@ void IOSystem_GLFW::OnTick(float dt)
 	}
 }
 
-void IOSystem_GLFW::BindActions(EKey* keys, uint32 actionCount)
+void IOSystem_GLFW::BindActions(EInput* inputs, uint32 actionCount)
 {
 	getKeyByAction.clear();
 	for (uint32 i = 0; i < actionCount; i++)
 	{
-		getKeyByAction.push_back(keys[i]);
+		getKeyByAction.push_back(inputs[i]);
 	}
 }
 
-HWND IOSystem_GLFW::GetWindow()
+void IOSystem_GLFW::SetWindowCamera(HWindow window, mat4& cameraTransform)
 {
-	return glfwGetWin32Window(window);
+	windows[window].cameraTransform = cameraTransform;
 }
 
-HINSTANCE IOSystem_GLFW::GetProcess()
+VkSurfaceKHR* IOSystem_GLFW::GetVkSurfaceKHR(HWindow window)
 {
-	return GetModuleHandle(nullptr);
+	return &windows[window].surface;
 }
 
-void IOSystem_GLFW::GetFramebufferSize(uint32& width, uint32& height)
+void IOSystem_GLFW::GetFramebufferSize(HWindow window, int32& width, int32& height)
 {
-	int w, h;
-	glfwGetFramebufferSize(window, &w, &h);
-	width = w;
-	height = h;
+	glfwGetFramebufferSize(windows[window].window, &width, &height);
 }
 
-IOSystem_GLFW::~IOSystem_GLFW()
+uint32 IOSystem_GLFW::GetWindowUpdateFlags(HWindow window)
 {
-	glfwDestroyWindow(window);
-	glfwTerminate();
+	return windows[window].updateFlags;
+}
+
+uint32 IOSystem_GLFW::GetWindowDrawOptionFlags(HWindow window)
+{
+	return windows[window].drawOptionFlags;
 }
 
 bool IOSystem_GLFW::IsActionHeld(uint64 action)
