@@ -1,55 +1,5 @@
 #include "RenderSystem.h"
 
-/**** Static debug callback configuration. ****/
-
-static VkResult CreateDebugUtilsMessengerEXT(VkInstance instance, const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo,
-	const VkAllocationCallbacks* pAllocator, VkDebugUtilsMessengerEXT* pDebugMessenger)
-{
-	auto func = (PFN_vkCreateDebugUtilsMessengerEXT) vkGetInstanceProcAddr(instance, "vkCreateDebugUtilsMessengerEXT");
-	if (func != nullptr)
-	{
-		return func(instance, pCreateInfo, pAllocator, pDebugMessenger);
-	}
-	else
-	{
-		return VK_ERROR_EXTENSION_NOT_PRESENT;
-	}
-}
-
-static void DestroyDebugUtilsMessengerEXT(
-	VkInstance instance, VkDebugUtilsMessengerEXT debugMessenger, const VkAllocationCallbacks* pAllocator)
-{
-	auto func = (PFN_vkDestroyDebugUtilsMessengerEXT) vkGetInstanceProcAddr(instance, "vkDestroyDebugUtilsMessengerEXT");
-	if (func != nullptr)
-	{
-		func(instance, debugMessenger, pAllocator);
-	}
-}
-
-static VKAPI_ATTR VkBool32 VKAPI_CALL DebugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
-	VkDebugUtilsMessageTypeFlagsEXT messageType, const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData)
-{
-	switch (messageSeverity)
-	{
-		case VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT:
-			std::cout << "[VERBOSE] " << pCallbackData->pMessage << std::endl;
-			break;
-		case VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT:
-			std::cout << "[INFO] " << pCallbackData->pMessage << std::endl;
-			break;
-		case VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT:
-			std::cout << "[WARNING] " << pCallbackData->pMessage << std::endl;
-			break;
-		case VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT:
-			std::cout << "[ERROR] " << pCallbackData->pMessage << std::endl;
-			break;
-		default:
-			std::cout << "[DEFAULT] " << pCallbackData->pMessage << std::endl;
-			break;
-	}
-	return VK_FALSE;
-}
-
 /**** Public interface. ****/
 
 RenderSystem::~RenderSystem()
@@ -79,7 +29,6 @@ RenderSystem::~RenderSystem()
 		DestroyDebugUtilsMessengerEXT(instance, debugMessenger, nullptr);
 	}
 
-	vkDestroySurfaceKHR(instance, surface, nullptr);
 	vkDestroyDevice(device, nullptr);
 	vkDestroyInstance(instance, nullptr);
 }
@@ -109,11 +58,6 @@ void RenderSystem::Init(const char* applicationName, IOSystem* pIO)
 	InitCommandBuffers();
 	InitSyncObjects();
 	InitDefaultTextureSampler();
-}
-
-void RenderSystem::Resize()
-{
-	framebufferResized = true;
 }
 
 void RenderSystem::CreateStaticMesh(
@@ -414,31 +358,6 @@ void RenderSystem::DrawSetCamera(mat4 transform)
 
 /**** Support checking utilities. ****/
 
-bool RenderSystem::CheckInstanceExtensionSupport(const std::vector<const char*>& extensions)
-{
-	uint32 availableExtensionCount = 0;
-	vkEnumerateInstanceExtensionProperties(nullptr, &availableExtensionCount, nullptr);
-	std::vector<VkExtensionProperties> availableExtensions(availableExtensionCount);
-	vkEnumerateInstanceExtensionProperties(nullptr, &availableExtensionCount, availableExtensions.data());
-
-	for (const char* extensionName : extensions)
-	{
-		bool bExtensionFound = false;
-
-		for (const auto& extensionProperties : availableExtensions)
-		{
-			if (strcmp(extensionName, extensionProperties.extensionName) == 0)
-			{
-				bExtensionFound = true;
-				break;
-			}
-		}
-		if (!bExtensionFound)
-			return false;
-	}
-	return true;
-}
-
 bool RenderSystem::CheckDeviceExtensionSupport(VkPhysicalDevice device, const std::vector<const char*>& extensions)
 {
 	uint32 extensionCount;
@@ -713,54 +632,6 @@ void RenderSystem::PickDeviceMemoryBlockTypes()
 
 /**** Initialize/destroy class members. *****/
 
-void RenderSystem::InitInstance()
-{
-	VkApplicationInfo appInfo{};
-	appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
-	appInfo.pApplicationName = applicationName.c_str();
-	appInfo.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
-	appInfo.pEngineName = "Limbic Engine";
-	appInfo.engineVersion = VK_MAKE_VERSION(1, 0, 0);
-	appInfo.apiVersion = VK_API_VERSION_1_2;
-
-	VkInstanceCreateInfo createInfo{};
-	createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
-	createInfo.pApplicationInfo = &appInfo;
-
-	std::vector<const char*> extensions = {VK_KHR_SURFACE_EXTENSION_NAME, VK_KHR_WIN32_SURFACE_EXTENSION_NAME};
-
-	if (bEnableValidationLayers)
-		extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
-
-	if (!CheckInstanceExtensionSupport(extensions))
-		throw std::runtime_error("[ERROR] Required instance extensions not available!");
-
-	createInfo.enabledExtensionCount = static_cast<uint32>(extensions.size());
-	createInfo.ppEnabledExtensionNames = extensions.data();
-
-	if (bEnableValidationLayers && !CheckValidationLayerSupport(validationLayers))
-		throw std::runtime_error("[ERROR] Validation layers requested, but not available!");
-
-	VkDebugUtilsMessengerCreateInfoEXT debugCreateInfo{};
-	if (bEnableValidationLayers)
-	{
-		createInfo.enabledLayerCount = static_cast<uint32>(validationLayers.size());
-		createInfo.ppEnabledLayerNames = validationLayers.data();
-		ConfigureDebugMessengerCreateInfo(debugCreateInfo);
-		createInfo.pNext = (VkDebugUtilsMessengerCreateInfoEXT*) &debugCreateInfo;
-	}
-	else
-	{
-		createInfo.enabledLayerCount = 0;
-		createInfo.pNext = nullptr;
-	}
-
-	if (vkCreateInstance(&createInfo, nullptr, &instance) != VK_SUCCESS)
-	{
-		throw std::runtime_error("[ERROR] Failed to create Vulkan instance!");
-	}
-}
-
 void RenderSystem::InitDebugMessenger()
 {
 	if (!bEnableValidationLayers)
@@ -821,19 +692,6 @@ void RenderSystem::InitDevice(const std::vector<const char*>& extensions)
 
 	vkGetDeviceQueue(device, indices.graphicsFamily.value(), 0, &graphicsQueue);
 	vkGetDeviceQueue(device, indices.presentFamily.value(), 0, &presentQueue);
-}
-
-void RenderSystem::InitSurface()
-{
-	VkWin32SurfaceCreateInfoKHR createInfo{};
-	createInfo.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
-	createInfo.hwnd = win32Window;
-	createInfo.hinstance = win32Process;
-
-	if (vkCreateWin32SurfaceKHR(instance, &createInfo, nullptr, &surface) != VK_SUCCESS)
-	{
-		throw std::runtime_error("[ERROR] Failed to create window surface!");
-	}
 }
 
 void RenderSystem::InitSwapChain()
