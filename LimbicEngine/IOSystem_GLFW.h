@@ -1,17 +1,31 @@
 #pragma once
 
 #include "IOSystem.h"
+#include "VkUtil.h"
 
 #include <GLFW/glfw3.h>
 
 #include <map>
 #include <memory>
 
+#ifdef _DEBUG
+const bool bDebugEnabled = true;
+#else
+const bool bDebugEnabled = false;
+#endif
+
+const uint32 MAX_SWAPCHAIN_FRAMES = 2;
+
 struct SWindowGlfw
 {
+	// ---- Glfw ----
 	std::string title;
 	GLFWwindow* window;
-	VkSurfaceKHR surface;
+
+	// ---- Vulkan ----
+	SVkWindow vkWindow;
+
+	// ---- Window state. ----
 	uint32 drawOptionFlags;
 	uint32 updateFlags;
 	mat4 cameraTransform;
@@ -20,7 +34,7 @@ struct SWindowGlfw
 class IOSystem_GLFW : public IOSystem
 {
 public:
-	IOSystem_GLFW();
+	IOSystem_GLFW(const char* applicationName);
 
 	~IOSystem_GLFW();
 
@@ -43,12 +57,19 @@ public:
 	bool IsActionHeld(uint64 action) override;
 
 protected:
-	std::vector<SWindowGlfw> windows;
+	// ---- Input ----
 	uint64 heldActionFlags;				/** Currently held action flags. */
 	std::vector<uint32> getKeyByAction;	/** Get EKey by action index. */
+
+	// ---- Vulkan ----
+	SVkContext vkContext;
+
+	// ---- Window management. ----
+	std::vector<SWindowGlfw> windows;
 };
 
-const uint32 getGlfwKeyByKey[] = {
+/** Maps GLFW keys to EInput. */
+const uint32 getGlfwKeyByInput[] = {
 	GLFW_KEY_LEFT_CONTROL,
 	GLFW_KEY_LEFT_SHIFT,
 	GLFW_KEY_LEFT_ALT,

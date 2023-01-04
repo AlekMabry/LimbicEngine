@@ -80,6 +80,7 @@ public:
 		pInstance = instance;
 	}
 
+
 	virtual VkSurfaceKHR* GetVkSurfaceKHR(HWindow window) = 0;
 
 	virtual void GetFramebufferSize(HWindow window, int32& width, int32& height) = 0;

@@ -3,21 +3,30 @@
 #include <bitset>
 #include <iostream>
 
-IOSystem_GLFW::IOSystem_GLFW()
+IOSystem_GLFW::IOSystem_GLFW(const char* applicationName)
 {
 	heldActionFlags = 0;
 	glfwInit();
+
+	uint32 extensionCount;
+	const char** instanceExtensions = glfwGetRequiredInstanceExtensions(&extensionCount);
+
+	VkCreateInstance(vkContext.instance, applicationName, instanceExtensions, extensionCount, bDebugEnabled);
+	// VkPickPhysicalDevice
+	// VkCreateDevice
+	// VkPickQueues
 }
 
 IOSystem_GLFW::~IOSystem_GLFW()
 {
+	vkDestroyInstance(vkContext.instance, nullptr);
+
 	for (SWindowGlfw window : windows)
 	{
 		glfwDestroyWindow(window.window);
 	}
 	glfwTerminate();
 }
-
 
 HWindow IOSystem_GLFW::SpawnWindow(const char* title, int32 width, int32 height, uint32 drawOptionFlags)
 {

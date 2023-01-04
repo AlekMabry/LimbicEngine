@@ -12,48 +12,10 @@
 #include <string>
 #include <vector>
 #include <vulkan/vulkan.hpp>
-#include <vulkan/vulkan_win32.h>
-
-#ifdef NDEBUG
-const bool bEnableValidationLayers = false;
-#else
-const bool bEnableValidationLayers = true;
-const std::vector<const char*> validationLayers = {"VK_LAYER_KHRONOS_validation"};
-#endif
-
-#define VK_CHECK(f)                                                 \
-	{                                                               \
-		VkResult res = (f);                                         \
-		if (res != VK_SUCCESS)                                      \
-		{                                                           \
-			std::cout << "[ERROR] Line: " << __LINE__ << std::endl; \
-			assert(res == VK_SUCCESS);                              \
-		}                                                           \
-	}
-
-const uint32 MAX_FRAMES_IN_FLIGHT = 2;
 
 struct SUniformBufferObject
 {
 	mat4 transform;
-};
-
-struct SQueueFamilyIndices
-{
-	std::optional<uint32> graphicsFamily;
-	std::optional<uint32> presentFamily;
-
-	bool IsComplete() const
-	{
-		return graphicsFamily.has_value() && presentFamily.has_value();
-	}
-};
-
-struct SSwapChainSupportDetails
-{
-	VkSurfaceCapabilitiesKHR capabilities;
-	std::vector<VkSurfaceFormatKHR> formats;
-	std::vector<VkPresentModeKHR> presentModes;
 };
 
 struct SPushConstants
@@ -82,11 +44,6 @@ enum ETextureFormat
 };
 
 const uint32 ETextureFormatCount = 2;
-
-struct SRenderWindow
-{
-	HWindow windowId;
-};
 
 /* Maps ETextureFormat enums to the Vulkan image formats. */
 const VkFormat textureFormatVkFormat[2] = {VK_FORMAT_R8G8B8A8_SRGB, VK_FORMAT_BC1_RGB_UNORM_BLOCK};
@@ -171,7 +128,7 @@ class RenderSystem
 public:
 	~RenderSystem();
 
-	void Init(const char* applicationName, IOSystem* pIO);
+	void Init(const char* applicationName, VkInstance instance, IOSystem* pIO);
 
 	/* Call to tell renderer that the window surface has been resized. */
 	void Resize();
@@ -203,20 +160,11 @@ public:
 private:
 	/**** Support checking utilities. ****/
 
-	bool CheckInstanceExtensionSupport(const std::vector<const char*>& extensions);
-
-	bool CheckDeviceExtensionSupport(VkPhysicalDevice device, const std::vector<const char*>& extensions);
-
-	bool CheckValidationLayerSupport(const std::vector<const char*>& layers);
-
 	bool CheckStencilComponentSupport(VkFormat format);
 
 	bool IsDeviceSuitable(VkPhysicalDevice device, const std::vector<const char*>& extensions);
 
 	/**** Option finding utilities. ****/
-	SQueueFamilyIndices FindQueueFamilies(VkPhysicalDevice device);
-
-	SSwapChainSupportDetails QuerySwapChainSupport(VkPhysicalDevice device);
 
 	uint32 FindMemoryType(uint32 typeFilter, VkMemoryPropertyFlags properties);
 
@@ -236,13 +184,9 @@ private:
 	void PickDeviceMemoryBlockTypes();
 
 	/**** Initialize/destroy class members. *****/
-	void InitInstance();
-
 	void InitDebugMessenger();
 
 	void InitDevice(const std::vector<const char*>& extensions);
-
-	void InitSurface();
 
 	void InitSwapChain();
 
@@ -315,26 +259,8 @@ private:
 	void ConfigureDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& info);
 
 	IOSystem* pIO;
-	VkSurfaceKHR surface;
 
-	uint32 currentFrame;
-	std::string applicationName;
 
-	VkInstance instance;
-	VkDevice device;
-	VkQueue graphicsQueue;
-	VkQueue presentQueue;
-	VkSwapchainKHR swapChain;
-	std::vector<VkImage> swapChainImages;
-	VkImage depthImage;
-	VkImageView depthImageView;
-	VkDeviceMemory depthImageMemory;
-	VkFormat swapChainImageFormat;
-	VkExtent2D swapChainExtent;
-	std::vector<VkImageView> swapChainImageViews;
-	std::vector<VkFramebuffer> swapChainFramebuffers;
-	VkDebugUtilsMessengerEXT debugMessenger;
-	VkPhysicalDevice physicalDevice;
 	VkRenderPass renderPass;
 	VkCommandPool commandPool;
 	std::vector<VkCommandBuffer> commandBuffers;

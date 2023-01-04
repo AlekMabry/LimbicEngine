@@ -29,7 +29,7 @@ void ETestCamera::OnDraw()
 	mat4 proj = glm::perspective(glm::radians(120.0f), 16.0f / 9.0f, 0.1f, 128.0f);
 	proj[1][1] *= -1;
 
-	hRender->DrawSetCamera(proj * view);
+	//hRender->DrawSetCamera(proj * view);
 }
 
 void ETestCamera::GetPropertyInfo(SPropertyInfo* propertyInfo, uint32& propertyCount)

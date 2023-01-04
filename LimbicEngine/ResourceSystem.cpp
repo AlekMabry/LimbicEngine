@@ -1,8 +1,40 @@
 #include "ResourceSystem.h"
 
-ResourceSystem::ResourceSystem(RenderSystem* renderSystem)
+const char ktx2FileIdentifier[12] = {0xAB, 0x4B, 0x54, 0x58, 0x20, 0x32, 0x30, 0xBB, 0x0D, 0x0A, 0x1A, 0x0A};
+
+struct SKTX2Header
 {
-	this->renderSystem = renderSystem;
+	char identifier[12];
+	uint32 vkFormat;
+	uint32 typeSize;
+	uint32 pixelWidth;
+	uint32 pixelHeight;
+	uint32 pixelDepth;
+	uint32 layerCount;
+	uint32 faceCount;
+	uint32 levelCount;
+	uint32 supercompressionScheme;
+};
+
+struct SKTX2Index
+{
+	uint32 dfdByteOffset;	 // Offset to data format descriptor.
+	uint32 dfdByteLength;	 // Size of data format descriptor.
+	uint32 kvdByteOffset;	 // Offset to key/value pairs.
+	uint32 kvdByteLength;	 // Size of key/value pairs (including padding).
+	uint32 sgdByteOffset;	 // Offset to super compression global data.
+	uint32 sgdByteLength;	 // Size of super compression global data.
+};
+
+struct SKTX2LevelIndex
+{
+	uint64 byteOffset;
+	uint64 byteLength;
+	uint64 uncompressedByteLength;
+};
+
+ResourceSystem::ResourceSystem()
+{
 	fbxManager = FbxManager::Create();
 	fbxIOSettings = FbxIOSettings::Create(fbxManager, IOSROOT);
 	fbxManager->SetIOSettings(fbxIOSettings);
@@ -23,12 +55,12 @@ RStaticMesh ResourceSystem::RequestStaticMesh(std::string& filename, std::string
 		RStaticMesh hMesh;
 		SStaticVertex* vertexBuffer;
 		uint32* indexBuffer;
-		renderSystem->CreateStaticMesh(static_cast<uint32>(mesh->vertices.size()), static_cast<uint32>(mesh->indices.size()), hMesh, vertexBuffer, indexBuffer);
-		memcpy(vertexBuffer, mesh->vertices.data(), mesh->vertices.size() * sizeof(SStaticVertex));
-		memcpy(indexBuffer, mesh->indices.data(), mesh->indices.size() * sizeof(uint32));
-		delete mesh;
-		renderSystem->SubmitAssets();
-		resourceLookup.insert(std::make_pair(meshName, hMesh));
+		//renderSystem->CreateStaticMesh(static_cast<uint32>(mesh->vertices.size()), static_cast<uint32>(mesh->indices.size()), hMesh, vertexBuffer, indexBuffer);
+		//memcpy(vertexBuffer, mesh->vertices.data(), mesh->vertices.size() * sizeof(SStaticVertex));
+		//memcpy(indexBuffer, mesh->indices.data(), mesh->indices.size() * sizeof(uint32));
+		//delete mesh;
+		//renderSystem->SubmitAssets();
+		//resourceLookup.insert(std::make_pair(meshName, hMesh));
 		return hMesh;
 	}
 	else
@@ -57,12 +89,12 @@ RTexture ResourceSystem::RequestTexture(std::string& filename)
 
 RMaterial ResourceSystem::RequestMaterial(std::string& baseColorFilename, std::string& normalFilename, std::string& propertiesFilename)
 {
-	RTexture baseColor = RequestTexture(baseColorFilename);
-	RTexture normal = RequestTexture(normalFilename);
-	RTexture properties = RequestTexture(propertiesFilename);
+	//RTexture baseColor = RequestTexture(baseColorFilename);
+	//RTexture normal = RequestTexture(normalFilename);
+	//RTexture properties = RequestTexture(propertiesFilename);
 
 	RMaterial material;
-	renderSystem->CreateMaterial(baseColor, normal, properties, material);
+	//renderSystem->CreateMaterial(baseColor, normal, properties, material);
 	return material;
 }
 
