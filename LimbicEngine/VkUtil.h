@@ -18,13 +18,10 @@
 
 struct SVkContext
 {
-	SVkContext();
-
 	VkInstance instance;
 	VkPhysicalDevice physicalDevice;
 	VkDevice device;
-	VkQueue graphicsQueue;
-	VkQueue presentQueue;
+	VkQueue queue;
 };
 
 struct SVkWindow
@@ -35,9 +32,10 @@ struct SVkWindow
 	// ---- Frame buffers. ----
 	VkFormat swapchainImageFormat;
 	VkExtent2D swapchainExtent;
-	VkImage swapchainImages[MAX_SWAPCHAIN_FRAMES];
-	VkImageView swapchainImageViews[MAX_SWAPCHAIN_FRAMES];
-	VkFramebuffer swapchainFramebuffers[MAX_SWAPCHAIN_FRAMES];
+	uint32 swapchainSize;
+	std::vector<VkImage> swapchainImages;
+	std::vector<VkImageView> swapchainImageViews;
+	std::vector<VkFramebuffer> swapchainFramebuffers;
 	// ---- Depth buffer. ----
 	VkImage depthImage;
 	VkImageView depthImageView;
@@ -56,8 +54,6 @@ struct SSwapChainSupportDetails
 	std::vector<VkSurfaceFormatKHR> formats;
 	std::vector<VkPresentModeKHR> presentModes;
 };
-
-const uint32 MAX_SWAPCHAIN_SIZE = 2;
 
 /**** Instance creation. ****/
 

@@ -14,8 +14,6 @@ const bool bDebugEnabled = true;
 const bool bDebugEnabled = false;
 #endif
 
-const uint32 MAX_SWAPCHAIN_FRAMES = 2;
-
 struct SWindowGlfw
 {
 	// ---- Glfw ----
@@ -57,6 +55,8 @@ public:
 	bool IsActionHeld(uint64 action) override;
 
 protected:
+	void CreateVkContext();
+
 	// ---- Input ----
 	uint64 heldActionFlags;				/** Currently held action flags. */
 	std::vector<uint32> getKeyByAction;	/** Get EKey by action index. */

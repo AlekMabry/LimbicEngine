@@ -1160,32 +1160,6 @@ void RenderSystem::GenerateMissingTexture(uint32 width, uint32 tiles, void* text
 	}
 }
 
-VkImageView RenderSystem::CreateImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags)
-{
-	VkImageViewCreateInfo viewInfo{};
-	viewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
-	viewInfo.image = image;
-	viewInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
-	viewInfo.format = format;
-	viewInfo.components.r = VK_COMPONENT_SWIZZLE_IDENTITY;
-	viewInfo.components.g = VK_COMPONENT_SWIZZLE_IDENTITY;
-	viewInfo.components.b = VK_COMPONENT_SWIZZLE_IDENTITY;
-	viewInfo.components.a = VK_COMPONENT_SWIZZLE_IDENTITY;
-	viewInfo.subresourceRange.aspectMask = aspectFlags;
-	viewInfo.subresourceRange.baseMipLevel = 0;
-	viewInfo.subresourceRange.levelCount = 1;
-	viewInfo.subresourceRange.baseArrayLayer = 0;
-	viewInfo.subresourceRange.layerCount = 1;
-
-	VkImageView imageView;
-	if (vkCreateImageView(device, &viewInfo, nullptr, &imageView) != VK_SUCCESS)
-	{
-		throw std::runtime_error("[ERROR] Failed to create image view!");
-	}
-
-	return imageView;
-}
-
 std::vector<char> RenderSystem::LoadSPIRV(const std::string& filename)
 {
 	std::ifstream file(filename, std::ios::ate | std::ios::binary);

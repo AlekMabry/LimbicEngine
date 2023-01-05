@@ -105,3 +105,8 @@ bool IOSystem_GLFW::IsActionHeld(uint64 action)
 	bool bHeld = heldActionFlags & (1 << action);
 	return bHeld;
 }
+
+void IOSystem_GLFW::CreateVkContext()
+{
+	
+}
