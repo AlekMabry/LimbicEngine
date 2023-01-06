@@ -7,9 +7,6 @@
 
 namespace VkUtil
 {
-
-//---- General ----
-
 /**	Finds a memory type index (see VkMemoryType array in VkPhysicalDeviceMemoryProperties).
 	@param[in]	physicalDevice	Valid physical device.
 	@param[in]	typeFilter
@@ -710,28 +707,6 @@ void CreateSwapchainFramebuffers(VkDevice device, VkRenderPass renderPass, const
 	}
 }
 
-EResult CreateSyncObjects(VkDevice device, SVkWindow* window)
-{
-	VkSemaphoreCreateInfo semaphoreInfo{};
-	semaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
-
-	VkFenceCreateInfo fenceInfo{};
-	fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
-	fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
-
-	for (size_t i = 0; i < 2; i++)
-	{
-		if (vkCreateSemaphore(device, &semaphoreInfo, nullptr, &window->imageAvailableSemaphores[i]) != VK_SUCCESS ||
-			vkCreateSemaphore(device, &semaphoreInfo, nullptr, &window->renderFinishedSemaphores[i]) != VK_SUCCESS ||
-			vkCreateFence(device, &fenceInfo, nullptr, &window->inFlightFences[i]) != VK_SUCCESS)
-		{
-			std::cout << "[ERROR] Failed to create sync objects for a frame!\n";
-			return eResult_Error;
-		}
-	}
-	return eResult_Success;
-}
-
 void CreateSemaphores(VkDevice device, VkSemaphore* semaphores, size_t semaphoreCount)
 {
 	VkSemaphoreCreateInfo semaphoreInfo{};
@@ -777,21 +752,4 @@ void RenderSystem::PickDeviceMemoryBlockTypes()
 		}
 	}
 }
-
-/**** Mega structure creation. ****/
-
-EResult CreateContext(SVkContext& context, std::vector<const char*>& extensions, const char* applicationName, bool bDebugEnabled,
-	std::vector<const char*>& validationLayers)
-{
-	CreateInstance(context.instance, applicationName, extensions, bDebugEnabled, validationLayers);
-}
-
-EResult VkCreateWindow(SVkWindow& window, int32 width, int32 height)
-{
-}
-
-EResult VkResizeWindow(SVkWindow& window)
-{
-}
-
 }	 // namespace VkUtil

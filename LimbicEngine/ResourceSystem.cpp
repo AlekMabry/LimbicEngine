@@ -240,3 +240,28 @@ void ResourceSystem::LoadTextureKTX2(std::string& filename, void* buffer)
 
 	fclose(file);
 }
+
+//---- Vulkan GPU memory management. ----
+uint32 ResourceSystem::CreateDeviceMemoryBlock(EMemoryBlockUsage usage)
+{
+	SMemoryBlock deviceBlock{};
+	deviceBlock.usage = usage;
+	switch (usage)
+	{
+	case eMemoryBlockUsageGeometry:
+		CreateBuffer(MEMORY_BLOCK_SIZE, usage, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, deviceBlock.buffer,
+			deviceBlock.memory);
+		break;
+	case eMemoryBlockUsageUniforms:
+		CreateBuffer(MEMORY_BLOCK_SIZE, usage, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, deviceBlock.buffer,
+			deviceBlock.memory);
+		break;
+	case eMemoryBlockUsageImages:
+		AllocateDeviceMemory(MEMORY_BLOCK_SIZE, memoryBlockUsageLocation[usage], deviceBlock.memory);
+		break;
+	case eMemoryBlockUsageStaging:
+		break;
+	}
+	deviceMemory.push_back(deviceBlock);
+	return static_cast<uint32>(deviceMemory.size() - 1);
+}

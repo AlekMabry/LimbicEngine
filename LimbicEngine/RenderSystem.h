@@ -36,49 +36,11 @@ struct SLights
 	vec4 lights[8];
 };
 
-/* Supported texture formats. */
-enum ETextureFormat
-{
-	eTextureFormatRGBA,
-	eTextureFormatDXT1
-};
 
-const uint32 ETextureFormatCount = 2;
 
-/* Maps ETextureFormat enums to the Vulkan image formats. */
-const VkFormat textureFormatVkFormat[2] = {VK_FORMAT_R8G8B8A8_SRGB, VK_FORMAT_BC1_RGB_UNORM_BLOCK};
 
-enum EMemoryLocation
-{
-	eMemoryLocationHost,
-	eMemoryLocationDevice
-};
 
-const uint32 EMemoryLocationCount = 2;
 
-/* Maps EMemoryLocation enums to the Vulkan memory property flags. */
-const VkMemoryPropertyFlags memoryLocationVkFlags[2] = {VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
-	VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT | VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT};
-
-enum EMemoryBlockUsage
-{
-	eMemoryBlockUsageGeometry,
-	eMemoryBlockUsageUniforms,
-	eMemoryBlockUsageImages,
-	eMemoryBlockUsageStaging
-};
-
-const uint32 EMemoryBlockUsageCount = 4;
-
-/* Maps EMemoryBlockUsage enums to the Vulkan buffer usage flags. */
-const VkBufferUsageFlags memoryBlockUsageVkFlags[4] = {
-	VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
-	VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
-	VK_BUFFER_USAGE_TRANSFER_SRC_BIT};
-
-/* Mape EMemoryBlockUsage enums to EMemoryLocation enums. */
-const EMemoryLocation memoryBlockUsageLocation[4] = {
-	eMemoryLocationDevice, eMemoryLocationHost, eMemoryLocationDevice, eMemoryLocationHost};
 
 struct SMeshMemoryHandle
 {
@@ -158,12 +120,6 @@ public:
 	void DrawSetCamera(mat4 transform);
 
 private:
-	/**** Support checking utilities. ****/
-
-	bool CheckStencilComponentSupport(VkFormat format);
-
-	bool IsDeviceSuitable(VkPhysicalDevice device, const std::vector<const char*>& extensions);
-
 	/**** Option finding utilities. ****/
 
 	uint32 FindMemoryType(uint32 typeFilter, VkMemoryPropertyFlags properties);
@@ -172,16 +128,6 @@ private:
 
 	VkFormat FindDepthFormat();
 
-	/**** Option picking utilities. ****/
-	void PickPhysicalDevice(const std::vector<const char*>& extensions);
-
-	VkSurfaceFormatKHR PickSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);
-
-	VkPresentModeKHR PickSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes);
-
-	VkExtent2D PickSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities);
-
-	void PickDeviceMemoryBlockTypes();
 
 	/**** Initialize/destroy class members. *****/
 	void InitDebugMessenger();
