@@ -2,7 +2,7 @@ The Limbic Engine source code:
 
     The MIT License (MIT)
 
-    Copyright (c) 2022 - Aleksander Mabry
+    Copyright (c) 2023 - Aleksander Mabry
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"), to deal
