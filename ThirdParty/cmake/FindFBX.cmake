@@ -21,8 +21,10 @@ set_target_properties(FBX PROPERTIES
 
     INTERFACE_INCLUDE_DIRECTORIES
         "${fbx_path}/include"
-    )
 
+    LINKER_LANGUAGE CXX
+    )
+    
 # For future reference: IMPORTED_LOCATION_<CONFIG> should be used if
 # Release/Debug binaries are added.
 

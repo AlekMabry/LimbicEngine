@@ -21,7 +21,7 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 add_compile_options(
     /W4         # Warning level 4
-    /WX         # Treat linker warnings as errors
+#   /WX         # Treat linker warnings as errors
     /MP         # Build with multiple processes
     )
 set_property(GLOBAL APPEND PROPERTY LINK_FLAGS /Debug)

@@ -1,5 +1,7 @@
 #include <Entity/EPlayer.h>
 
+#include <System/IOSystem_InputBinds.h>
+
 #define GLM_FORCE_RADIANS
 #define GLM_DEPTH_ZERO_TO_ONE
 #include <glm/gtc/matrix_transform.hpp>
@@ -19,11 +21,11 @@ EPlayer::EPlayer()
 
 void EPlayer::OnInit()
 {
-	std::array<EInput,4> keys;
-	keys[ePlayerActionForward] = eInput_W;
-	keys[ePlayerActionBackward] = eInput_S;
-	keys[ePlayerActionLeft] = eInput_A;
-	keys[ePlayerActionRight] = eInput_D;
+	std::array<EKey,4> keys;
+	keys[ePlayerActionForward] = eKey_W;
+	keys[ePlayerActionBackward] = eKey_S;
+	keys[ePlayerActionLeft] = eKey_A;
+	keys[ePlayerActionRight] = eKey_D;
 
 	hIO->BindActions(keys.data(), static_cast<uint32>(keys.size()));
 }
@@ -56,7 +58,7 @@ void EPlayer::OnDraw()
 	mat4 proj = glm::perspective(glm::radians(120.0f), 16.0f / 9.0f, 0.1f, 128.0f);
 	proj[1][1] *= -1;
 
-	//hRender->DrawSetCamera(proj * view);
+	hRender->DrawSetCamera(proj * view);
 }
 
 void EPlayer::GetPropertyInfo(SPropertyInfo* propertyInfo, uint32& propertyCount)

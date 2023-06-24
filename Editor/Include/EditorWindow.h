@@ -4,12 +4,11 @@
 #include <QPointer>
 
 #include "ui_Editor.h"
-#include "SettingsDialog.h"
-#include "ViewPortWidget.h"
+#include <SettingsDialog.h>
 
 class EditorWindow : public QMainWindow
 {
-    Q_OBJECT
+    
 
 public:
     EditorWindow(QWidget *parent = nullptr);

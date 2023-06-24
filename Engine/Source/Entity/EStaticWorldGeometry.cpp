@@ -8,8 +8,8 @@ EStaticWorldGeometry::EStaticWorldGeometry() : EEntity()
 
 void EStaticWorldGeometry::OnInit()
 {
-	//trussMesh = hResource->RequestStaticMesh(staticMeshFilename, staticMeshNode);
-	//trussMaterial = hResource->RequestMaterial(baseColorFilename, normalFilename, propertiesFilename);
+	trussMesh = hResource->RequestStaticMesh(staticMeshFilename, staticMeshNode);
+	trussMaterial = hResource->RequestMaterial(baseColorFilename, normalFilename, propertiesFilename);
 
 	transform = glm::rotate(mat4(1.0f), glm::radians(rotation.z), vec3(0.0f, 0.0f, 1.0f));
 	transform = glm::rotate(transform, glm::radians(rotation.y), vec3(0.0f, 1.0f, 0.0f));
@@ -23,7 +23,7 @@ void EStaticWorldGeometry::OnTick(float dt)
 
 void EStaticWorldGeometry::OnDraw()
 {
-	//hRender->DrawStaticMesh(trussMesh, trussMaterial, transform);
+	hRender->DrawStaticMesh(trussMesh, trussMaterial, transform);
 }
 
 void EStaticWorldGeometry::GetPropertyInfo(SPropertyInfo* propertyInfo, uint32& propertyCount)

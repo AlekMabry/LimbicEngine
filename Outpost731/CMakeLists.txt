@@ -17,12 +17,7 @@ set(sources
 source_group("Source" FILES ${sources})
 
 # Setup executable
-add_executable(Outpost731 WIN32 ${sources})
+add_executable(Outpost731 ${sources})
 
 # Link engine shared library
-target_link_libraries(LimbicEditor PRIVATE Limbic::Engine)
-
-# Include engine library headers
-target_include_directories(
-    LimbicEditor PRIVATE $<TARGET_PROPERTY:Limbic::Engine,INTERFACE_INCLUDE_DIRECTORIES>
-    )
+target_link_libraries(Outpost731 PUBLIC Limbic::Engine)

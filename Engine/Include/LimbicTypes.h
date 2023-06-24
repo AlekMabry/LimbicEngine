@@ -8,12 +8,6 @@
 
 #define LSTRINGIFY(s) #s
 
-enum EResult
-{
-	eResult_Success,
-	eResult_Error
-};
-
 typedef unsigned char uint8;
 typedef signed char int8;
 typedef unsigned short uint16;

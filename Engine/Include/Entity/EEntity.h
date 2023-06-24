@@ -2,7 +2,7 @@
 
 #include <System/IOSystem.h>
 #include <System/ResourceSystem.h>
-//#include "RenderSystem.h"
+#include <System/RenderSystem.h>
 #include <LimbicProperties.h>
 
 #define ENTITY_EVENT_ENABLED_TICK	1
@@ -32,7 +32,7 @@ public:
 
 	IOSystem* hIO;
 	ResourceSystem* hResource;
-	//RenderSystem* hRender;
+	RenderSystem* hRender;
 
 protected:
 	uint32 enabledEventFlags;

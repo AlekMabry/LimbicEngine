@@ -1,10 +1,9 @@
 #pragma once
 
 #include <LimbicTypes.h>
-//#include "RenderSystem.h"
+#include <System/RenderSystem.h>
 
 #include <fbxsdk.h>
-#include <vulkan/vulkan.h>
 
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
@@ -13,44 +12,43 @@
 #include <string>
 #include <unordered_map>
 
-enum EMemoryLocation
+const char ktx2FileIdentifier[12] = {0xAB, 0x4B, 0x54, 0x58, 0x20, 0x32, 0x30, 0xBB, 0x0D, 0x0A, 0x1A, 0x0A};
+
+struct SKTX2Header
 {
-	eMemoryLocationHost,
-	eMemoryLocationDevice,
-	eMemoryLocationSize
+	char identifier[12];
+	uint32 vkFormat;
+	uint32 typeSize;
+	uint32 pixelWidth;
+	uint32 pixelHeight;
+	uint32 pixelDepth;
+	uint32 layerCount;
+	uint32 faceCount;
+	uint32 levelCount;
+	uint32 supercompressionScheme;
 };
 
-/* Maps EMemoryLocation enums to the Vulkan memory property flags. */
-const VkMemoryPropertyFlags memoryLocationVkFlags[2] = {VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
-VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT | VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT};
-
-enum EMemoryBlockUsage
+struct SKTX2Index
 {
-	eMemoryBlockUsageGeometry,
-	eMemoryBlockUsageUniforms,
-	eMemoryBlockUsageImages,
-	eMemoryBlockUsageStaging,
-	eMemoryBlockUsageSize
+	uint32 dfdByteOffset;	 // Offset to data format descriptor.
+	uint32 dfdByteLength;	 // Size of data format descriptor.
+	uint32 kvdByteOffset;	 // Offset to key/value pairs.
+	uint32 kvdByteLength;	 // Size of key/value pairs (including padding).
+	uint32 sgdByteOffset;	 // Offset to super compression global data.
+	uint32 sgdByteLength;	 // Size of super compression global data.
 };
 
-/* Maps EMemoryBlockUsage enums to the Vulkan buffer usage flags. */
-const VkBufferUsageFlags memoryBlockUsageVkFlags[4] = {
-	VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
-	VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
-	VK_BUFFER_USAGE_TRANSFER_SRC_BIT};
-
-/* Maps EMemoryBlockUsage enums to EMemoryLocation enums. */
-const EMemoryLocation memoryBlockUsageLocation[4] = {
-	eMemoryLocationDevice, eMemoryLocationHost, eMemoryLocationDevice, eMemoryLocationHost};
-
-
-
-
+struct SKTX2LevelIndex
+{
+	uint64 byteOffset;
+	uint64 byteLength;
+	uint64 uncompressedByteLength;
+};
 
 class ResourceSystem
 {
 public:
-	ResourceSystem();
+	ResourceSystem(RenderSystem* renderSystem);
 
 	~ResourceSystem();
 
@@ -70,11 +68,8 @@ protected:
 
 	void LoadTextureKTX2(std::string& filename, void* buffer);
 
-	//---- Vulkan GPU memory management. ----
-
-
 	FbxManager* fbxManager;
 	FbxIOSettings* fbxIOSettings;
-	//RenderSystem* renderSystem;
+	RenderSystem* renderSystem;
 	std::unordered_map<std::string, uint32_t> resourceLookup;
 };

@@ -12,22 +12,19 @@
 class Game
 {
 public:
-	Game(std::string applicationName, IOSystem* pIO);
+	Game(std::string applicationName);
 
 	void OnInit();
+
+	void SetIO(IOSystem* ioSystem);
 
 	void Run();
 
 protected:
-	void CreateVkInstance();
-
-	bool CheckVkInstanceExtensionSupport(const std::vector<const char*>& extensions);
-	
-	VkInstance vkInstance;
 	float dt;
 	std::unique_ptr<ResourceSystem> resourceSystem;
 	std::unique_ptr<RenderSystem> renderSystem;
 	std::unique_ptr<WorldSystem> worldSystem;
-	IOSystem* pIO;
+	IOSystem* ioSystem;
 	std::string applicationName;
 };

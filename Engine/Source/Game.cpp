@@ -1,31 +1,31 @@
 #include <Game.h>
+#include <ShlObj.h>
 
-/**** Static debug callback configuration. ****/
-
-/**** Public Interface ****/
-
-Game::Game(std::string applicationName, IOSystem* pIO)
+Game::Game(std::string applicationName)
 {
 	this->applicationName = applicationName;
-	this->pIO = pIO;
+}
+
+void Game::SetIO(IOSystem* ioSystem)
+{
+	this->ioSystem = ioSystem;
 }
 
 void Game::OnInit()
 {
-	CreateVkInstance();
-
-	//renderSystem = std::make_unique<RenderSystem>();
-	//resourceSystem = std::make_unique<ResourceSystem>(renderSystem.get());
+	renderSystem = std::make_unique<RenderSystem>();
+	resourceSystem = std::make_unique<ResourceSystem>(renderSystem.get());
 	
 	uint32 w, h;
-	//ioSystem->GetFramebufferSize(w, h);
-	//renderSystem->Init(applicationName.c_str(), w, h, ioSystem->GetWindow(), ioSystem->GetProcess());
+	ioSystem->GetFramebufferSize(w, h);
+	renderSystem->Init(applicationName.c_str(), w, h, ioSystem->GetWindow(), ioSystem->GetProcess());
 
 	worldSystem = std::make_unique<WorldSystem>();
 	worldSystem->hIO = ioSystem;
-	//worldSystem->hResource = resourceSystem.get();
-	//worldSystem->hRender = renderSystem.get();
-	worldSystem->LoadFromJSON("C:/Users/alekm/Desktop/Outpost731/Map/Test.json");
+	worldSystem->hResource = resourceSystem.get();
+	worldSystem->hRender = renderSystem.get();
+	// I tried to get a windows env path and it gave me wide chars and instability so this is hardcoded for the time being
+	worldSystem->LoadFromJSON("C:/Users/alekm/AppData/Local/Outpost731/Map/Test.json");
 
 	EEntity** entities;
 	uint32 entityCount;
@@ -48,7 +48,7 @@ void Game::Run()
 		dt = std::chrono::duration<float, std::chrono::seconds::period>(currentTickTime - lastTickTime).count();
 		lastTickTime = currentTickTime;
 
-		pIO->OnTick(dt);
+		ioSystem->OnTick(dt);
 
 		EEntity** entities;
 		uint32 entityCount = 0;
@@ -58,13 +58,13 @@ void Game::Run()
 			entities[i]->OnTick(dt);
 		}
 
-		//renderSystem->OnDrawStart();
+		renderSystem->OnDrawStart();
 
 		for (uint32 i = 0; i < entityCount; i++)
 		{
-			//entities[i]->OnDraw();
+			entities[i]->OnDraw();
 		}
 
-		//renderSystem->OnDrawEnd();
+		renderSystem->OnDrawEnd();
 	}
 }
