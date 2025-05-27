@@ -22,7 +22,7 @@ public:
 
 	ResourceSystem* GetResourceSystem() const;
 
-	RenderSystem* GetRenderSystem() const;
+	RenderSystem* GetRenderSystem();
 
 	WorldSystem* GetWorldSystem() const;
 

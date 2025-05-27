@@ -15,10 +15,13 @@
 #include <vulkan/vulkan.hpp>
 #include <vulkan/vulkan_win32.h>
 
+#include <map>
+
 #ifdef NDEBUG
 const bool bEnableValidationLayers = false;
 const std::vector<const char*> validationLayers = {};
 #else
+class RWindow;
 const bool bEnableValidationLayers = true;
 const std::vector<const char*> validationLayers = {"VK_LAYER_KHRONOS_validation"};
 #endif
@@ -32,8 +35,6 @@ const std::vector<const char*> validationLayers = {"VK_LAYER_KHRONOS_validation"
 			assert(res == VK_SUCCESS);                              \
 		}                                                           \
 	}
-
-const uint32 MAX_FRAMES_IN_FLIGHT = 2;
 
 struct SUniformBufferObject
 {
@@ -49,13 +50,6 @@ struct SQueueFamilyIndices
 	{
 		return graphicsFamily.has_value() && presentFamily.has_value();
 	}
-};
-
-struct SSwapChainSupportDetails
-{
-	VkSurfaceCapabilitiesKHR capabilities{};
-	std::vector<VkSurfaceFormatKHR> formats;
-	std::vector<VkPresentModeKHR> presentModes;
 };
 
 struct SPushConstants
@@ -163,17 +157,31 @@ struct SMemoryBlock
 	void* mappedLocation; /* Host-mapped location (only defined for eMemoryBlockUsageStaging/eMemoryBlockUsageUniforms).*/
 };
 
-const VkDeviceSize MEMORY_BLOCK_SIZE = 8 * 1024 * 1024;
+const VkDeviceSize MEMORY_BLOCK_SIZE = 8 * 1024 * 2048;
 
 class RenderSystem
 {
+	friend class RView;
+	friend class RWindow_GLFW;
+
 public:
 	~RenderSystem();
 
-	void Init(const char* applicationName, uint32 width, uint32 height, HWND window, HINSTANCE process);
+	/* Initializes vk instance, next step is to add a window. */
+	VkInstance InitInstance(const char* applicationName);
 
-	/* Call to tell renderer that the window surface has been resized. */
-	void Resize();
+	/* After window creation, configures device and queues. */
+	VkInstance InitGLFW();
+
+	/* Configure from Qt. */
+	void InitQt(VkDevice device, VkPhysicalDevice physicalDevice, VkQueue graphicsQueue,
+		VkQueue presentQueue, VkCommandPool commandPool);
+
+	/* After InitGLFW or QtVulkanWindow created. */
+	void Init();
+
+	/* Each window/view pair manages a surface and it's draw settings. */
+	void AddWindow(const std::string& name, RWindow &window);
 
 	/* Creates static mesh, provides staging buffer to write vertices and indices to. */
 	void CreateStaticMesh(uint32 vertices, uint32 indices, uint32& meshHandle, SStaticVertex*& vertexBuffer, uint32*& indexBuffer);
@@ -196,8 +204,8 @@ public:
 	/* Draw static mesh. */
 	void DrawStaticMesh(RStaticMesh meshId, RMaterial materialId, mat4 modelTransform);
 
-	/* Set camera. */
-	void DrawSetCamera(mat4 transform);
+	/* Get window and view. */
+	std::pair<RWindow*, RView*> GetWindowView(const std::string& window);
 
 private:
 	/**** Support checking utilities. ****/
@@ -213,9 +221,9 @@ private:
 	bool IsDeviceSuitable(VkPhysicalDevice device, const std::vector<const char*>& extensions);
 
 	/**** Option finding utilities. ****/
-	SQueueFamilyIndices FindQueueFamilies(VkPhysicalDevice device);
 
-	SSwapChainSupportDetails QuerySwapChainSupport(VkPhysicalDevice device);
+	/* A window surface must be initialized first. */
+	SQueueFamilyIndices FindQueueFamilies(VkPhysicalDevice device);
 
 	uint32 FindMemoryType(uint32 typeFilter, VkMemoryPropertyFlags properties);
 
@@ -226,50 +234,16 @@ private:
 	/**** Option picking utilities. ****/
 	void PickPhysicalDevice(const std::vector<const char*>& extensions);
 
-	VkSurfaceFormatKHR PickSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);
-
-	VkPresentModeKHR PickSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes);
-
-	VkExtent2D PickSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities);
-
 	void PickDeviceMemoryBlockTypes();
 
-	/**** Initialize/destroy class members. *****/
-	void InitInstance();
-
+private:
 	void InitDebugMessenger();
 
 	void InitDevice(const std::vector<const char*>& extensions);
 
-	void InitSurface();
-
-	void InitSwapChain();
-
-	void DestroySwapChain();
-
-	void InitDescriptorPool();
-
-	void InitDescriptorSetLayout();
-
-	void InitGraphicsPipeline();
-
-	void InitRenderPass();
-
-	void InitSwapChainFramebuffers();
-
-	void InitDepthbuffer();
-
-	void InitGraphicsCommandPool();
-
-	void InitCommandBuffers();
-
-	void InitSyncObjects();
-
 	void InitDeviceMemoryManager();
 
 	void DestroyDeviceMemoryManager();
-
-	void InitDefaultTextureSampler();
 
 	/* Utility */
 
@@ -307,61 +281,28 @@ private:
 
 	VkShaderModule CreateShaderModule(const std::vector<char>& code);
 
-	void RecordCommandBuffer(VkCommandBuffer commandBuffer, uint32 imageIndex);
-
-	void RecreateSwapChain();
-
 	void ConfigureDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& info);
 
-	HWND win32Window;
-	HINSTANCE win32Process;
-	HANDLE win32Console;
-
-	uint32 currentFrame;
-	uint32 width;
-	uint32 height;
+	
 	std::string applicationName;
+	HANDLE win32Console;
 
 	VkInstance instance;
 	VkDevice device;
 	VkQueue graphicsQueue;
 	VkQueue presentQueue;
-	VkSurfaceKHR surface;
-	VkSwapchainKHR swapChain;
-	std::vector<VkImage> swapChainImages;
-	VkImage depthImage;
-	VkImageView depthImageView;
-	VkDeviceMemory depthImageMemory;
-	VkFormat swapChainImageFormat;
-	VkExtent2D swapChainExtent;
-	std::vector<VkImageView> swapChainImageViews;
-	std::vector<VkFramebuffer> swapChainFramebuffers;
+	VkCommandPool commandPool;
+
 	VkDebugUtilsMessengerEXT debugMessenger;
 	VkPhysicalDevice physicalDevice;
-	VkRenderPass renderPass;
-	VkCommandPool commandPool;
-	std::vector<VkCommandBuffer> commandBuffers;
-	VkSampler textureSampler;
-	bool framebufferResized = false;
 
 	// Cached Draw Commands
 	std::vector<SDrawStaticPBR> drawStaticCommands;
-	mat4 camera;
-
-	// Sync
-	std::vector<VkSemaphore> imageAvailableSemaphores;
-	std::vector<VkSemaphore> renderFinishedSemaphores;
-	std::vector<VkFence> inFlightFences;
 
 	std::vector<VkBuffer> uniformBuffers;
 	std::vector<VkDeviceMemory> uniformBuffersMemory;
 	std::vector<void*> uniformBuffersMapped;
 
-	// Pipelines
-	VkDescriptorPool descriptorPool_PBR;
-	VkDescriptorSetLayout descriptorSetLayout_PBR;
-	VkPipelineLayout pipelineLayout;
-	VkPipeline graphicsPipeline;
 
 	// Uniforms
 	std::vector<SPushConstants> pushConstants;
@@ -381,4 +322,6 @@ private:
 	std::vector<SMemoryBlock> deviceMemory;	 /* GPU memory blocks. */
 	std::vector<SMemoryBlock> uniformMemory; /* Local-visible GPU memory for changing values. */
 	std::vector<SMemoryBlock> stagingMemory; /* Local memory-mapped staging blocks. */
+
+	std::map<std::string, RWindow*> windows;
 };

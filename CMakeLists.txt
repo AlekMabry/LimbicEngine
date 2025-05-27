@@ -25,12 +25,13 @@ add_compile_options(
     /MP         # Build with multiple processes
     /wd4996     # Disable deprecation warnings such as fopen -> fopen_s
     /wd4458     # Disable warnings of argument names matching class members
+    /Zc:__cplusplus # Passthrough version macro to Qt to evaluate
     )
 set_property(GLOBAL APPEND PROPERTY LINK_FLAGS /Debug)
 
 set(CMAKE_CONFIGURATION_TYPES Debug RelWithDebInfo Release CACHE STRING "Configuration" FORCE)
 set(THIRDPARTY_DIR ${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty CACHE PATH "ThirdParty Directory")
-set(QT6_CMAKE_DIR "C:/Qt/6.5.1/msvc2019_64/lib/cmake/" CACHE PATH "Qt6 CMake Directory")
+set(QT6_CMAKE_DIR "C:/Qt/6.9.0/msvc2022_64/lib/cmake/" CACHE PATH "Qt6 CMake Directory")
 
 # Add location of Find[package].cmake files for finding third party packages
 set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH}" "${THIRDPARTY_DIR}/cmake")

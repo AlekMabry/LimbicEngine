@@ -11,6 +11,8 @@
 Game::Game(const std::string& applicationName)
 	: dt(0), pIo(nullptr) , applicationName(applicationName)
 {
+	render = std::make_unique<RenderSystem>();
+	resource = std::make_unique<ResourceSystem>(render.get());
 }
 
 Game::~Game()
@@ -24,13 +26,6 @@ void Game::SetIO(IOSystem& io)
 
 void Game::OnInit()
 { 
-	render = std::make_unique<RenderSystem>();
-	resource = std::make_unique<ResourceSystem>(render.get());
-	
-	uint32 w, h;
-	pIo->GetFramebufferSize(w, h);
-	render->Init(applicationName.c_str(), w, h, pIo->GetWindow(), pIo->GetProcess());
-
 	world = std::make_unique<WorldSystem>(*this);
 	// I tried to get a windows env path and it gave me wide chars and instability so this is hardcoded for the time being
 	world->LoadFromJSON("C:/Users/alekm/AppData/Local/Outpost731/Map/Test.json");
@@ -70,7 +65,7 @@ ResourceSystem* Game::GetResourceSystem() const
 	return resource.get();
 }
 
-RenderSystem* Game::GetRenderSystem() const
+RenderSystem* Game::GetRenderSystem()
 {
 	return render.get();
 }

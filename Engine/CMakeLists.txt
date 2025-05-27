@@ -27,6 +27,11 @@ set(entity_sources
     )
 set(utility_sources
     )
+set(renderer_sources
+    Source/Renderer/RView.cpp
+    Source/Renderer/RWindow.cpp
+    Source/Renderer/RWindow_GLFW.cpp
+    )
 set(includes
     Include/Game.h
     Include/LimbicProperties.h
@@ -50,6 +55,11 @@ set(entity_includes
 )
 set(utility_includes
     )
+set(renderer_includes
+    Include/Renderer/RView.h
+    Include/Renderer/RWindow.h
+    Include/Renderer/RWindow_GLFW.h
+    )
 set(shaders
     Shader/hardcodedTriangle.vert
     Shader/hardcodedTriangle.frag
@@ -69,16 +79,18 @@ source_group("Source" FILES ${sources})
 source_group("Source/System" FILES ${system_sources})
 source_group("Source/Entity" FILES ${entity_sources})
 source_group("Source/Utility" FILES ${utility_sources})
+source_group("Source/Renderer" FILES ${renderer_sources})
 source_group("Include" FILES ${includes})
 source_group("Include/System" FILES ${system_includes})
 source_group("Include/Entity" FILES ${entity_includes})
 source_group("Include/Utility" FILES ${utility_includes})
+source_group("Include/Renderer" FILES ${renderer_includes})
 source_group("Shader" FILES ${shaders})
 
 # Setup static engine library that is used as the base for the editor and game
 add_library(LimbicEngine STATIC
-    ${sources} ${system_sources} ${entity_sources} ${utility_sources}
-    ${includes} ${system_includes} ${entity_includes} ${utility_includes}
+    ${sources} ${system_sources} ${entity_sources} ${utility_sources} ${renderer_sources}
+    ${includes} ${system_includes} ${entity_includes} ${utility_includes} ${renderer_includes}
     )
 target_include_directories(LimbicEngine
     PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/Include"

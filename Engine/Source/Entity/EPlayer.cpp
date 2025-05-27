@@ -2,6 +2,7 @@
 
 #include <System/IOSystem_InputBinds.h>
 #include <System/RenderSystem.h>
+#include <Renderer/RView.h>
 
 #define GLM_FORCE_RADIANS
 #define GLM_DEPTH_ZERO_TO_ONE
@@ -59,10 +60,10 @@ void EPlayer::OnDraw()
 {
 	vec3 eye = position + vec3(0.0, 0.0, 1.8f);
 	mat4 view = glm::lookAt(eye, vec3(0.0f, 0.0f, 1.0f), vec3(0.0f, 0.0f, 1.0f));
-	mat4 proj = glm::perspective(glm::radians(120.0f), 16.0f / 9.0f, 0.1f, 128.0f);
-	proj[1][1] *= -1;
 
-	pRender->DrawSetCamera(proj * view);
+	auto windowView = pRender->GetWindowView("main");
+	windowView.second->SetViewTransform(view);
+	windowView.second->SetProjection(0.1f, 128.0f, 120.0f);
 }
 
 void EPlayer::GetPropertyInfo(SPropertyInfo* propertyInfo, uint32& propertyCount)

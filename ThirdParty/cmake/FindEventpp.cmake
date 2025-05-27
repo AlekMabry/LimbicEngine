@@ -3,7 +3,7 @@ add_library(Eventpp INTERFACE)
 
 # Set locations for headers
 target_include_directories(Eventpp
-    INTERFACE "${CMAKE_CURRENT_LIST_DIR}/../Eventpp-0.1.2/include"
+    INTERFACE "${CMAKE_CURRENT_LIST_DIR}/../Eventpp-0.1.3/include"
     )
 
 # For future reference: IMPORTED_LOCATION_<CONFIG> should be used if

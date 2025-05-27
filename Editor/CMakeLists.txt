@@ -13,12 +13,16 @@ set(sources
     Source/main.cpp
     Source/EditorWindow.cpp
     Source/SettingsDialog.cpp
+    Source/VulkanWindow.cpp
+    Source/VulkanRenderer.cpp
     Source/LimbicEditor.qrc
     )
 set(includes
     Include/EditorTypes.h
     Include/EditorWindow.h
     Include/SettingsDialog.h
+    Include/VulkanWindow.h
+    Include/VulkanRenderer.h
     )
 set(qt_files
     Qt/Editor.ui
@@ -56,11 +60,12 @@ target_link_libraries(LimbicEditor PRIVATE Qt6::Core Qt6::Gui Qt6::Widgets)
 # Use windeployqt.exe to copy the required runtime libraries
 get_target_property(qmake_exe Qt6::qmake IMPORTED_LOCATION)
 get_filename_component(qmake_dir "${qmake_exe}" DIRECTORY)
-string(TOLOWER $<CONFIG> config_lower)
+#string(TOLOWER $<CONFIG> config_lower)
 add_custom_command(TARGET LimbicEditor POST_BUILD
     COMMAND "${qmake_dir}/windeployqt.exe"
         --verbose 1
-        --${config_lower}
+        $<$<CONFIG:Debug>:--debug>
+        $<$<CONFIG:Release>:--release>
         \"$<TARGET_FILE:LimbicEditor>\"
     )
 

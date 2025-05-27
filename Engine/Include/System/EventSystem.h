@@ -1,9 +1,9 @@
 #pragma once
 
 #include <LimbicTypes.h>
-#include <eventpp/eventqueue.h>
+//#include <eventpp/eventqueue.h>
 
-namespace Event = eventpp;
+//namespace Event = eventpp;
 
 enum EEvent
 {
@@ -17,5 +17,5 @@ class EventSystem
 public:
 
 protected:
-	Event::EventQueue<EEvent, void()> queue;
+	//Event::EventQueue<EEvent, void()> queue;
 };
