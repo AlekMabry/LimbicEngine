@@ -15,7 +15,9 @@ set(sources
     Source/SettingsDialog.cpp
     Source/VulkanWindow.cpp
     Source/VulkanRenderer.cpp
-    Source/LimbicEditor.qrc
+    Source/SceneTree/SceneTreeModel.cpp
+    Source/SceneTree/SceneTreeView.cpp
+    Source/NodePropertiesWidget.cpp
     )
 set(includes
     Include/EditorTypes.h
@@ -23,18 +25,25 @@ set(includes
     Include/SettingsDialog.h
     Include/VulkanWindow.h
     Include/VulkanRenderer.h
+    Include/SceneTree/SceneTreeModel.h
+    Include/SceneTree/SceneTreeView.h
+    Include/NodePropertiesWidget.h
     )
 set(qt_files
     Qt/Editor.ui
     Qt/Resources.ui
     Qt/Settings.ui
     Qt/Widget.ui
+    Qt/NodePropertiesWidget.ui
+    )
+set(qt_rc
+    Qt/LimbicEditor.qrc
     )
 
 # Folders in IDE
 source_group("Source" FILES ${sources})
 source_group("Include" FILES ${includes})
-source_group("Qt" FILES ${qt_files})
+source_group("Qt" FILES ${qt_files} ${qt_rc})
 
 # Setup executable
 add_executable(LimbicEditor WIN32 ${sources} ${includes} ${qt_files})
@@ -53,9 +62,11 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOMOC ON)
 qt_standard_project_setup()
+qt6_add_resources(resource_files ${qt_rc})
 
 qt_wrap_ui(UI_HEADERS ${qt_files})   # Rule for calling uic on .ui files. For each input, a header is generate
 target_link_libraries(LimbicEditor PRIVATE Qt6::Core Qt6::Gui Qt6::Widgets)
+target_sources(LimbicEditor PRIVATE ${resource_files})
 
 # Use windeployqt.exe to copy the required runtime libraries
 get_target_property(qmake_exe Qt6::qmake IMPORTED_LOCATION)

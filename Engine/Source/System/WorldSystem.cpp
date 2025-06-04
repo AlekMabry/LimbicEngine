@@ -66,7 +66,6 @@ void WorldSystem::LoadFromJSON(const char* filename)
 	// Create data structures to store entity property info (json property identifiers,
 	// property types, and property pointers in spawned entity)
 	std::array<SPropertyInfo, 16> entityPropertyInfo;
-	uint32 entityPropertyCount;
 
 	rapidjson::Value& entityJsonArray = document["Entities"];
 	for (size_t i = 0; i < entityJsonArray.Size(); i++)
@@ -79,40 +78,38 @@ void WorldSystem::LoadFromJSON(const char* filename)
 		// Spawn entity using spawn function in the lookup table
 		EEntity* spawned = NewEntity[entityTypeString]();
 
-		// Ask entity for properties information
-		spawned->GetPropertyInfo(entityPropertyInfo.data(), entityPropertyCount);
-
 		// For each property the entity requests, find it in the JSON file and write to entity with property handles.
-		for (uint32 p = 0; p < entityPropertyCount; p++)
+		for (auto& infoPair : spawned->GetPropertyInfo())
 		{
-			rapidjson::Value& propertyJsonObject = entityPropertiesJsonArray[entityPropertyInfo[p].name.c_str()];
-			switch (entityPropertyInfo[p].type)
+			auto& info = infoPair.second;
+			rapidjson::Value& propertyJsonObject = entityPropertiesJsonArray[info.name.c_str()];
+			switch (info.type)
 			{
 				case ePropertyTypeFilename:
-					*static_cast<std::string*>(entityPropertyInfo[p].handle) = propertyJsonObject.GetString();
+					*static_cast<std::string*>(info.handle) = propertyJsonObject.GetString();
 					break;
 				case ePropertyTypeVec4:
-					static_cast<vec4*>(entityPropertyInfo[p].handle)->x = propertyJsonObject["x"].GetFloat();
-					static_cast<vec4*>(entityPropertyInfo[p].handle)->y = propertyJsonObject["y"].GetFloat();
-					static_cast<vec4*>(entityPropertyInfo[p].handle)->z = propertyJsonObject["z"].GetFloat();
-					static_cast<vec4*>(entityPropertyInfo[p].handle)->w = propertyJsonObject["w"].GetFloat();
+					static_cast<vec4*>(info.handle)->x = propertyJsonObject["x"].GetFloat();
+					static_cast<vec4*>(info.handle)->y = propertyJsonObject["y"].GetFloat();
+					static_cast<vec4*>(info.handle)->z = propertyJsonObject["z"].GetFloat();
+					static_cast<vec4*>(info.handle)->w = propertyJsonObject["w"].GetFloat();
 					break;
 				case ePropertyTypeVec3:
-					static_cast<vec3*>(entityPropertyInfo[p].handle)->x = propertyJsonObject["x"].GetFloat();
-					static_cast<vec3*>(entityPropertyInfo[p].handle)->y = propertyJsonObject["y"].GetFloat();
-					static_cast<vec3*>(entityPropertyInfo[p].handle)->z = propertyJsonObject["z"].GetFloat();
+					static_cast<vec3*>(info.handle)->x = propertyJsonObject["x"].GetFloat();
+					static_cast<vec3*>(info.handle)->y = propertyJsonObject["y"].GetFloat();
+					static_cast<vec3*>(info.handle)->z = propertyJsonObject["z"].GetFloat();
 					break;
 				case ePropertyTypeVec2:
-					static_cast<vec2*>(entityPropertyInfo[p].handle)->x = propertyJsonObject["x"].GetFloat();
-					static_cast<vec2*>(entityPropertyInfo[p].handle)->y = propertyJsonObject["y"].GetFloat();
+					static_cast<vec2*>(info.handle)->x = propertyJsonObject["x"].GetFloat();
+					static_cast<vec2*>(info.handle)->y = propertyJsonObject["y"].GetFloat();
 					break;
 			}
 		}
 	}
+	eMapUpdated();
 }
 
-void WorldSystem::GetEntities(EEntity**& entities, uint32& entityCount)
+std::vector<EEntity*>& WorldSystem::GetEntities()
 {
-	entities = this->entities.data();
-	entityCount = static_cast<uint32>(this->entities.size());
+	return entities;
 }

@@ -1,5 +1,4 @@
 <RCC>
-    <qresource prefix="/LimbicEngine"/>
     <qresource prefix="/Icons">
         <file alias="SceneTree-Point">Icons/16x16/SceneTree-Point.png</file>
         <file alias="SceneTree-PointLight">Icons/16x16/SceneTree-PointLight.png</file>

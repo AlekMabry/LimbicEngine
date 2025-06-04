@@ -6,6 +6,8 @@
 #include "ui_Editor.h"
 #include <SettingsDialog.h>
 
+class NodePropertiesWidget;
+class Game;
 class VulkanWindow;
 
 class EditorWindow : public QMainWindow
@@ -13,7 +15,7 @@ class EditorWindow : public QMainWindow
     
 
 public:
-    EditorWindow(VulkanWindow *pVkWindow, QWidget *parent = nullptr);
+    EditorWindow(VulkanWindow *pVkWindow, Game* pGame, QWidget *parent = nullptr);
     ~EditorWindow();
 
 public slots:
@@ -21,5 +23,7 @@ public slots:
 
 private:
     Ui::Editor ui;
-    VulkanWindow *pVkWindow = nullptr;
+    VulkanWindow* pVkWindow;
+    Game* pGame;
+    NodePropertiesWidget* pNodeProperties;
 };

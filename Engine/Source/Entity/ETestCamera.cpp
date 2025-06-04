@@ -34,7 +34,7 @@ void ETestCamera::OnDraw()
 	windowView.second->SetProjection(0.1f, 128.0f, 120.0f);
 }
 
-void ETestCamera::GetPropertyInfo(SPropertyInfo*, uint32& propertyCount)
+std::map<std::string, SPropertyInfo> ETestCamera::GetPropertyInfo()
 {
-	propertyCount = 0;
+	return {};
 }

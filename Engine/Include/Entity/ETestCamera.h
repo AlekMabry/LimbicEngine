@@ -13,7 +13,7 @@ public:
 
 	void OnDraw() override;
 
-	void GetPropertyInfo(SPropertyInfo* propertyInfo, uint32& propertyCount) override;
+	std::map<std::string, SPropertyInfo> GetPropertyInfo() override;
 
 protected:
 	float angle;

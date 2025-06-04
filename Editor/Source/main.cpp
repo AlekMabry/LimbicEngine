@@ -26,11 +26,7 @@ int main(int argc, char *argv[])
     auto pVkWindow = new VulkanWindow(&game, pRenderSystem, qVkInstance);
 	pRenderSystem->AddWindow("main", *pVkWindow);
 
-    pVkWindow->setTitle("Scene View");
-    pVkWindow->resize(640, 480);
-    //pVkWindow->show();
-
-	EditorWindow w(pVkWindow);
+	EditorWindow w(pVkWindow, &game);
 	w.show();
 
     // Continued in VulkanRenderer::initResources()

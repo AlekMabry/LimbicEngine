@@ -1,8 +1,9 @@
-#include "VulkanRenderer.h"
-#include "VulkanWindow.h"
-#include "Game.h"
-#include "System/RenderSystem.h"
-#include "System/WorldSystem.h"
+#include <VulkanRenderer.h>
+#include <VulkanWindow.h>
+
+#include <Game.h>
+#include <System/RenderSystem.h>
+#include <System/WorldSystem.h>
 
 VulkanRenderer::VulkanRenderer(Game *pGame, RenderSystem* pRenderSystem, QVulkanWindow* pWindow)
 	: RView(pRenderSystem, dynamic_cast<RWindow*>(pWindow), [pWindow]()

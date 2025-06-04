@@ -13,6 +13,7 @@ Game::Game(const std::string& applicationName)
 {
 	render = std::make_unique<RenderSystem>();
 	resource = std::make_unique<ResourceSystem>(render.get());
+	world = std::make_unique<WorldSystem>(*this);
 }
 
 Game::~Game()
@@ -25,17 +26,13 @@ void Game::SetIO(IOSystem& io)
 }
 
 void Game::OnInit()
-{ 
-	world = std::make_unique<WorldSystem>(*this);
+{
 	// I tried to get a windows env path and it gave me wide chars and instability so this is hardcoded for the time being
 	world->LoadFromJSON("C:/Users/alekm/AppData/Local/Outpost731/Map/Test.json");
 
-	EEntity** entities;
-	uint32 entityCount;
-	world->GetEntities(entities, entityCount);
-	for (uint32 i = 0; i < entityCount; i++)
+	for (auto& entity : world->GetEntities())
 	{
-		entities[i]->OnInit();
+		entity->OnInit();
 	}
 }
 

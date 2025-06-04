@@ -66,9 +66,9 @@ void EPlayer::OnDraw()
 	windowView.second->SetProjection(0.1f, 128.0f, 120.0f);
 }
 
-void EPlayer::GetPropertyInfo(SPropertyInfo* propertyInfo, uint32& propertyCount)
+std::map<std::string, SPropertyInfo> EPlayer::GetPropertyInfo()
 {
-	LPROPERTY(propertyInfo[0], position, "Position", ePropertyTypeVec3);
-
-	propertyCount = 1;
+	std::map<std::string, SPropertyInfo> properties;
+	LPROPERTY(position, "Position", ePropertyTypeVec3)
+	return properties;
 }

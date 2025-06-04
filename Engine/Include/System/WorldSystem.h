@@ -2,8 +2,12 @@
 
 #include <LimbicTypes.h>
 
+#include <eventpp/callbacklist.h>
+
 #include <string>
 #include <functional>
+
+using namespace eventpp;
 
 #define LREGISTER(entityClass) \
 	NewEntity.insert(std::make_pair(std::string(LSTRINGIFY(entityClass)), [this]() -> EEntity* { return SpawnEntityCast<entityClass>(); }));
@@ -23,7 +27,7 @@ public:
 
 	void LoadFromJSON(const char* filename);
 
-	void GetEntities(EEntity**& entities, uint32& entityCount);
+	std::vector<EEntity*>& GetEntities();
 
 	template <typename TEntityClass>
 	TEntityClass* SpawnEntity()
@@ -38,8 +42,9 @@ public:
 	{
 		TEntityClass* entity = SpawnEntity<TEntityClass>();
 		return static_cast<EEntity*>(entity);
-	} 
+	}
 
+	CallbackList<void()> eMapUpdated;
 
 protected:
 	std::vector<EEntity*> entities;

@@ -13,11 +13,6 @@ void EStaticWorldGeometry::OnInit()
 {
 	trussMesh = pResource->RequestStaticMesh(staticMeshFilename, staticMeshNode);
 	trussMaterial = pResource->RequestMaterial(baseColorFilename, normalFilename, propertiesFilename);
-
-	transform = glm::rotate(mat4(1.0f), glm::radians(rotation.z), vec3(0.0f, 0.0f, 1.0f));
-	transform = glm::rotate(transform, glm::radians(rotation.y), vec3(0.0f, 1.0f, 0.0f));
-	transform = glm::rotate(transform, glm::radians(rotation.x), vec3(1.0f, 0.0f, 0.0f));
-	transform = glm::translate(transform, position);
 }
 
 void EStaticWorldGeometry::OnTick(float)
@@ -26,18 +21,22 @@ void EStaticWorldGeometry::OnTick(float)
 
 void EStaticWorldGeometry::OnDraw()
 {
+	transform = glm::rotate(mat4(1.0f), glm::radians(rotation.z), vec3(0.0f, 0.0f, 1.0f));
+	transform = glm::rotate(transform, glm::radians(rotation.y), vec3(0.0f, 1.0f, 0.0f));
+	transform = glm::rotate(transform, glm::radians(rotation.x), vec3(1.0f, 0.0f, 0.0f));
+	transform = glm::translate(transform, position);
 	pRender->DrawStaticMesh(trussMesh, trussMaterial, transform);
 }
 
-void EStaticWorldGeometry::GetPropertyInfo(SPropertyInfo* propertyInfo, uint32& propertyCount)
+std::map<std::string, SPropertyInfo> EStaticWorldGeometry::GetPropertyInfo()
 {
-	LPROPERTY(propertyInfo[0], staticMeshFilename, "Static Mesh Filename", ePropertyTypeFilename)
-	LPROPERTY(propertyInfo[1], staticMeshNode, "Mesh Node Name", ePropertyTypeFilename)
-	LPROPERTY(propertyInfo[2], baseColorFilename, "Base Color Texture Filename", ePropertyTypeFilename)
-	LPROPERTY(propertyInfo[3], normalFilename, "Normal Texture Filename", ePropertyTypeFilename)
-	LPROPERTY(propertyInfo[4], propertiesFilename, "Properties Texture Filename", ePropertyTypeFilename)
-	LPROPERTY(propertyInfo[5], position, "Position", ePropertyTypeVec3);
-	LPROPERTY(propertyInfo[6], rotation, "Rotation", ePropertyTypeVec3);
-
-	propertyCount = 7;
+	std::map<std::string, SPropertyInfo> properties;
+	LPROPERTY(staticMeshFilename, "Static Mesh Filename", ePropertyTypeFilename)
+	LPROPERTY(staticMeshNode, "Mesh Node Name", ePropertyTypeFilename)
+	LPROPERTY(baseColorFilename, "Base Color Texture Filename", ePropertyTypeFilename)
+	LPROPERTY(normalFilename, "Normal Texture Filename", ePropertyTypeFilename)
+	LPROPERTY(propertiesFilename, "Properties Texture Filename", ePropertyTypeFilename)
+	LPROPERTY(position, "Position", ePropertyTypeVec3)
+	LPROPERTY(rotation, "Rotation", ePropertyTypeVec3)
+	return properties;
 }

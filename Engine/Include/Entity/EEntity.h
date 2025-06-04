@@ -2,6 +2,8 @@
 
 #include <LimbicProperties.h>
 
+#include <map>
+
 #define ENTITY_EVENT_ENABLED_TICK	1
 #define ENTITY_EVENT_ENABLED_DRAW	2
 
@@ -28,7 +30,7 @@ public:
 	virtual void OnDraw() = 0;
 
 	/**	Returns initialization properties available in the map file or editor. */
-	virtual void GetPropertyInfo(SPropertyInfo* propertyInfo, uint32& propertyCount) = 0;
+	virtual std::map<std::string, SPropertyInfo> GetPropertyInfo() = 0;
 
 	uint32 GetEnabledEventFlags() const;
 
