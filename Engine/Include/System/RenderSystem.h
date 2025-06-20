@@ -56,6 +56,7 @@ struct SPushConstants
 {
 	mat4 camera;
 	mat4 model;
+	alignas(16) int id;
 };
 
 struct SDrawStaticPBR
@@ -63,6 +64,7 @@ struct SDrawStaticPBR
 	RStaticMesh mesh;
 	RMaterial material;
 	mat4 modelTransform;
+	bool selected;
 };
 
 struct SLights
@@ -163,6 +165,8 @@ class RenderSystem
 {
 	friend class RView;
 	friend class RWindow_GLFW;
+	friend class RWindow_Qt;
+	friend class RWindow;
 
 public:
 	~RenderSystem();
@@ -202,7 +206,7 @@ public:
 	void OnDrawEnd();
 
 	/* Draw static mesh. */
-	void DrawStaticMesh(RStaticMesh meshId, RMaterial materialId, mat4 modelTransform);
+	void DrawStaticMesh(RStaticMesh meshId, RMaterial materialId, mat4 modelTransform, bool selected);
 
 	/* Get window and view. */
 	std::pair<RWindow*, RView*> GetWindowView(const std::string& window);

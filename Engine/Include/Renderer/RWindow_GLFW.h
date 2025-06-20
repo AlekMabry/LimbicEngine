@@ -35,7 +35,6 @@ public:
 	int GetCurrentFrame() const override;
 	VkFramebuffer GetCurrentFramebuffer() const override;
 	int GetCurrentSwapChainImageIndex() const override;
-	VkRenderPass GetDefaultRenderPass() const override;
 	VkFormat GetDepthStencilFormat() const override;
 	VkImage GetDepthStencilImage() const override;
 	VkImageView GetDepthStencilImageView() const override;
@@ -54,11 +53,9 @@ public:
 	void InitCommandBuffers();
 	void InitSwapChain();
 	void InitDepthbuffer();
-	void InitSwapChainFramebuffers();
-	void DestroySwapChain();
+	void DestroySwapChain();	// Todo - Integrate DestroyFramebuffers();
 	void InitSyncObjects();
 	void RecreateSwapChain();
-	void InitRenderPass();
 
 	/**** Option picking utilities. ****/
 
@@ -98,8 +95,10 @@ public:
 	VkExtent2D swapChainExtent;
 	std::vector<VkImageView> swapChainImageViews;
 	std::vector<VkFramebuffer> swapChainFramebuffers;
-	VkRenderPass renderPass;
 	std::vector<VkCommandBuffer> commandBuffers;
+	VkImage maskImage;
+	VkImageView maskImageView;
+	VkDeviceMemory maskImageMemory;
 
 private:
 	void PresentFrame();

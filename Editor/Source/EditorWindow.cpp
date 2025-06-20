@@ -1,12 +1,12 @@
 #include <EditorWindow.h>
-#include "VulkanWindow.h"
+#include "RWindow_Qt.h"
 #include <QMdiSubWindow>
-#include <VulkanRenderer.h>
+#include <RView_Qt.h>
 
 #include <NodePropertiesWidget.h>
 #include <SceneTree/SceneTreeModel.h>
 
-EditorWindow::EditorWindow(VulkanWindow* pVkWindow, Game* pGame, QWidget* parent) : QMainWindow(parent), pGame(pGame), pVkWindow(pVkWindow)
+EditorWindow::EditorWindow(RWindow_Qt* pVkWindow, Game* pGame, QWidget* parent) : QMainWindow(parent), pGame(pGame), pVkWindow(pVkWindow)
 {
 	// Window config
 	setCorner(Qt::BottomRightCorner, Qt::RightDockWidgetArea);

@@ -1,3 +1,5 @@
+#include "Entity/EEntity.h"
+#include "Entity/EEntity.h"
 #include "Renderer/RWindow_GLFW.h"
 #include "Renderer/RView.h"
 
@@ -79,8 +81,8 @@ RenderSystem::~RenderSystem()
 	vkDestroyDescriptorPool(device, descriptorPool_PBR, nullptr);
 	vkDestroyDescriptorSetLayout(device, descriptorSetLayout_PBR, nullptr);
 
-	vkDestroyPipeline(device, graphicsPipeline, nullptr);
-	vkDestroyPipelineLayout(device, pipelineLayout, nullptr);
+	vkDestroyPipeline(device, pipeline_graphics, nullptr);
+	vkDestroyPipelineLayout(device, pipelineLayout_graphics, nullptr);
 
 	vkDestroyRenderPass(device, renderPass, nullptr);
 
@@ -421,9 +423,9 @@ void RenderSystem::OnDrawEnd()
 	}
 }
 
-void RenderSystem::DrawStaticMesh(RStaticMesh meshId, RMaterial materialId, mat4 modelTransform)
+void RenderSystem::DrawStaticMesh(RStaticMesh meshId, RMaterial materialId, mat4 modelTransform, bool selected)
 {
-	SDrawStaticPBR drawCommand = {meshId, materialId, modelTransform};
+	SDrawStaticPBR drawCommand = {meshId, materialId, modelTransform, selected};
 	drawStaticCommands.push_back(drawCommand);
 }
 
@@ -871,10 +873,7 @@ void RenderSystem::CreateImage(uint32_t width, uint32_t height, VkFormat format,
 	imageInfo.samples = VK_SAMPLE_COUNT_1_BIT;
 	imageInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
-	if (vkCreateImage(device, &imageInfo, nullptr, &image) != VK_SUCCESS)
-	{
-		throw std::runtime_error("[ERROR] Failed to create image!");
-	}
+	VK_CHECK(vkCreateImage(device, &imageInfo, nullptr, &image));
 
 	VkMemoryRequirements memRequirements;
 	vkGetImageMemoryRequirements(device, image, &memRequirements);
@@ -884,10 +883,7 @@ void RenderSystem::CreateImage(uint32_t width, uint32_t height, VkFormat format,
 	allocInfo.allocationSize = memRequirements.size;
 	allocInfo.memoryTypeIndex = FindMemoryType(memRequirements.memoryTypeBits, properties);
 
-	if (vkAllocateMemory(device, &allocInfo, nullptr, &imageMemory) != VK_SUCCESS)
-	{
-		throw std::runtime_error("[ERROR] Failed to allocate image memory!");
-	}
+	VK_CHECK(vkAllocateMemory(device, &allocInfo, nullptr, &imageMemory));
 
 	vkBindImageMemory(device, image, imageMemory, 0);
 }

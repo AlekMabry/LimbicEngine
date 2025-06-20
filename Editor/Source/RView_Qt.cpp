@@ -1,11 +1,11 @@
-#include <VulkanRenderer.h>
-#include <VulkanWindow.h>
+#include <RView_Qt.h>
+#include <RWindow_Qt.h>
 
 #include <Game.h>
 #include <System/RenderSystem.h>
 #include <System/WorldSystem.h>
 
-VulkanRenderer::VulkanRenderer(Game *pGame, RenderSystem* pRenderSystem, QVulkanWindow* pWindow)
+RView_Qt::RView_Qt(Game *pGame, RenderSystem* pRenderSystem, RWindow_Qt* pWindow)
 	: RView(pRenderSystem, dynamic_cast<RWindow*>(pWindow), [pWindow]()
 	{
 		pWindow->frameReady();
@@ -14,24 +14,43 @@ VulkanRenderer::VulkanRenderer(Game *pGame, RenderSystem* pRenderSystem, QVulkan
 {
 }
 
-VulkanRenderer::~VulkanRenderer()
+RView_Qt::~RView_Qt()
 {
 }
 
-void VulkanRenderer::initResources()
+void RView_Qt::initSwapChainResources()
+{
+	auto pVW = static_cast<RWindow_Qt*>(pW);
+	pVW->CreateColorImage();
+	pVW->CreateMaskImages();
+	InitRenderPass();
+	pVW->CreateFramebuffers();
+	InitGraphicsPipeline();
+	InitPostprocessPipeline();
+	BindMaskDescriptorSet();
+}
+
+void RView_Qt::releaseSwapChainResources()
+{
+	auto pVW = static_cast<RWindow_Qt*>(pW);
+	pVW->DestroyMaskImages();
+	pVW->DestroyFramebuffers();
+	DestroyRenderPass();
+}
+
+void RView_Qt::initResources()
 {
 	auto pVW = dynamic_cast<QVulkanWindow*>(pW);
 	pR->InitQt(pVW->device(), pVW->physicalDevice(), pVW->graphicsQueue(), pVW->graphicsQueue(), pVW->graphicsCommandPool());
 	InitDescriptorPool();
 	InitDescriptorSetLayout();
-	InitGraphicsPipeline();
 	InitDefaultTextureSampler();
 
 	pR->Init();
 	pG->OnInit();
 }
 
-void VulkanRenderer::startNextFrame()
+void RView_Qt::startNextFrame()
 {
 	auto pW = pG->GetWorldSystem();
 	pR->OnDrawStart();

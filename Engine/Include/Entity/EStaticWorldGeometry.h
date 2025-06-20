@@ -23,6 +23,7 @@ public:
 	std::string propertiesFilename;
 	vec3 position;
 	vec3 rotation;
+	bool selected;
 
 protected:
 	RStaticMesh trussMesh;

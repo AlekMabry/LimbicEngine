@@ -4,6 +4,7 @@ layout(push_constant) uniform SConstants
 {
     mat4 camera;
     mat4 model;
+    int id;
 } constants;
 
 layout(location = 0) in vec3 inPosition;

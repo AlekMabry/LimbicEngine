@@ -65,6 +65,8 @@ set(shaders
     Shader/hardcodedTriangle.frag
     Shader/passthrough.vert
     Shader/passthrough.frag
+    Shader/postprocess.vert
+    Shader/postprocess.frag
     Shader/spinning.vert
     Shader/spinning.frag
     Shader/staticPBR.vert

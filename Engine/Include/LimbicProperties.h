@@ -15,7 +15,8 @@ enum EPropertyType
 	ePropertyTypeFilename,
 	ePropertyTypeVec4,
 	ePropertyTypeVec3,
-	ePropertyTypeVec2
+	ePropertyTypeVec2,
+	ePropertyTypeBool
 };
 
 struct SPropertyInfo

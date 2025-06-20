@@ -36,6 +36,8 @@ public:
 
 	bool IsPendingKill() const;
 
+	std::string name;
+
 protected:
 	uint32 enabledEventFlags;
 	bool bPendingKill;

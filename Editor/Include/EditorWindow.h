@@ -8,14 +8,14 @@
 
 class NodePropertiesWidget;
 class Game;
-class VulkanWindow;
+class RWindow_Qt;
 
 class EditorWindow : public QMainWindow
 {
     
 
 public:
-    EditorWindow(VulkanWindow *pVkWindow, Game* pGame, QWidget *parent = nullptr);
+    EditorWindow(RWindow_Qt *pVkWindow, Game* pGame, QWidget *parent = nullptr);
     ~EditorWindow();
 
 public slots:
@@ -23,7 +23,7 @@ public slots:
 
 private:
     Ui::Editor ui;
-    VulkanWindow* pVkWindow;
+    RWindow_Qt* pVkWindow;
     Game* pGame;
     NodePropertiesWidget* pNodeProperties;
 };

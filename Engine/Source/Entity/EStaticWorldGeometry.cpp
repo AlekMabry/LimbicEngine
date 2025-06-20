@@ -25,7 +25,7 @@ void EStaticWorldGeometry::OnDraw()
 	transform = glm::rotate(transform, glm::radians(rotation.y), vec3(0.0f, 1.0f, 0.0f));
 	transform = glm::rotate(transform, glm::radians(rotation.x), vec3(1.0f, 0.0f, 0.0f));
 	transform = glm::translate(transform, position);
-	pRender->DrawStaticMesh(trussMesh, trussMaterial, transform);
+	pRender->DrawStaticMesh(trussMesh, trussMaterial, transform, selected);
 }
 
 std::map<std::string, SPropertyInfo> EStaticWorldGeometry::GetPropertyInfo()
@@ -38,5 +38,6 @@ std::map<std::string, SPropertyInfo> EStaticWorldGeometry::GetPropertyInfo()
 	LPROPERTY(propertiesFilename, "Properties Texture Filename", ePropertyTypeFilename)
 	LPROPERTY(position, "Position", ePropertyTypeVec3)
 	LPROPERTY(rotation, "Rotation", ePropertyTypeVec3)
+	LPROPERTY(selected, "Selected", ePropertyTypeBool)
 	return properties;
 }

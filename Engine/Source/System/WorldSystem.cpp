@@ -77,6 +77,7 @@ void WorldSystem::LoadFromJSON(const char* filename)
 
 		// Spawn entity using spawn function in the lookup table
 		EEntity* spawned = NewEntity[entityTypeString]();
+		spawned->name = entityJsonObject["Name"].GetString();
 
 		// For each property the entity requests, find it in the JSON file and write to entity with property handles.
 		for (auto& infoPair : spawned->GetPropertyInfo())
@@ -102,6 +103,9 @@ void WorldSystem::LoadFromJSON(const char* filename)
 				case ePropertyTypeVec2:
 					static_cast<vec2*>(info.handle)->x = propertyJsonObject["x"].GetFloat();
 					static_cast<vec2*>(info.handle)->y = propertyJsonObject["y"].GetFloat();
+					break;
+				case ePropertyTypeBool:
+					*static_cast<bool*>(info.handle) = propertyJsonObject.GetBool();
 					break;
 			}
 		}

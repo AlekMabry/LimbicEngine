@@ -22,12 +22,14 @@ void RWindow_GLFW::Init()
 	});
 	InitSurface();
 	InitSwapChain();
-	InitRenderPass();
+	pV->InitRenderPass();
 	pV->InitDescriptorPool();
 	pV->InitDescriptorSetLayout();
 	pV->InitGraphicsPipeline();
 	InitDepthbuffer();
-	InitSwapChainFramebuffers();
+	CreateMaskImages();
+	CreateColorImage();
+	CreateFramebuffers();
 	pV->InitGraphicsCommandPool();
 	InitCommandBuffers();
 	pV->InitDefaultTextureSampler();
@@ -88,11 +90,6 @@ VkFramebuffer RWindow_GLFW::GetCurrentFramebuffer() const
 int RWindow_GLFW::GetCurrentSwapChainImageIndex() const
 {
 	return currentFrame;
-}
-
-VkRenderPass RWindow_GLFW::GetDefaultRenderPass() const
-{
-	return renderPass;
 }
 
 VkFormat RWindow_GLFW::GetDepthStencilFormat() const
@@ -245,43 +242,13 @@ void RWindow_GLFW::InitSwapChain()
 	}
 }
 
-void RWindow_GLFW::InitDepthbuffer()
-{
-	depthImageFormat = pR->FindDepthFormat();
-	pR->CreateImage(swapChainExtent.width, swapChainExtent.height, depthImageFormat, VK_IMAGE_TILING_OPTIMAL,
-		VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, depthImage, depthImageMemory);
-	depthImageView = pR->CreateImageView(depthImage, depthImageFormat, VK_IMAGE_ASPECT_DEPTH_BIT);
-}
-
-void RWindow_GLFW::InitSwapChainFramebuffers()
-{
-	swapChainFramebuffers.resize(swapChainImageViews.size());
-
-	for (size_t i = 0; i < swapChainImageViews.size(); i++)
-	{
-		std::array<VkImageView, 2> attachments = {swapChainImageViews[i], depthImageView};
-
-		VkFramebufferCreateInfo framebufferInfo{};
-		framebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
-		framebufferInfo.renderPass = renderPass;
-		framebufferInfo.attachmentCount = static_cast<uint32>(attachments.size());
-		framebufferInfo.pAttachments = attachments.data();
-		framebufferInfo.width = swapChainExtent.width;
-		framebufferInfo.height = swapChainExtent.height;
-		framebufferInfo.layers = 1;
-
-		if (vkCreateFramebuffer(pR->device, &framebufferInfo, nullptr, &swapChainFramebuffers[i]) != VK_SUCCESS)
-		{
-			throw std::runtime_error("[ERROR] Failed to create framebuffer!");
-		}
-	}
-}
-
 void RWindow_GLFW::DestroySwapChain()
 {
 	vkDestroyImageView(pR->device, depthImageView, nullptr);
 	vkDestroyImage(pR->device, depthImage, nullptr);
 	vkFreeMemory(pR->device, depthImageMemory, nullptr);
+	DestroyColorImage();
+	DestroyMaskImages();
 
 	for (size_t i = 0; i < swapChainFramebuffers.size(); i++)
 	{
@@ -294,6 +261,14 @@ void RWindow_GLFW::DestroySwapChain()
 	}
 
 	vkDestroySwapchainKHR(pR->device, swapChain, nullptr);
+}
+
+void RWindow_GLFW::InitDepthbuffer()
+{
+	depthImageFormat = pR->FindDepthFormat();
+	pR->CreateImage(swapChainExtent.width, swapChainExtent.height, depthImageFormat, VK_IMAGE_TILING_OPTIMAL,
+		VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, depthImage, depthImageMemory);
+	depthImageView = pR->CreateImageView(depthImage, depthImageFormat, VK_IMAGE_ASPECT_DEPTH_BIT);
 }
 
 void RWindow_GLFW::InitSyncObjects()
@@ -326,66 +301,9 @@ void RWindow_GLFW::RecreateSwapChain()
 	DestroySwapChain();
 	InitSwapChain();
 	InitDepthbuffer();
-	InitSwapChainFramebuffers();
-}
-
-void RWindow_GLFW::InitRenderPass()
-{
-	VkAttachmentDescription colorAttachment{};
-	colorAttachment.format = GetColorFormat();
-	colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
-	colorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;	 // Clear framebuffer
-	colorAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
-	colorAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-	colorAttachment.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
-
-	VkAttachmentReference colorAttachmentRef{};
-	colorAttachmentRef.attachment = 0;
-	colorAttachmentRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-
-	VkAttachmentDescription depthAttachment{};
-	depthAttachment.format = pR->FindDepthFormat();
-	depthAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
-	depthAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
-	depthAttachment.storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-	depthAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-	depthAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-	depthAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-	depthAttachment.finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
-
-	VkAttachmentReference depthAttachmentRef{};
-	depthAttachmentRef.attachment = 1;
-	depthAttachmentRef.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
-
-	VkSubpassDescription subpass{};
-	subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
-	subpass.colorAttachmentCount = 1;
-	subpass.pColorAttachments = &colorAttachmentRef;
-	subpass.pDepthStencilAttachment = &depthAttachmentRef;
-
-	VkSubpassDependency dependency{};
-	dependency.srcSubpass = VK_SUBPASS_EXTERNAL;
-	dependency.dstSubpass = 0;
-	dependency.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
-	dependency.srcAccessMask = 0;
-	dependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
-	dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
-
-	std::array<VkAttachmentDescription, 2> attachments = {colorAttachment, depthAttachment};
-
-	VkRenderPassCreateInfo renderPassInfo{};
-	renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
-	renderPassInfo.attachmentCount = static_cast<uint32>(attachments.size());
-	renderPassInfo.pAttachments = attachments.data();
-	renderPassInfo.subpassCount = 1;
-	renderPassInfo.pSubpasses = &subpass;
-	renderPassInfo.dependencyCount = 1;
-	renderPassInfo.pDependencies = &dependency;
-
-	if (vkCreateRenderPass(pR->device, &renderPassInfo, nullptr, &renderPass) != VK_SUCCESS)
-	{
-		throw std::runtime_error("[ERROR] Failed to create render pass!");
-	}
+	CreateColorImage();
+	CreateMaskImages();
+	CreateFramebuffers();
 }
 
 VkSurfaceFormatKHR RWindow_GLFW::PickSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats)

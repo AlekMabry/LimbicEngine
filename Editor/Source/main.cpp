@@ -5,8 +5,8 @@
 #include "System/RenderSystem.h"
 #include "Renderer/RWindow.h"
 #include "Renderer/RView.h"
-#include "VulkanRenderer.h"
-#include "VulkanWindow.h"
+#include "RView_Qt.h"
+#include "RWindow_Qt.h"
 
 int main(int argc, char *argv[])
 {
@@ -23,13 +23,13 @@ int main(int argc, char *argv[])
 	qVkInstance.setVkInstance(vkInstance);
 	qVkInstance.setLayers({"VK_LAYER_KHRONOS_validation"});
     qVkInstance.create();
-    auto pVkWindow = new VulkanWindow(&game, pRenderSystem, qVkInstance);
+    auto pVkWindow = new RWindow_Qt(&game, pRenderSystem, qVkInstance);
 	pRenderSystem->AddWindow("main", *pVkWindow);
 
 	EditorWindow w(pVkWindow, &game);
 	w.show();
 
-    // Continued in VulkanRenderer::initResources()
+    // Continued in RView_Qt::initResources()
     
     return a.exec();
 }

@@ -15,6 +15,7 @@ class RView
 	friend class RenderSystem;
 	friend class RWindow;
 	friend class RWindow_GLFW;
+	friend class RWindow_Qt;
 
 public:
 	RView(RenderSystem *pRenderSystem, RWindow *pRenderWindow, std::function<void()> frameReadyFunc);
@@ -32,10 +33,14 @@ public:
 	/* Write RenderSystem draw calls to command buffer. "Emits" frameReadyFunc() when done. */
 	void StartNextFrame();
 
+	void InitRenderPass();
+	void DestroyRenderPass();
 	void InitGraphicsPipeline();
+	void InitPostprocessPipeline();
 	void InitGraphicsCommandPool();
 	void InitDescriptorPool();
 	void InitDescriptorSetLayout();
+	void BindMaskDescriptorSet();
 	void InitDefaultTextureSampler();
 	void RecordCommandBuffer(VkCommandBuffer commandBuffer);
 
@@ -57,8 +62,13 @@ protected:
 	// Pipelines
 	VkDescriptorPool descriptorPool_PBR;
 	VkDescriptorSetLayout descriptorSetLayout_PBR;
-	VkPipelineLayout pipelineLayout;
-	VkPipeline graphicsPipeline;
+	VkDescriptorSetLayout descriptorSetLayout_postprocess;
+	std::vector<VkDescriptorSet> descriptorSet_postprocess;
+	VkRenderPass renderPass;
+	VkPipelineLayout pipelineLayout_graphics;
+	VkPipeline pipeline_graphics;
+	VkPipelineLayout pipelineLayout_postprocess;
+	VkPipeline pipeline_postprocess;
 
 private:
 	mat4 GetCameraMat();

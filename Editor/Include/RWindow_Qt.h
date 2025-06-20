@@ -6,16 +6,18 @@
 
 class Game;
 class RenderSystem;
-class VulkanRenderer;
+class RView_Qt;
 
-class VulkanWindow : public QVulkanWindow, public RWindow
+class RWindow_Qt : public QVulkanWindow, public RWindow
 {
+	friend class RView_Qt;
+
 public:
-	VulkanWindow(Game *pGame, RenderSystem *pRenderSystem, QVulkanInstance &instance);
+	RWindow_Qt(Game *pGame, RenderSystem *pRenderSystem, QVulkanInstance &instance);
 	void Init() override;
 	void RequestUpdate() override;
 	RView* GetRenderView() override;
-	
+
 	QVulkanWindowRenderer *createRenderer() override;
 
 	VkFormat GetColorFormat() const override;
@@ -24,7 +26,6 @@ public:
 	int GetCurrentFrame() const override;
 	VkFramebuffer GetCurrentFramebuffer() const override;
 	int GetCurrentSwapChainImageIndex() const override;
-	VkRenderPass GetDefaultRenderPass() const override;
 	VkFormat GetDepthStencilFormat() const override;
 	VkImage GetDepthStencilImage() const override;
 	VkImageView GetDepthStencilImageView() const override;
@@ -39,7 +40,5 @@ public:
 
 private:
 	QVulkanInstance &instance;
-	VulkanRenderer* pV;	// Render View
-	RenderSystem* pR;
 	Game* pG;
 };

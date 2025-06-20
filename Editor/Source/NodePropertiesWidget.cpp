@@ -11,7 +11,7 @@
 #include <QFormLayout>
 #include <QGroupBox>
 
-NodePropertiesWidget::NodePropertiesWidget(VulkanWindow* pVkWindow, QWidget* pParent)
+NodePropertiesWidget::NodePropertiesWidget(RWindow_Qt* pVkWindow, QWidget* pParent)
 	: QWidget(pParent), pUi(std::make_unique<Ui::NodePropertiesWidget>()), pVkWindow(pVkWindow)
 {
 	pUi->setupUi(this);

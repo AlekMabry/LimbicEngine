@@ -85,7 +85,7 @@ QVariant SceneTreeModel::data(const QModelIndex& index, int role) const
 	switch (role)
 	{
 		case Qt::DisplayRole:
-			return {"Unknown Entity"};
+			return QString::fromStdString(pNode->pEntity->name);
 
 		case Qt::DecorationRole:
 			if (dynamic_cast<EStaticWorldGeometry*>(pNode->pEntity))

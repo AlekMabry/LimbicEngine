@@ -1,7 +1,7 @@
 #pragma once
 
 #include <Entity/EEntity.h>
-#include <VulkanWindow.h>
+#include <RWindow_Qt.h>
 
 #include <QWidget>
 #include <QVBoxLayout>
@@ -11,7 +11,7 @@
 class NodePropertiesWidget : public QWidget
 {
 public:
-	NodePropertiesWidget(VulkanWindow* pVkWindow, QWidget* pParent);
+	NodePropertiesWidget(RWindow_Qt* pVkWindow, QWidget* pParent);
 	~NodePropertiesWidget();
 
 public slots:
@@ -22,7 +22,7 @@ signals:
 
 private:
 	std::unique_ptr<Ui::NodePropertiesWidget> pUi;
-	VulkanWindow* pVkWindow;
+	RWindow_Qt* pVkWindow;
 	QVBoxLayout* pEntityLayout;
 	QVBoxLayout* pTransformLayout;
 	QVBoxLayout* pModelLayout;
