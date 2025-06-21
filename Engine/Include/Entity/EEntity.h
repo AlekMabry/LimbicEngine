@@ -14,6 +14,8 @@ class WorldSystem;
 
 class EEntity
 {
+	friend class WorldSystem;
+
 public:
 	EEntity(Game& game);
 	~EEntity() = default;
@@ -35,9 +37,15 @@ public:
 
 	bool IsPendingKill() const;
 
+	uint32 GetID() const;
+
+	std::string& GetName();
+
 protected:
 	uint32 enabledEventFlags;
 	bool bPendingKill;
+	uint32 id;
+	std::string name;
 
 	Game* pGame;
 	ResourceSystem* pResource;

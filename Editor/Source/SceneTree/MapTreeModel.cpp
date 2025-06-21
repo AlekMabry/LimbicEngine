@@ -1,5 +1,5 @@
 
-#include <SceneTree/SceneTreeModel.h>
+#include <SceneTree/MapTreeModel.h>
 #include <Game.h>
 #include <Entity/EStaticWorldGeometry.h>
 
@@ -10,7 +10,7 @@ bool ENode::operator==(const ENode& rhs) const
 	return this == &rhs;
 }
 
-SceneTreeModel::SceneTreeModel(Game* pGame, QObject* pParent)
+MapTreeModel::MapTreeModel(Game* pGame, QObject* pParent)
 	: QAbstractItemModel(pParent), pWorld(pGame->GetWorldSystem())
 {
 	onWorldUpdated();
@@ -19,11 +19,11 @@ SceneTreeModel::SceneTreeModel(Game* pGame, QObject* pParent)
 	pWorld->eMapUpdated.append([this]() { onWorldUpdated(); });
 }
 
-SceneTreeModel::~SceneTreeModel()
+MapTreeModel::~MapTreeModel()
 {
 }
 
-QModelIndex SceneTreeModel::index(int row, int column, const QModelIndex& parent) const
+QModelIndex MapTreeModel::index(int row, int column, const QModelIndex& parent) const
 {
 	if (!hasIndex(row, column, parent))
 		return {};
@@ -44,7 +44,7 @@ QModelIndex SceneTreeModel::index(int row, int column, const QModelIndex& parent
 	return {};
 }
 
-QModelIndex SceneTreeModel::parent(const QModelIndex& child) const
+QModelIndex MapTreeModel::parent(const QModelIndex& child) const
 {
 	if (!child.isValid())
 		return {};
@@ -59,7 +59,7 @@ QModelIndex SceneTreeModel::parent(const QModelIndex& child) const
 	return createIndex(childIndex, 0, pParentNode);
 }
 
-int SceneTreeModel::rowCount(const QModelIndex& parent) const
+int MapTreeModel::rowCount(const QModelIndex& parent) const
 {
 	const ENode* parentNode;
 	if (!parent.isValid())
@@ -70,12 +70,12 @@ int SceneTreeModel::rowCount(const QModelIndex& parent) const
 	return parentNode->children.size();
 }
 
-int SceneTreeModel::columnCount(const QModelIndex& /*parent*/) const
+int MapTreeModel::columnCount(const QModelIndex& /*parent*/) const
 {
 	return 1;
 }
 
-QVariant SceneTreeModel::data(const QModelIndex& index, int role) const
+QVariant MapTreeModel::data(const QModelIndex& index, int role) const
 {
 	if (!index.isValid())
 		return {};
@@ -85,7 +85,13 @@ QVariant SceneTreeModel::data(const QModelIndex& index, int role) const
 	switch (role)
 	{
 		case Qt::DisplayRole:
-			return {"Unknown Entity"};
+			if (pNode->pEntity->GetName().empty())
+			{
+				QString entityNamePlaceholder = {"Entity "};
+				entityNamePlaceholder += QString::number(pNode->pEntity->GetID());
+				return entityNamePlaceholder;
+			}
+			return QString::fromStdString(pNode->pEntity->GetName());
 
 		case Qt::DecorationRole:
 			if (dynamic_cast<EStaticWorldGeometry*>(pNode->pEntity))
@@ -100,7 +106,7 @@ QVariant SceneTreeModel::data(const QModelIndex& index, int role) const
 	}
 }
 
-void SceneTreeModel::onWorldUpdated()
+void MapTreeModel::onWorldUpdated()
 {
 	root.children.clear();
 	for (const auto& entity : pWorld->GetEntities())

@@ -1,5 +1,5 @@
 #include <NodePropertiesWidget.h>
-#include <SceneTree/SceneTreeModel.h>
+#include <SceneTree/MapTreeModel.h>
 #include <Game.h>
 #include <Entity/EEntity.h>
 #include <LimbicTypes.h>
@@ -29,6 +29,11 @@ NodePropertiesWidget::NodePropertiesWidget(Game* pGame, QWidget* pParent)
 
 NodePropertiesWidget::~NodePropertiesWidget()
 {
+}
+
+QSize NodePropertiesWidget::minimumSizeHint() const
+{
+	return {200, 300};
 }
 
 void NodePropertiesWidget::onEntitySelected(EEntity* pEntity)

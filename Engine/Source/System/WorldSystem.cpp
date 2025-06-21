@@ -13,7 +13,7 @@
 #include <iostream>
 
 WorldSystem::WorldSystem(Game& game)
-	: pGame(&game)
+	: pGame(&game), idCounter(0)
 {
 	LREGISTER(EStaticWorldGeometry)
 	LREGISTER(ETestCamera)
@@ -73,10 +73,17 @@ void WorldSystem::LoadFromJSON(const char* filename)
 		// Get entity Type string and Properties JSON object
 		rapidjson::Value& entityJsonObject = entityJsonArray[static_cast<rapidjson::SizeType>(i)];
 		std::string entityTypeString = entityJsonObject["Type"].GetString();
+		std::string entityNameString;
+		if (entityJsonObject.HasMember("Name") && entityJsonObject["Name"].IsString())
+		{
+			entityNameString = entityJsonObject["Name"].GetString();
+		}
 		rapidjson::Value& entityPropertiesJsonArray = entityJsonObject["Properties"];
 
 		// Spawn entity using spawn function in the lookup table
 		EEntity* spawned = NewEntity[entityTypeString]();
+
+		spawned->GetName() = entityNameString;
 
 		// For each property the entity requests, find it in the JSON file and write to entity with property handles.
 		for (auto& infoPair : spawned->GetPropertyInfo())
@@ -112,4 +119,9 @@ void WorldSystem::LoadFromJSON(const char* filename)
 std::vector<EEntity*>& WorldSystem::GetEntities()
 {
 	return entities;
+}
+
+uint32 WorldSystem::GetUniqueID()
+{
+	return idCounter++;
 }

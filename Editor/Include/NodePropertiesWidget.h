@@ -11,6 +11,7 @@ class NodePropertiesWidget : public QWidget
 public:
 	NodePropertiesWidget(Game* pGame, QWidget* pParent);
 	~NodePropertiesWidget();
+	QSize minimumSizeHint() const override;
 
 public slots:
 	void onEntitySelected(EEntity* pEntity);

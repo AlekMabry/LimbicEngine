@@ -33,6 +33,7 @@ public:
 	TEntityClass* SpawnEntity()
 	{
 		TEntityClass* entity = new TEntityClass(*pGame);
+		static_cast<EEntity*>(entity)->id = GetUniqueID();
 		entities.push_back(static_cast<EEntity*>(entity));
 		return entity;
 	}
@@ -50,4 +51,8 @@ protected:
 	std::vector<EEntity*> entities;
 	std::unordered_map<std::string, std::function<EEntity*()>> NewEntity;
 	Game* pGame;
+
+private:
+	uint32 GetUniqueID();
+	uint32 idCounter;
 };

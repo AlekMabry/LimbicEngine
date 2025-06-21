@@ -4,7 +4,7 @@
 #include <Game.h>
 
 #include <NodePropertiesWidget.h>
-#include <SceneTree/SceneTreeModel.h>
+#include <SceneTree/MapTreeModel.h>
 #include <ViewWidget.h>
 
 EditorWindow::EditorWindow(Game* pGame, QWidget* parent) : QMainWindow(parent), pGame(pGame)
@@ -14,7 +14,7 @@ EditorWindow::EditorWindow(Game* pGame, QWidget* parent) : QMainWindow(parent), 
 	ui.setupUi(this);
 	showMaximized();
 
-	ui.mapTree->setModel(new SceneTreeModel(pGame, this));
+	ui.mapTree->setModel(new MapTreeModel(pGame, this));
 
 	pNodeProperties = new NodePropertiesWidget(pGame, this);
 	ui.nodePropertiesDockLayout->layout()->addWidget(pNodeProperties);

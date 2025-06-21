@@ -13,11 +13,11 @@ struct ENode
 	bool operator==(const ENode& rhs) const;
 };
 
-class SceneTreeModel : public QAbstractItemModel
+class MapTreeModel : public QAbstractItemModel
 {
 public:
-	SceneTreeModel(Game* pGame, QObject* pParent = nullptr);
-	~SceneTreeModel();
+	MapTreeModel(Game* pGame, QObject* pParent = nullptr);
+	~MapTreeModel();
 	QModelIndex index(int row, int column, const QModelIndex& parent) const override;
 	QModelIndex parent(const QModelIndex& child) const override;
 	int rowCount(const QModelIndex& parent) const override;

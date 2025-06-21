@@ -18,3 +18,13 @@ bool EEntity::IsPendingKill() const
 {
 	return bPendingKill;
 }
+
+uint32 EEntity::GetID() const
+{
+	return id;
+}
+
+std::string& EEntity::GetName()
+{
+	return name;
+}
