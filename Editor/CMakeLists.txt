@@ -13,21 +13,19 @@ set(sources
     Source/main.cpp
     Source/EditorWindow.cpp
     Source/SettingsDialog.cpp
-    Source/VulkanWindow.cpp
-    Source/VulkanRenderer.cpp
     Source/SceneTree/SceneTreeModel.cpp
     Source/SceneTree/SceneTreeView.cpp
     Source/NodePropertiesWidget.cpp
+    Source/ViewWidget.cpp
     )
 set(includes
     Include/EditorTypes.h
     Include/EditorWindow.h
     Include/SettingsDialog.h
-    Include/VulkanWindow.h
-    Include/VulkanRenderer.h
     Include/SceneTree/SceneTreeModel.h
     Include/SceneTree/SceneTreeView.h
     Include/NodePropertiesWidget.h
+    Include/ViewWidget.h
     )
 set(qt_files
     Qt/Editor.ui

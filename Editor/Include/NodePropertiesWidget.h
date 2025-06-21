@@ -1,8 +1,6 @@
 #pragma once
 
 #include <Entity/EEntity.h>
-#include <VulkanWindow.h>
-
 #include <QWidget>
 #include <QVBoxLayout>
 
@@ -11,7 +9,7 @@
 class NodePropertiesWidget : public QWidget
 {
 public:
-	NodePropertiesWidget(VulkanWindow* pVkWindow, QWidget* pParent);
+	NodePropertiesWidget(Game* pGame, QWidget* pParent);
 	~NodePropertiesWidget();
 
 public slots:
@@ -22,7 +20,7 @@ signals:
 
 private:
 	std::unique_ptr<Ui::NodePropertiesWidget> pUi;
-	VulkanWindow* pVkWindow;
+	Game* pGame;
 	QVBoxLayout* pEntityLayout;
 	QVBoxLayout* pTransformLayout;
 	QVBoxLayout* pModelLayout;

@@ -162,6 +162,7 @@ const VkDeviceSize MEMORY_BLOCK_SIZE = 8 * 1024 * 2048;
 class RenderSystem
 {
 	friend class RView;
+	friend class RWindow;
 	friend class RWindow_GLFW;
 
 public:

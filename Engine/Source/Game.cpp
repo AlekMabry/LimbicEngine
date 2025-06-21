@@ -51,10 +51,15 @@ void Game::Run()
 		pIo->OnTick(dt);
 		world->OnTick(dt);
 
-		render->OnDrawStart();
-		world->OnDraw();
-		render->OnDrawEnd();
+		Draw();
 	}
+}
+
+void Game::Draw()
+{
+	render->OnDrawStart();
+	world->OnDraw();
+	render->OnDrawEnd();
 }
 
 ResourceSystem* Game::GetResourceSystem() const

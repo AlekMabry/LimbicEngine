@@ -1,5 +1,6 @@
 #include <NodePropertiesWidget.h>
 #include <SceneTree/SceneTreeModel.h>
+#include <Game.h>
 #include <Entity/EEntity.h>
 #include <LimbicTypes.h>
 
@@ -11,8 +12,8 @@
 #include <QFormLayout>
 #include <QGroupBox>
 
-NodePropertiesWidget::NodePropertiesWidget(VulkanWindow* pVkWindow, QWidget* pParent)
-	: QWidget(pParent), pUi(std::make_unique<Ui::NodePropertiesWidget>()), pVkWindow(pVkWindow)
+NodePropertiesWidget::NodePropertiesWidget(Game* pGame, QWidget* pParent)
+	: QWidget(pParent), pUi(std::make_unique<Ui::NodePropertiesWidget>()), pGame(pGame)
 {
 	pUi->setupUi(this);
 
@@ -66,7 +67,7 @@ void NodePropertiesWidget::onEntitySelected(EEntity* pEntity)
 					[=](double d)
 					{
 						pVec->x = d;
-						pVkWindow->RequestUpdate();
+						pGame->Draw();
 					});
 				pLayout->insertRow(0, "X:", xBox);
 
@@ -76,7 +77,7 @@ void NodePropertiesWidget::onEntitySelected(EEntity* pEntity)
 					[=](double d)
 					{
 						pVec->y = d;
-						pVkWindow->RequestUpdate();
+						pGame->Draw();
 					});
 				pLayout->insertRow(0, "Y:", yBox);
 
@@ -86,7 +87,7 @@ void NodePropertiesWidget::onEntitySelected(EEntity* pEntity)
 					[=](double d)
 					{
 						pVec->z = d;
-						pVkWindow->RequestUpdate();
+						pGame->Draw();
 					});
 				pLayout->insertRow(0, "Z:", zBox);
 				pTransformLayout->addWidget(pGroupBox);

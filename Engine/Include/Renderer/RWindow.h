@@ -1,41 +1,123 @@
 #pragma once
 
+#include <LimbicTypes.h>
+
 #include <vulkan/vulkan.h>
+
+#include <array>
 #include <utility>
+#include <vector>
+#include <memory>
+
+#include <Windows.h>
 
 class RView;
+
+struct SSwapChainSupportDetails
+{
+	VkSurfaceCapabilitiesKHR capabilities{};
+	std::vector<VkSurfaceFormatKHR> formats;
+	std::vector<VkPresentModeKHR> presentModes;
+};
+
+struct SSubmissionResources
+{
+	/* Throttle if we get too far ahead of image presents. */
+	VkFence fence;
+
+	/* VkAcquireNextImageKHR wait. */
+	VkSemaphore imageAcquiredSemaphore;
+
+	VkCommandBuffer commandBuffer;
+};
+
+struct SSwapchainImageResources
+{
+	VkImage pbrColorImage;
+	VkImageView pbrColorImageView;
+	VkImage presentImage;
+	VkImageView presentImageView;
+	VkFramebuffer framebuffer;
+	VkSemaphore drawCompleteSemaphore;		/// Signaled by completed draw call
+};
+
+#define FRAME_LAG 3
 
 /** Virtual class for QVulkanWindow. */
 class RWindow
 {
+	friend class RenderSystem;
+	friend class RView;
+
 public:
-	/* Render system must be initialized first. */
-	virtual void Init() = 0;
+	RWindow(RenderSystem* pRenderSystem, uint32 width, uint32 height, HWND window, HINSTANCE process);
 
-	/* Triggers RView render. */
-	virtual void RequestUpdate() = 0;
+	~RWindow();
 
-	/* Null until initialized. */
-	virtual RView *GetRenderView() = 0;
+	void Init();
 
-	/**** QVulkanWindow interface. ****/
+	RView *GetRenderView();
 
-	virtual VkFormat GetColorFormat() const = 0;
-	virtual int GetConcurrentFrameCount() const = 0;
-	virtual VkCommandBuffer GetCurrentCommandBuffer() const = 0;
-	virtual int GetCurrentFrame() const = 0;
-	virtual VkFramebuffer GetCurrentFramebuffer() const = 0;
-	virtual int GetCurrentSwapChainImageIndex() const = 0;
-	virtual VkRenderPass GetDefaultRenderPass() const = 0;
-	virtual VkFormat GetDepthStencilFormat() const = 0;
-	virtual VkImage GetDepthStencilImage() const = 0;
-	virtual VkImageView GetDepthStencilImageView() const = 0;
-	virtual VkCommandPool GetGraphicsCommandPool() const = 0;
-	virtual VkQueue GetGraphicsQueue() const = 0;
-	virtual VkImage GetSwapChainImage(int idx) const = 0;
-	virtual int GetSwapChainImageCount() const = 0;
-	virtual std::pair<int, int> GetSwapChainImageSize() const = 0;
-	virtual VkImageView GetSwapChainImageView(int idx) const = 0;
-	virtual VkExtent2D GetSwapChainExtent() const = 0;
-	virtual VkSurfaceKHR GetSurface() const = 0;
+	void CreateSurface();
+
+	void DrawFrame();
+
+	HWND GetHandle();
+
+protected:
+	/**** Initialize/destroy class members. ****/
+
+	void CreateCommandBuffers();
+
+	void CreateSwapchain();
+
+	void CreateDepthbuffer();
+
+	void CreateFramebuffers();
+
+	void DestroySwapchain();
+
+	void CreateSyncObjects();
+
+	void DestroySyncObjects();
+
+	void RecreateSwapchain();
+
+	void CreateRenderPass();
+
+	/**** Option picking utilities. ****/
+
+	VkSurfaceFormatKHR PickSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);
+	VkPresentModeKHR PickSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes);
+	VkExtent2D PickSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities);
+
+	/**** Option finding utitilies. ****/
+
+	SSwapChainSupportDetails QuerySwapChainSupport(VkPhysicalDevice device);
+
+	VkSurfaceKHR surface;
+	VkRenderPass renderPass;
+
+	VkSwapchainKHR swapchain;
+	VkFormat swapchainImageFormat;
+	VkExtent2D swapchainExtent;
+	std::vector<SSwapchainImageResources> swapchainResources;
+	bool bFirstSwapchainFrame = false;
+
+	VkImage depthImage;
+	VkFormat depthImageFormat;
+	VkImageView depthImageView;
+	VkDeviceMemory depthImageMemory;
+
+	std::array<SSubmissionResources, FRAME_LAG> submissionResources;
+	uint32 currentSubmissionIndex = 0;
+
+	RenderSystem* pR;
+	std::unique_ptr<RView> pV;
+
+	HWND win32Window;
+	HINSTANCE win32Process;
+
+	uint32 width;
+	uint32 height;
 };

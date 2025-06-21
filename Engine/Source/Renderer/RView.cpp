@@ -25,18 +25,10 @@ void RView::SetProjection(float zNear, float zFar, float fovY)
 	cameraFar = zFar;
 	cameraFov = fovY;
 	cameraOrthographic = (fovY == 0.0f);
-	const auto &imgSize = pW->GetSwapChainImageSize();
-	const auto aspect = static_cast<float>(imgSize.first) / static_cast<float>(imgSize.second);
+	const auto &imgSize = pW->swapchainExtent;
+	const auto aspect = static_cast<float>(imgSize.width) / static_cast<float>(imgSize.height);
 	cameraProj = glm::perspective(glm::radians(fovY), aspect, zNear, zFar);
 	cameraProj[1][1] *= -1;
-}
-
-void RView::StartNextFrame()
-{
-	vkResetCommandBuffer(pW->GetCurrentCommandBuffer(), 0);
-	RecordCommandBuffer(pW->GetCurrentCommandBuffer());
-
-	frameReadyFunc();
 }
 
 void RView::InitGraphicsPipeline()
@@ -116,14 +108,14 @@ void RView::InitGraphicsPipeline()
 	VkViewport viewport{};
 	viewport.x = 0.0f;
 	viewport.y = 0.0f;
-	viewport.width = (float) pW->GetSwapChainExtent().width;
-	viewport.height = (float) pW->GetSwapChainExtent().height;
+	viewport.width = static_cast<float>(pW->swapchainExtent.width);
+	viewport.height = static_cast<float>(pW->swapchainExtent.height);
 	viewport.minDepth = 0.0f;
 	viewport.maxDepth = 1.0f;
 
 	VkRect2D scissor{};
 	scissor.offset = {0, 0};
-	scissor.extent = pW->GetSwapChainExtent();
+	scissor.extent = pW->swapchainExtent;
 
 	std::vector<VkDynamicState> dynamicStates = {VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR};
 	VkPipelineDynamicStateCreateInfo dynamicStateCreateInfo{};
@@ -219,7 +211,7 @@ void RView::InitGraphicsPipeline()
 	pipelineInfo.pColorBlendState = &colorBlending;
 	pipelineInfo.pDynamicState = &dynamicStateCreateInfo;
 	pipelineInfo.layout = pipelineLayout;
-	pipelineInfo.renderPass = pW->GetDefaultRenderPass();
+	pipelineInfo.renderPass = pW->renderPass;
 	pipelineInfo.subpass = 0;
 	pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
 	pipelineInfo.basePipelineIndex = -1;	// Used to derive new pipeline from existing
@@ -324,26 +316,18 @@ void RView::InitDefaultTextureSampler()
 	VK_CHECK(vkCreateSampler(pR->device, &samplerInfo, nullptr, &textureSampler));
 }
 
-void RView::RecordCommandBuffer(VkCommandBuffer commandBuffer)
+void RView::RecordCommandBuffer(VkCommandBuffer commandBuffer, VkFramebuffer framebuffer, VkExtent2D extent)
 {
-	VkCommandBufferBeginInfo beginInfo{};
-	beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-	beginInfo.flags = 0;
-	beginInfo.pInheritanceInfo = nullptr;
-
-	VK_CHECK(vkBeginCommandBuffer(commandBuffer, &beginInfo));
-
 	std::array<VkClearValue, 2> clearValues{};
 	clearValues[0].color = {{0.0f, 0.0f, 0.0f, 1.0f}};
 	clearValues[1].depthStencil = {1.0f, 0};
 
 	VkRenderPassBeginInfo renderPassInfo{};
 	renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-	renderPassInfo.renderPass = pW->GetDefaultRenderPass();
-	renderPassInfo.framebuffer = pW->GetCurrentFramebuffer();
+	renderPassInfo.renderPass = pW->renderPass;
+	renderPassInfo.framebuffer = framebuffer;
 	renderPassInfo.renderArea.offset = {0, 0};
-	renderPassInfo.renderArea.extent = pW->GetSwapChainExtent();
-	VkClearValue clearColor = {{{0.0f, 0.0f, 0.0f, 1.0f}}};
+	renderPassInfo.renderArea.extent = extent;
 	renderPassInfo.clearValueCount = static_cast<uint32>(clearValues.size());
 	renderPassInfo.pClearValues = clearValues.data();
 
@@ -383,11 +367,6 @@ void RView::RecordCommandBuffer(VkCommandBuffer commandBuffer)
 	}
 
 	vkCmdEndRenderPass(commandBuffer);
-
-	if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS)
-	{
-		throw std::runtime_error("[ERROR] Failed to record command buffer!");
-	}
 }
 
 mat4 RView::GetCameraMat()

@@ -3,30 +3,40 @@
 #include "EditorWindow.h"
 #include "Game.h"
 #include "System/RenderSystem.h"
-#include "Renderer/RWindow.h"
-#include "Renderer/RView.h"
-#include "VulkanRenderer.h"
-#include "VulkanWindow.h"
+#include "Renderer/RWindow_GLFW.h"
+#include "System/IOSystem_GLFW.h"
 
 int main(int argc, char *argv[])
 {
 	Game game("Limbic Engine Editor");
-    auto pRenderSystem = game.GetRenderSystem();
-	auto vkInstance = pRenderSystem->InitInstance("Limbic Engine Editor");
+	auto pRender = game.GetRenderSystem();
+	pRender->InitInstance("Limbic Engine Editor");
 
     QApplication a(argc, argv);
     QCoreApplication::setOrganizationName("Alek Mabry");
     QCoreApplication::setOrganizationDomain("alekstutorials.com");
     QCoreApplication::setApplicationName("Limbic Editor");
 
-    QVulkanInstance qVkInstance;
-	qVkInstance.setVkInstance(vkInstance);
-	qVkInstance.setLayers({"VK_LAYER_KHRONOS_validation"});
-    qVkInstance.create();
-    auto pVkWindow = new VulkanWindow(&game, pRenderSystem, qVkInstance);
-	pRenderSystem->AddWindow("main", *pVkWindow);
+    // Create window
+	IOSystem_GLFW io(game.GetApplicationName().c_str(), 640, 480);
+	game.SetIO(io);
+	RWindow_GLFW mainVkWindow(game.GetRenderSystem(), 640, 480, io.GetWindow(), io.GetProcess());
+	mainVkWindow.CreateSurface();
+	pRender->AddWindow("main", mainVkWindow);
 
-	EditorWindow w(pVkWindow, &game);
+	// Initialize Vulkan (configure device, graphics/presentation queue)
+	pRender->InitGLFW();
+
+	// Initialize RenderSystem (asset management)
+	pRender->Init();
+
+	// Initialize RWindow (swapchain, frame/depth buffers, command queues)
+	mainVkWindow.Init();
+
+	game.OnInit();
+	
+	EditorWindow w(&game);
+	w.AttachGameWindow(&mainVkWindow);
 	w.show();
 
     // Continued in VulkanRenderer::initResources()

@@ -20,6 +20,8 @@ public:
 
 	void Run();
 
+	void Draw();
+
 	ResourceSystem* GetResourceSystem() const;
 
 	RenderSystem* GetRenderSystem();

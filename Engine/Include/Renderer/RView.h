@@ -29,15 +29,12 @@ public:
 	/** Configures camera projection matrix, fovY is in degrees, fovY = 0.0f sets orthographic. */
 	void SetProjection(float zNear, float zFar, float fovY);
 
-	/* Write RenderSystem draw calls to command buffer. "Emits" frameReadyFunc() when done. */
-	void StartNextFrame();
-
 	void InitGraphicsPipeline();
 	void InitGraphicsCommandPool();
 	void InitDescriptorPool();
 	void InitDescriptorSetLayout();
 	void InitDefaultTextureSampler();
-	void RecordCommandBuffer(VkCommandBuffer commandBuffer);
+	void RecordCommandBuffer(VkCommandBuffer commandBuffer, VkFramebuffer framebuffer, VkExtent2D extent);
 
 protected:
 	RenderSystem *pR;

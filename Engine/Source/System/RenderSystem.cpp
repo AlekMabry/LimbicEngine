@@ -73,7 +73,7 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL DebugCallback(VkDebugUtilsMessageSeverityF
 RenderSystem::~RenderSystem()
 {
 	/*
-	DestroySwapChain();
+	DestroySwapchain();
 
 	vkDestroySampler(device, textureSampler, nullptr);
 	vkDestroyDescriptorPool(device, descriptorPool_PBR, nullptr);
@@ -417,7 +417,7 @@ void RenderSystem::OnDrawEnd()
 {
 	for (auto& window : windows)
 	{
-		window.second->RequestUpdate();
+		window.second->DrawFrame();
 	}
 }
 
@@ -531,7 +531,7 @@ bool RenderSystem::IsDeviceSuitable(VkPhysicalDevice device, const std::vector<c
 	bool bSwapChainAcceptable = false;
 	if (bExtensionsSupported)
 	{
-		SSwapChainSupportDetails swapChainSupport = dynamic_cast<RWindow_GLFW*>(pW)->QuerySwapChainSupport(device);
+		SSwapChainSupportDetails swapChainSupport = pW->QuerySwapChainSupport(device);
 		bSwapChainAcceptable = !swapChainSupport.formats.empty() && !swapChainSupport.presentModes.empty();
 	}
 
@@ -557,7 +557,7 @@ SQueueFamilyIndices RenderSystem::FindQueueFamilies(VkPhysicalDevice device)
 	{
 		throw std::runtime_error("[ERROR] Vulkan attempted to find queue families before a surface was initialized.");
 	}
-	auto surface = windows.begin()->second->GetSurface();
+	auto surface = windows.begin()->second->surface;
 
 	int i = 0;
 	for (const auto& queueFamily : queueFamilies)
