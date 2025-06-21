@@ -1,10 +1,57 @@
-#include <System/RenderSystem.h>
-#include <Renderer/RWindow.h>
+#include <Game.h>
 #include <Renderer/RView.h>
+#include <Renderer/RWindow.h>
+#include <System/RenderSystem.h>
 
-RWindow::RWindow(RenderSystem* pRenderSystem, uint32 width, uint32 height, HWND window, HINSTANCE process)
-	: pR(pRenderSystem), width(width), height(height), win32Window(window), win32Process(process)
+#include <GLFW/glfw3.h>
+#define GLFW_EXPOSE_NATIVE_WIN32
+#include <GLFW/glfw3native.h>
+
+void GLFWMouseFunc(GLFWwindow* window, int button, int action, int mods)
 {
+	if (!window)
+	{
+		return;
+	}
+
+	if (auto pLWindow = static_cast<RWindow*>(glfwGetWindowUserPointer(window)))
+	{
+		pLWindow->mouseButtonEvent(pLWindow, button, action, mods);
+	}
+}
+
+void GLFWMousePosFunc(GLFWwindow* window, double xPos, double yPos)
+{
+	if (!window)
+	{
+		return;
+	}
+
+	if (auto pLWindow = static_cast<RWindow*>(glfwGetWindowUserPointer(window)))
+	{
+		pLWindow->mousePosEvent(pLWindow, xPos, yPos);
+	}
+}
+
+RWindow::RWindow(Game* pGame, const std::string& name, uint32 width, uint32 height)
+	: pGame(pGame)
+	, name(name)
+	, pR(pGame->GetRenderSystem())
+	, width(width)
+	, height(height)
+{
+	glfwInit();
+	glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+	glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
+	window = glfwCreateWindow(width, height, name.c_str(), nullptr, nullptr);
+	glfwSetWindowUserPointer(window, this);
+	win32Window = glfwGetWin32Window(window);
+	win32Process = GetModuleHandle(nullptr);
+
+	glfwSetMouseButtonCallback(window, &GLFWMouseFunc);
+	glfwSetCursorPosCallback(window, &GLFWMousePosFunc);
+
+	CreateSurface();
 }
 
 RWindow::~RWindow()
@@ -13,8 +60,7 @@ RWindow::~RWindow()
 
 void RWindow::Init()
 {
-	pV = std::make_unique<RView>(pR, this, [this]() { RWindow::DrawFrame(); });
-	CreateSurface();
+	pV = std::make_unique<RView>(pR, this);
 	CreateSwapchain();
 	CreateRenderPass();
 	pV->InitDescriptorPool();
@@ -123,7 +169,8 @@ void RWindow::CreateSwapchain()
 	for (uint32 i = 0; i < imageCount; i++)
 	{
 		swapchainResources[i].presentImage = swapchainImages[i];
-		swapchainResources[i].presentImageView = pR->CreateImageView(swapchainResources[i].presentImage, swapchainImageFormat, VK_IMAGE_ASPECT_COLOR_BIT);
+		swapchainResources[i].presentImageView =
+			pR->CreateImageView(swapchainResources[i].presentImage, swapchainImageFormat, VK_IMAGE_ASPECT_COLOR_BIT);
 		VK_CHECK(vkCreateSemaphore(pR->device, &semaphoreCreateInfo, nullptr, &swapchainResources[i].drawCompleteSemaphore));
 	}
 }
@@ -173,14 +220,9 @@ void RWindow::DestroySwapchain()
 void RWindow::CreateSyncObjects()
 {
 	// Submission sync objects
-	VkSemaphoreCreateInfo semaphoreCreateInfo = {
-		.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO
-	};
+	VkSemaphoreCreateInfo semaphoreCreateInfo = {.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO};
 
-	VkFenceCreateInfo fenceCreateInfo = {
-		.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO,
-		.flags = VK_FENCE_CREATE_SIGNALED_BIT
-	};
+	VkFenceCreateInfo fenceCreateInfo = {.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO, .flags = VK_FENCE_CREATE_SIGNALED_BIT};
 
 	for (auto& submissionResource : submissionResources)
 	{
@@ -265,8 +307,8 @@ void RWindow::DrawFrame()
 	VkResult result;
 	do
 	{
-		result = vkAcquireNextImageKHR(pR->device, swapchain, UINT64_MAX, currentSubmission.imageAcquiredSemaphore,
-			VK_NULL_HANDLE, &currentSwapchainImageIndex);
+		result = vkAcquireNextImageKHR(pR->device, swapchain, UINT64_MAX, currentSubmission.imageAcquiredSemaphore, VK_NULL_HANDLE,
+			&currentSwapchainImageIndex);
 
 		if (result == VK_ERROR_OUT_OF_DATE_KHR)
 		{
@@ -371,6 +413,28 @@ void RWindow::DrawFrame()
 HWND RWindow::GetHandle()
 {
 	return win32Window;
+}
+
+void RWindow::AddMouseButtonCallback(std::function<void(RWindow*, int, int, int)> callback)
+{
+	mouseButtonEvent.append(callback);
+}
+
+void RWindow::AddMousePosCallback(std::function<void(RWindow*, double, double)> callback)
+{
+	mousePosEvent.append(callback);
+}
+
+void RWindow::SetMousePos(double x, double y)
+{
+	glfwSetCursorPos(window, x, y);
+}
+
+std::pair<int, int> RWindow::GetWindowSize()
+{
+	int x, y;
+	glfwGetWindowSize(window, &x, &y);
+	return {x, y};
 }
 
 VkSurfaceFormatKHR RWindow::PickSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats)

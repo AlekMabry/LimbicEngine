@@ -30,7 +30,6 @@ set(utility_sources
 set(renderer_sources
     Source/Renderer/RView.cpp
     Source/Renderer/RWindow.cpp
-    Source/Renderer/RWindow_GLFW.cpp
     )
 set(includes
     Include/Game.h
@@ -38,10 +37,6 @@ set(includes
     Include/LimbicTypes.h
     )
 set(system_includes
-    Include/System/IOSystem.h
-    Include/System/IOSystem_GLFW.h
-    Include/System/IOSystem_GLFWBinds.h
-    Include/System/IOSystem_InputBinds.h
     Include/System/RenderSystem.h
     Include/System/ResourceSystem.h
     Include/System/WorldSystem.h
@@ -58,7 +53,6 @@ set(utility_includes
 set(renderer_includes
     Include/Renderer/RView.h
     Include/Renderer/RWindow.h
-    Include/Renderer/RWindow_GLFW.h
     )
 set(shaders
     Shader/hardcodedTriangle.vert

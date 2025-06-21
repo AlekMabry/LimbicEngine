@@ -9,7 +9,6 @@
 
 class Game;
 class ResourceSystem;
-class IOSystem;
 class RenderSystem;
 class WorldSystem;
 
@@ -41,7 +40,6 @@ protected:
 	bool bPendingKill;
 
 	Game* pGame;
-	IOSystem* pIO;
 	ResourceSystem* pResource;
 	RenderSystem* pRender;
 	WorldSystem* pWorld;

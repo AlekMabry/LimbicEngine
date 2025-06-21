@@ -17,7 +17,6 @@ class EditorWindow : public QMainWindow
 public:
     EditorWindow(Game* pGame, QWidget *parent = nullptr);
     ~EditorWindow();
-	void AttachGameWindow(RWindow_GLFW* pWindow);
 
 public slots:
     void showSettingsDialog();

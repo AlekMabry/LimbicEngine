@@ -14,10 +14,9 @@ class RView
 {
 	friend class RenderSystem;
 	friend class RWindow;
-	friend class RWindow_GLFW;
 
 public:
-	RView(RenderSystem *pRenderSystem, RWindow *pRenderWindow, std::function<void()> frameReadyFunc);
+	RView(RenderSystem *pRenderSystem, RWindow *pRenderWindow);
 
 	~RView();
 
@@ -46,8 +45,6 @@ protected:
 	float cameraNear;
 	float cameraFar;
 	mat4 cameraProj;
-
-	std::function<void()> frameReadyFunc;	// Called when commands are done queueing.
 
 	VkSampler textureSampler;
 

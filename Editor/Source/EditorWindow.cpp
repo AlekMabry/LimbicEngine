@@ -3,7 +3,6 @@
 #include <QWindow>
 #include <Game.h>
 
-#include <Renderer/RWindow_GLFW.h>
 #include <NodePropertiesWidget.h>
 #include <SceneTree/SceneTreeModel.h>
 #include <ViewWidget.h>
@@ -26,17 +25,16 @@ EditorWindow::EditorWindow(Game* pGame, QWidget* parent) : QMainWindow(parent), 
 	});
 
 	connect(ui.actionSettings, SIGNAL(triggered()), this, SLOT(showSettingsDialog()));
+
+	auto pViewWidget = new ViewWidget(pGame, "perspective", this);
+	setCentralWidget(pViewWidget);
+	pViewWidget->show();
+
+	pGame->LoadMap("");
 }
 
 EditorWindow::~EditorWindow()
 {
-}
-
-void EditorWindow::AttachGameWindow(RWindow_GLFW* pWindow)
-{
-	auto pViewWidget = new ViewWidget(pGame, pWindow, this);
-	setCentralWidget(pViewWidget);
-	pViewWidget->show();
 }
 
 void EditorWindow::showSettingsDialog()

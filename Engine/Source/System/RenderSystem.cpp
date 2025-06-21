@@ -1,8 +1,8 @@
-#include "Renderer/RWindow_GLFW.h"
 #include "Renderer/RView.h"
 
 #include <System/RenderSystem.h>
 #include <Renderer/RWindow.h>
+#include <Game.h>
 
 /**** Static debug callback configuration. ****/
 
@@ -70,6 +70,14 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL DebugCallback(VkDebugUtilsMessageSeverityF
 
 /**** Public interface. ****/
 
+RenderSystem::RenderSystem(Game* pGame) :
+	pGame(pGame),
+	bInstanceInitialized(false),
+	bSystemInitialized(false),
+	commandPool(nullptr)
+{
+}
+
 RenderSystem::~RenderSystem()
 {
 	/*
@@ -104,9 +112,9 @@ RenderSystem::~RenderSystem()
 	*/
 }
 
-VkInstance RenderSystem::InitInstance(const char* applicationName)
+void RenderSystem::InitInstance(const char* applicationName)
 {
-	this->applicationName = applicationName;
+	this->applicationName = std::string(applicationName);
 	win32Console = GetStdHandle(STD_OUTPUT_HANDLE);
 
 	VkApplicationInfo appInfo{};
@@ -121,7 +129,7 @@ VkInstance RenderSystem::InitInstance(const char* applicationName)
 	createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
 	createInfo.pApplicationInfo = &appInfo;
 
-	std::vector<const char*> extensions = {VK_KHR_SURFACE_EXTENSION_NAME, VK_KHR_WIN32_SURFACE_EXTENSION_NAME};
+	std::vector extensions = {VK_KHR_SURFACE_EXTENSION_NAME, VK_KHR_WIN32_SURFACE_EXTENSION_NAME};
 
 	if (bEnableValidationLayers)
 		extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
@@ -154,36 +162,27 @@ VkInstance RenderSystem::InitInstance(const char* applicationName)
 		throw std::runtime_error("[ERROR] Failed to create Vulkan instance!");
 	}
 
-	return nullptr;
+	bInstanceInitialized = true;
 }
 
-VkInstance RenderSystem::InitGLFW()
+bool RenderSystem::IsInstanceInitialized() const
 {
-	std::vector<const char*> deviceExtensions = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
+	return bInstanceInitialized;
+}
+
+void RenderSystem::InitSystem()
+{
+	const std::vector deviceExtensions = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
 	PickPhysicalDevice(deviceExtensions);
 	InitDevice(deviceExtensions);
 	PickDeviceMemoryBlockTypes();
-	return instance;
-}
-
-void RenderSystem::InitQt(VkDevice device, VkPhysicalDevice physicalDevice, VkQueue graphicsQueue, VkQueue presentQueue, VkCommandPool commandPool)
-{
-	this->device = device;
-	this->physicalDevice = physicalDevice;
-	this->graphicsQueue = graphicsQueue;
-	this->presentQueue = presentQueue;
-	this->commandPool = commandPool;
-}
-
-void RenderSystem::Init()
-{
-	PickDeviceMemoryBlockTypes();
 	InitDeviceMemoryManager();
+	bSystemInitialized = true;
 }
 
-void RenderSystem::AddWindow(const std::string& name, RWindow& window)
+bool RenderSystem::IsSystemInitialized() const
 {
-	windows.insert({name, &window});
+	return bSystemInitialized;
 }
 
 void RenderSystem::CreateStaticMesh(
@@ -246,6 +245,7 @@ void RenderSystem::CreateTexture(uint32 width, uint32 height, ETextureFormat for
 
 void RenderSystem::CreateMaterial(RTexture baseColor, RTexture normal, RTexture properties, RMaterial& material)
 {
+	auto& windows = pGame->GetWins();
 	if (windows.empty())
 	{
 		throw std::runtime_error("[ERROR] Attempted to create material before window was created.");
@@ -413,28 +413,10 @@ void RenderSystem::OnDrawStart()
 	drawStaticCommands.clear();
 }
 
-void RenderSystem::OnDrawEnd()
-{
-	for (auto& window : windows)
-	{
-		window.second->DrawFrame();
-	}
-}
-
 void RenderSystem::DrawStaticMesh(RStaticMesh meshId, RMaterial materialId, mat4 modelTransform)
 {
 	SDrawStaticPBR drawCommand = {meshId, materialId, modelTransform};
 	drawStaticCommands.push_back(drawCommand);
-}
-
-std::pair<RWindow*, RView*> RenderSystem::GetWindowView(const std::string& window)
-{
-	if (windows.contains(window))
-	{
-		auto pW = windows[window];
-		return {pW, pW->GetRenderView()};
-	}
-	return {};
 }
 
 /**** Support checking utilities. ****/
@@ -522,11 +504,12 @@ bool RenderSystem::IsDeviceSuitable(VkPhysicalDevice device, const std::vector<c
 
 	bool bExtensionsSupported = CheckDeviceExtensionSupport(device, extensions);
 
+	auto& windows = pGame->GetWins();
 	if (windows.empty())
 	{
 		throw std::runtime_error("[ERROR] Vulkan attempted to query swap chain support before a window was created.");
 	}
-	auto pW = windows.begin()->second;
+	auto pW = windows.begin()->second.get();
 
 	bool bSwapChainAcceptable = false;
 	if (bExtensionsSupported)
@@ -553,6 +536,7 @@ SQueueFamilyIndices RenderSystem::FindQueueFamilies(VkPhysicalDevice device)
 	std::vector<VkQueueFamilyProperties> queueFamilies(queueFamilyCount);
 	vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, queueFamilies.data());
 
+	auto& windows = pGame->GetWins();
 	if (windows.empty())
 	{
 		throw std::runtime_error("[ERROR] Vulkan attempted to find queue families before a surface was initialized.");

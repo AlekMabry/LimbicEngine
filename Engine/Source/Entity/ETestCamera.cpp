@@ -1,9 +1,12 @@
 #include "Entity/ETestCamera.h"
 #include "System/RenderSystem.h"
 #include "Renderer/RView.h"
+#include <Game.h>
 
 #define GLM_DEPTH_ZERO_TO_ONE
 #define GLM_FORCE_RADIANS
+#include "Renderer/RWindow.h"
+
 #include <glm/gtc/matrix_transform.hpp>
 
 ETestCamera::ETestCamera(Game& game)
@@ -29,9 +32,15 @@ void ETestCamera::OnDraw()
 {
 	vec3 position = vec3(3.0f * cos(angle), 3.0f * sin(angle), 1.8f);
 	mat4 view = glm::lookAt(position, vec3(0.0f, 0.0f, 1.0f), vec3(0.0f, 0.0f, 1.0f));
-	auto windowView = pRender->GetWindowView("main");
-	windowView.second->SetViewTransform(view);
-	windowView.second->SetProjection(0.1f, 128.0f, 120.0f);
+	auto pWindow = pGame->GetWin("main");
+	if (pWindow)
+	{
+		if (auto pView = pWindow->GetRenderView())
+		{
+			pView->SetViewTransform(view);
+			pView->SetProjection(0.1f, 128.0f, 120.0f);
+		}
+	}
 }
 
 std::map<std::string, SPropertyInfo> ETestCamera::GetPropertyInfo()

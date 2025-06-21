@@ -159,30 +159,29 @@ struct SMemoryBlock
 
 const VkDeviceSize MEMORY_BLOCK_SIZE = 8 * 1024 * 2048;
 
+class Game;
+
 class RenderSystem
 {
 	friend class RView;
 	friend class RWindow;
-	friend class RWindow_GLFW;
 
 public:
+	RenderSystem(Game* pGame);
+
 	~RenderSystem();
 
 	/* Initializes vk instance, next step is to add a window. */
-	VkInstance InitInstance(const char* applicationName);
+	void InitInstance(const char* applicationName);
 
-	/* After window creation, configures device and queues. */
-	VkInstance InitGLFW();
+	/* See InitInstance() */
+	bool IsInstanceInitialized() const;
 
-	/* Configure from Qt. */
-	void InitQt(VkDevice device, VkPhysicalDevice physicalDevice, VkQueue graphicsQueue,
-		VkQueue presentQueue, VkCommandPool commandPool);
+	/* Initialize system after window creation. */
+	void InitSystem();
 
-	/* After InitGLFW or QtVulkanWindow created. */
-	void Init();
-
-	/* Each window/view pair manages a surface and it's draw settings. */
-	void AddWindow(const std::string& name, RWindow &window);
+	/* See InitSystem() */
+	bool IsSystemInitialized() const;
 
 	/* Creates static mesh, provides staging buffer to write vertices and indices to. */
 	void CreateStaticMesh(uint32 vertices, uint32 indices, uint32& meshHandle, SStaticVertex*& vertexBuffer, uint32*& indexBuffer);
@@ -199,14 +198,8 @@ public:
 	/* Executed at start of frame before entity draw events are called. */
 	void OnDrawStart();
 
-	/* Executed after entity draw events are called, draws frame. */
-	void OnDrawEnd();
-
 	/* Draw static mesh. */
 	void DrawStaticMesh(RStaticMesh meshId, RMaterial materialId, mat4 modelTransform);
-
-	/* Get window and view. */
-	std::pair<RWindow*, RView*> GetWindowView(const std::string& window);
 
 private:
 	/**** Support checking utilities. ****/
@@ -284,7 +277,10 @@ private:
 
 	void ConfigureDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& info);
 
-	
+	Game* pGame;
+	bool bInstanceInitialized;
+	bool bSystemInitialized;
+
 	std::string applicationName;
 	HANDLE win32Console;
 
@@ -323,6 +319,4 @@ private:
 	std::vector<SMemoryBlock> deviceMemory;	 /* GPU memory blocks. */
 	std::vector<SMemoryBlock> uniformMemory; /* Local-visible GPU memory for changing values. */
 	std::vector<SMemoryBlock> stagingMemory; /* Local memory-mapped staging blocks. */
-
-	std::map<std::string, RWindow*> windows;
 };

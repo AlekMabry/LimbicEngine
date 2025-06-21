@@ -3,6 +3,7 @@
 #include <LimbicTypes.h>
 
 #include <vulkan/vulkan.h>
+#include <eventpp/callbacklist.h>
 
 #include <array>
 #include <utility>
@@ -12,6 +13,8 @@
 #include <Windows.h>
 
 class RView;
+class GLFWwindow;
+class Game;
 
 struct SSwapChainSupportDetails
 {
@@ -50,7 +53,7 @@ class RWindow
 	friend class RView;
 
 public:
-	RWindow(RenderSystem* pRenderSystem, uint32 width, uint32 height, HWND window, HINSTANCE process);
+	RWindow(Game* pGame, const std::string& name, uint32 width, uint32 height);
 
 	~RWindow();
 
@@ -63,6 +66,24 @@ public:
 	void DrawFrame();
 
 	HWND GetHandle();
+
+	/**** I/O ****/
+
+	/*
+	 * @brief Creates a mouse callback.
+	 * @param callback glfwMouseButtonCallback(RWindow* window, int button, int action, int mods)
+	 */
+	void AddMouseButtonCallback(std::function<void(RWindow*, int, int, int)> callback);
+
+	/*
+	 * @brief Creates a mouse movement callback/
+	 * @param callback glfwMouseMovementCallback(RWindow* window, double xPos, double yPos);
+	 */
+	void AddMousePosCallback(std::function<void(RWindow*, double, double)> callback);
+
+	void SetMousePos(double x, double y);
+
+	std::pair<int, int> GetWindowSize();
 
 protected:
 	/**** Initialize/destroy class members. ****/
@@ -113,11 +134,20 @@ protected:
 	uint32 currentSubmissionIndex = 0;
 
 	RenderSystem* pR;
+	Game* pGame;
 	std::unique_ptr<RView> pV;
 
 	HWND win32Window;
 	HINSTANCE win32Process;
+	const std::string name;
 
 	uint32 width;
 	uint32 height;
+	GLFWwindow* window;
+
+	eventpp::CallbackList<void(RWindow*, int, int, int)> mouseButtonEvent;
+	eventpp::CallbackList<void(RWindow*, double, double)> mousePosEvent;
+
+	friend void GLFWMouseFunc(GLFWwindow* window, int button, int action, int mods);
+	friend void GLFWMousePosFunc(GLFWwindow* window, double xPos, double yPos);
 };

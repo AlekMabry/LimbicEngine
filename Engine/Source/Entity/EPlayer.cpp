@@ -1,13 +1,14 @@
 #include <Entity/EPlayer.h>
 
-#include <System/IOSystem_InputBinds.h>
+#include <Game.h>
 #include <System/RenderSystem.h>
 #include <Renderer/RView.h>
 
 #define GLM_FORCE_RADIANS
 #define GLM_DEPTH_ZERO_TO_ONE
 
-#include <System/IOSystem.h>
+#include "Renderer/RWindow.h"
+
 #include <glm/gtc/matrix_transform.hpp>
 
 enum EPlayerActions
@@ -26,19 +27,13 @@ EPlayer::EPlayer(Game& game)
 
 void EPlayer::OnInit()
 {
-	std::array<EKey,4> keys;
-	keys[ePlayerActionForward] = eKey_W;
-	keys[ePlayerActionBackward] = eKey_S;
-	keys[ePlayerActionLeft] = eKey_A;
-	keys[ePlayerActionRight] = eKey_D;
-
-	pIO->BindActions(keys.data(), static_cast<uint32>(keys.size()));
 }
 
 void EPlayer::OnTick(float dt)
 {
 	vec3 moveVec = vec3(0.0f);
-	
+
+	/*
 	if (pIO->IsActionHeld(ePlayerActionForward))
 		moveVec += vec3(1.0f, 0.0f, 0.0f);
 
@@ -50,6 +45,7 @@ void EPlayer::OnTick(float dt)
 
 	if (pIO->IsActionHeld(ePlayerActionRight))
 		moveVec += vec3(0.0f, -1.0f, 0.0f);
+	*/
 
 	glm::normalize(moveVec);
 
@@ -61,9 +57,14 @@ void EPlayer::OnDraw()
 	vec3 eye = position + vec3(0.0, 0.0, 1.8f);
 	mat4 view = glm::lookAt(eye, vec3(0.0f, 0.0f, 1.0f), vec3(0.0f, 0.0f, 1.0f));
 
-	auto windowView = pRender->GetWindowView("main");
-	windowView.second->SetViewTransform(view);
-	windowView.second->SetProjection(0.1f, 128.0f, 120.0f);
+	if (auto pWindow = pGame->GetWin("main"))
+	{
+		if (auto pView = pWindow->GetRenderView())
+		{
+			pView->SetViewTransform(view);
+			pView->SetProjection(0.1f, 128.0f, 120.0f);
+		}
+	}
 }
 
 std::map<std::string, SPropertyInfo> EPlayer::GetPropertyInfo()

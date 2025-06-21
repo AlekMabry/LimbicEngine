@@ -4,7 +4,6 @@
 EEntity::EEntity(Game& game)
 	: enabledEventFlags(0), bPendingKill(false), pGame(&game)
 {
-	pIO = pGame->GetIOSystem();
 	pResource = pGame->GetResourceSystem();
 	pRender = pGame->GetRenderSystem();
 	pWorld = pGame->GetWorldSystem();

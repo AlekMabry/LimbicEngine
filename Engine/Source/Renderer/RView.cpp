@@ -5,8 +5,8 @@
 #include <glm/ext/matrix_clip_space.hpp>
 
 
-RView::RView(RenderSystem* pRenderSystem, RWindow* pRenderWindow, std::function<void()> frameReady)
-	: pR(pRenderSystem), pW(pRenderWindow), frameReadyFunc(std::move(frameReady))
+RView::RView(RenderSystem* pRenderSystem, RWindow* pRenderWindow)
+	: pR(pRenderSystem), pW(pRenderWindow)
 {
 }
 
