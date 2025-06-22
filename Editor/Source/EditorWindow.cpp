@@ -4,7 +4,7 @@
 #include <Game.h>
 
 #include <NodePropertiesWidget.h>
-#include <SceneTree/MapTreeModel.h>
+#include <MapTreeModel.h>
 #include <ViewWidget.h>
 
 EditorWindow::EditorWindow(Game* pGame, QWidget* parent) : QMainWindow(parent), pGame(pGame)

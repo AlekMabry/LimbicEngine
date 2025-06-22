@@ -13,7 +13,6 @@ set(sources
     Source/Game.cpp
     )
 set(system_sources
-    Source/System/IOSystem_GLFW.cpp
     Source/System/RenderSystem.cpp
     Source/System/ResourceSystem.cpp
     Source/System/WorldSystem.cpp 
@@ -28,6 +27,8 @@ set(entity_sources
 set(utility_sources
     )
 set(renderer_sources
+    Source/Renderer/RVR.cpp
+    Source/Renderer/RVRUtil.cpp
     Source/Renderer/RView.cpp
     Source/Renderer/RWindow.cpp
     )
@@ -51,6 +52,8 @@ set(entity_includes
 set(utility_includes
     )
 set(renderer_includes
+    Include/Renderer/RVR.h
+    Include/Renderer/RVRUtil.h
     Include/Renderer/RView.h
     Include/Renderer/RWindow.h
     )
@@ -102,8 +105,9 @@ target_link_libraries(LimbicEngine PUBLIC
 # Privately linked third party libs
 find_package(FBX REQUIRED)
 find_package(RapidJSON REQUIRED)
+find_package(OpenXR REQUIRED)
 target_link_libraries(LimbicEngine PUBLIC
-    FBX::FBX RapidJSON::RapidJSON)
+    FBX::FBX RapidJSON::RapidJSON OpenXR::openxr_loader)
 
 # Copy runtime .dlls of linked libraries
 add_custom_command(TARGET LimbicEngine POST_BUILD

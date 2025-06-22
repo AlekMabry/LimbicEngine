@@ -2,17 +2,14 @@
 Binaries/headers for x64 builds with MSVC 17. Built as shared libraries
 when possible.
 
-Limbic Engine is currently targeting Windows for development, but this
-directory will be updated on release for Linux/Mac support.
-
 ### Externally Installed
 Libraries with installers are not included in this directory, and should be
 downloaded by their installers:
 
 * Vulkan SDK:
-    * Download the latest 1.3.* [Vulkan SDK installer](https://vulkan.lunarg.com/sdk/home#windows).
+    * Download a version >= 1.3 [Vulkan SDK installer](https://vulkan.lunarg.com/sdk/home#windows).
 * Qt6:
-    * Download the latest 6.5.* LTS from the
+    * Download the latest Qt6 from the
       [Qt6 installer](https://www.qt.io/download).
     * Qt Quick components do not need to be installed, this engine uses classic
       Qt Widgets.
@@ -22,6 +19,9 @@ downloaded by their installers:
 * FBX SDK:
     * Download and run the
       [FBX SDK 2020.0.1 VS2017 installer](https://www.autodesk.com/developer-network/platform-technologies/fbx-sdk-2020-0).
+* OpenXR SDK:
+    * Compile the OpenXR SDK from [github.com/KhronosGroup/OpenXR-SDK](https://github.com/KhronosGroup/OpenXR-SDK).
+    * After building, open the solution with elevated Visual Studio, then run the `INSTALL` project.
 
 ### CMake
 The `CMakeLists.txt` for each project uses `find_package()` to link libraries from this
