@@ -4,7 +4,6 @@
 
 #include <glm/ext/matrix_clip_space.hpp>
 
-
 RView::RView(RenderSystem* pRenderSystem, RWindow* pRenderWindow)
 	: pR(pRenderSystem), pW(pRenderWindow)
 {
@@ -198,6 +197,13 @@ void RView::InitGraphicsPipeline()
 
 	VK_CHECK(vkCreatePipelineLayout(pR->device, &pipelineLayoutInfo, nullptr, &pipelineLayout));
 
+	const VkPipelineRenderingCreateInfoKHR pipelineRenderingCreateInfo{
+		.sType = VK_STRUCTURE_TYPE_PIPELINE_RENDERING_CREATE_INFO_KHR,
+		.colorAttachmentCount = 1,
+		.pColorAttachmentFormats = &pW->swapchainImageFormat,
+		.depthAttachmentFormat = pW->depthImageFormat
+	};
+
 	VkGraphicsPipelineCreateInfo pipelineInfo{};
 	pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
 	pipelineInfo.stageCount = 2;
@@ -211,10 +217,11 @@ void RView::InitGraphicsPipeline()
 	pipelineInfo.pColorBlendState = &colorBlending;
 	pipelineInfo.pDynamicState = &dynamicStateCreateInfo;
 	pipelineInfo.layout = pipelineLayout;
-	pipelineInfo.renderPass = pW->renderPass;
+	pipelineInfo.renderPass = nullptr;
 	pipelineInfo.subpass = 0;
 	pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
 	pipelineInfo.basePipelineIndex = -1;	// Used to derive new pipeline from existing
+	pipelineInfo.pNext = &pipelineRenderingCreateInfo;
 
 	VK_CHECK(vkCreateGraphicsPipelines(pR->device, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &graphicsPipeline));
 
@@ -316,37 +323,78 @@ void RView::InitDefaultTextureSampler()
 	VK_CHECK(vkCreateSampler(pR->device, &samplerInfo, nullptr, &textureSampler));
 }
 
-void RView::RecordCommandBuffer(VkCommandBuffer commandBuffer, VkFramebuffer framebuffer, VkExtent2D extent)
+void RView::RecordCommandBuffer(VkCommandBuffer commandBuffer, SSwapchainImageResources& imageResources, VkExtent2D extent)
 {
+	const VkImageMemoryBarrier inputMemoryBarrier{
+	.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
+		.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT,
+		.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED,
+		.newLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
+		.image = imageResources.presentImage,
+		.subresourceRange = {
+			.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+			.baseMipLevel = 0,
+			.levelCount = 1,
+			.baseArrayLayer = 0,
+			.layerCount = 1,
+		}};
+
+	vkCmdPipelineBarrier(commandBuffer,
+		VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,				  // srcStageMask
+		VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,	  // dstStageMask
+		0, 0, nullptr, 0, nullptr,
+		1,						 // imageMemoryBarrierCount
+		&inputMemoryBarrier	 // pImageMemoryBarriers
+	);
+
 	std::array<VkClearValue, 2> clearValues{};
 	clearValues[0].color = {{0.0f, 0.0f, 0.0f, 1.0f}};
 	clearValues[1].depthStencil = {1.0f, 0};
 
-	VkRenderPassBeginInfo renderPassInfo{};
-	renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-	renderPassInfo.renderPass = pW->renderPass;
-	renderPassInfo.framebuffer = framebuffer;
-	renderPassInfo.renderArea.offset = {0, 0};
-	renderPassInfo.renderArea.extent = extent;
-	renderPassInfo.clearValueCount = static_cast<uint32>(clearValues.size());
-	renderPassInfo.pClearValues = clearValues.data();
+	const VkRenderingAttachmentInfoKHR colorAttachmentInfo{
+		.sType = VK_STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO_KHR,
+		.imageView = imageResources.presentImageView,
+		.imageLayout = VK_IMAGE_LAYOUT_ATTACHMENT_OPTIMAL_KHR,
+		.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR,
+		.storeOp = VK_ATTACHMENT_STORE_OP_STORE,
+		.clearValue = clearValues[0],
+	};
 
-	vkCmdBeginRenderPass(commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+	const VkRenderingAttachmentInfoKHR depthAttachmentInfo{
+		.sType = VK_STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO_KHR,
+		.imageView = pW->depthImageView,
+		.imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL,
+		.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR,
+		.storeOp = VK_ATTACHMENT_STORE_OP_STORE,
+		.clearValue = clearValues[1],
+	};
+
+	const VkRect2D renderArea = {
+		.offset = {0, 0},
+		.extent = extent
+	};
+
+	const VkRenderingInfoKHR renderInfo{
+		.sType = VK_STRUCTURE_TYPE_RENDERING_INFO_KHR,
+		.renderArea = renderArea,
+		.layerCount = 1,
+		.colorAttachmentCount = 1,
+		.pColorAttachments = &colorAttachmentInfo,
+		.pDepthAttachment = &depthAttachmentInfo
+	};
+
+	vkCmdBeginRendering(commandBuffer, &renderInfo);
 	vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline);
 
 	VkViewport viewport{};
 	viewport.x = 0.0f;
 	viewport.y = 0.0f;
-	viewport.width = static_cast<float>(renderPassInfo.renderArea.extent.width);
-	viewport.height = static_cast<float>(renderPassInfo.renderArea.extent.height);
+	viewport.width = static_cast<float>(renderArea.extent.width);
+	viewport.height = static_cast<float>(renderArea.extent.height);
 	viewport.minDepth = 0.0f;
 	viewport.maxDepth = 1.0f;
 	vkCmdSetViewport(commandBuffer, 0, 1, &viewport);
-
-	VkRect2D scissor{};
-	scissor.offset = {0, 0};
-	scissor.extent = renderPassInfo.renderArea.extent;
-	vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
+	vkCmdSetScissor(commandBuffer, 0, 1, &renderArea);
 
 	for (size_t i = 0; i < pR->drawStaticCommands.size(); i++)
 	{
@@ -366,7 +414,29 @@ void RView::RecordCommandBuffer(VkCommandBuffer commandBuffer, VkFramebuffer fra
 		vkCmdDrawIndexed(commandBuffer, pR->meshes[pR->drawStaticCommands[i].mesh].indices, 1, 0, 0, 0);
 	}
 
-	vkCmdEndRenderPass(commandBuffer);
+	vkCmdEndRendering(commandBuffer);
+
+	const VkImageMemoryBarrier imageMemoryBarrier{
+		.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
+		.srcAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT,
+		.oldLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
+		.newLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
+		.image = imageResources.presentImage,
+		.subresourceRange = {
+			.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+			.baseMipLevel = 0,
+			.levelCount = 1,
+			.baseArrayLayer = 0,
+			.layerCount = 1,
+		}};
+
+	vkCmdPipelineBarrier(commandBuffer,
+		VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,	  // srcStageMask
+		VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT,			  // dstStageMask
+		0, 0, nullptr, 0, nullptr,
+		1,						 // imageMemoryBarrierCount
+		&imageMemoryBarrier	   // pImageMemoryBarriers
+	);
 }
 
 mat4 RView::GetCameraMat()

@@ -7,6 +7,7 @@
 
 #include <functional>
 
+struct SSwapchainImageResources;
 class RenderSystem;
 class RWindow;
 
@@ -33,7 +34,7 @@ public:
 	void InitDescriptorPool();
 	void InitDescriptorSetLayout();
 	void InitDefaultTextureSampler();
-	void RecordCommandBuffer(VkCommandBuffer commandBuffer, VkFramebuffer framebuffer, VkExtent2D extent);
+	void RecordCommandBuffer(VkCommandBuffer commandBuffer, SSwapchainImageResources& imageResources, VkExtent2D extent);
 
 protected:
 	RenderSystem *pR;

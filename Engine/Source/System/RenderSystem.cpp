@@ -123,7 +123,7 @@ void RenderSystem::InitInstance(const char* applicationName)
 	appInfo.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
 	appInfo.pEngineName = "Limbic Engine";
 	appInfo.engineVersion = VK_MAKE_VERSION(1, 0, 0);
-	appInfo.apiVersion = VK_API_VERSION_1_2;
+	appInfo.apiVersion = VK_API_VERSION_1_3;
 
 	VkInstanceCreateInfo createInfo{};
 	createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
@@ -697,6 +697,10 @@ void RenderSystem::InitDevice(const std::vector<const char*>& extensions)
 
 	VkPhysicalDeviceFeatures deviceFeatures{};
 
+	VkPhysicalDeviceDynamicRenderingFeatures dynamicRenderingFeature = {};
+	dynamicRenderingFeature.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DYNAMIC_RENDERING_FEATURES;
+	dynamicRenderingFeature.dynamicRendering = VK_TRUE;
+
 	VkDeviceCreateInfo deviceCreateInfo{};
 	deviceCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
 	deviceCreateInfo.pQueueCreateInfos = queueCreateInfos.data();
@@ -704,8 +708,9 @@ void RenderSystem::InitDevice(const std::vector<const char*>& extensions)
 	deviceCreateInfo.pEnabledFeatures = &deviceFeatures;
 	deviceCreateInfo.enabledExtensionCount = static_cast<uint32>(extensions.size());
 	deviceCreateInfo.ppEnabledExtensionNames = extensions.data();
+	deviceCreateInfo.pNext = &dynamicRenderingFeature;
 
-	// For Vulkan support < 1.3 that still makes a distrinction between device and validation layers.
+	// For Vulkan support < 1.3 that still makes a distinction between device and validation layers.
 	if (bEnableValidationLayers)
 	{
 		deviceCreateInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());

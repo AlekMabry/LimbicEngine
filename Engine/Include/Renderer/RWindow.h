@@ -40,7 +40,6 @@ struct SSwapchainImageResources
 	VkImageView pbrColorImageView;
 	VkImage presentImage;
 	VkImageView presentImageView;
-	VkFramebuffer framebuffer;
 	VkSemaphore drawCompleteSemaphore;		/// Signaled by completed draw call
 };
 
@@ -94,8 +93,6 @@ protected:
 
 	void CreateDepthbuffer();
 
-	void CreateFramebuffers();
-
 	void DestroySwapchain();
 
 	void CreateSyncObjects();
@@ -103,8 +100,6 @@ protected:
 	void DestroySyncObjects();
 
 	void RecreateSwapchain();
-
-	void CreateRenderPass();
 
 	/**** Option picking utilities. ****/
 
@@ -117,7 +112,6 @@ protected:
 	SSwapChainSupportDetails QuerySwapChainSupport(VkPhysicalDevice device);
 
 	VkSurfaceKHR surface;
-	VkRenderPass renderPass;
 
 	VkSwapchainKHR swapchain;
 	VkFormat swapchainImageFormat;
